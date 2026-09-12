@@ -1,0 +1,238 @@
+import React, { useState, useRef, useCallback } from 'react';
+import { LabBench } from './components/bench/LabBench';
+import { LabNotebook } from './components/notebook/LabNotebook';
+import { MeniscusLoupeModal } from './components/inspection/MeniscusLoupeModal';
+import { AuditModal } from './components/feedback/AuditModal';
+import { ProcedureEngine } from './engine/procedureFsm';
+import { evaluateBenchEquilibrium } from './engine/equilibrium';
+import { PRACTICE_4_CONFIG } from './data/practiceConfig';
+import { FlaskConical, BookOpen, ShieldCheck, ChevronUp } from 'lucide-react';
+
+export const App: React.FC = () => {
+  // Parámetros de la sesión aleatorizados para el estudiante:
+  // Masa nominal de KHP: entre 0.2050 y 0.2350 g
+  // Normalidad verdadera de NaOH: entre 0.0985 y 0.1035 N
+  const [sampleMass] = useState<number>(() => Number((0.2150 + (Math.random() - 0.5) * 0.02).toFixed(4)));
+  const [trueNormality] = useState<number>(() => Number((0.1015 + (Math.random() - 0.5) * 0.006).toFixed(4)));
+
+  // Instancia de la Máquina de Estados Procedimental (TDA)
+  const engineRef = useRef<ProcedureEngine>(new ProcedureEngine());
+
+  // Estado reactivo de la simulación
+  const [deliveredMl, setDeliveredMl] = useState<number>(0);
+  const [isStopcockOpen, setIsStopcockOpen] = useState<boolean>(false);
+  const [flowRate, setFlowRate] = useState<'dropwise' | 'fast' | 'closed'>('dropwise');
+  const [indicatorDrops, setIndicatorDrops] = useState<number>(0);
+  const [isBubblePurged, setIsBubblePurged] = useState<boolean>(false);
+  const [isStirring, setIsStirring] = useState<boolean>(true);
+
+  // Lecturas registradas transferidas a la libreta
+  const [recordedV0, setRecordedV0] = useState<number>(0);
+  const [recordedVf, setRecordedVf] = useState<number>(0);
+
+  // Modales y vistas
+  const [isLoupeOpen, setIsLoupeOpen] = useState<boolean>(false);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState<boolean>(false);
+  const [isMobileNotebookOpen, setIsMobileNotebookOpen] = useState<boolean>(false);
+
+  // Evaluación físico-química del punto instantáneo (pH y color del erlenmeyer)
+  const equilibrium = evaluateBenchEquilibrium(
+    sampleMass,
+    PRACTICE_4_CONFIG.primaryStandard.equivalentWeight,
+    trueNormality,
+    deliveredMl,
+    indicatorDrops
+  );
+
+  // Manejo de titulación continua a 60 FPS
+  const handleTickTitration = useCallback((deltaMl: number) => {
+    setDeliveredMl((prev) => {
+      const next = Number((prev + deltaMl).toFixed(3));
+      if (next >= 50) {
+        setIsStopcockOpen(false);
+        return 50;
+      }
+      return next;
+    });
+
+    engineRef.current.onTitrationStarted();
+
+    if (equilibrium.endpointQuality !== 'none') {
+      engineRef.current.onEndpointReached(equilibrium.endpointQuality);
+    }
+  }, [equilibrium.endpointQuality]);
+
+  const handleToggleStopcock = () => {
+    setIsStopcockOpen((prev) => !prev);
+  };
+
+  const handlePurgeBubble = () => {
+    engineRef.current.purgeBuretteBubble();
+    setIsBubblePurged(true);
+  };
+
+  const handleAddIndicator = () => {
+    engineRef.current.addIndicatorDrop();
+    setIndicatorDrops((prev) => Math.min(5, prev + 1));
+  };
+
+  const handleToggleStirring = () => {
+    const active = engineRef.current.toggleStirring();
+    setIsStirring(active);
+  };
+
+  const handleParallaxChanged = (degrees: number) => {
+    engineRef.current.setParallaxAngle(degrees);
+  };
+
+  const handleTransferReading = (vol: number, target: 'initial' | 'final') => {
+    if (target === 'initial') {
+      setRecordedV0(vol);
+      engineRef.current.completeMilestone('MS_MENISCUS_ALIGNED');
+    } else {
+      setRecordedVf(vol);
+      engineRef.current.completeMilestone('MS_FINAL_READING');
+    }
+  };
+
+  const handleResetBench = () => {
+    engineRef.current = new ProcedureEngine();
+    setDeliveredMl(0);
+    setIsStopcockOpen(false);
+    setFlowRate('dropwise');
+    setIndicatorDrops(0);
+    setIsBubblePurged(false);
+    setIsStirring(true);
+    setRecordedV0(0);
+    setRecordedVf(0);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased">
+      {/* Barra de Navegación Superior */}
+      <header className="h-14 px-4 sm:px-6 bg-slate-900 border-b border-slate-800 flex items-center justify-between z-30 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-600/20 border border-blue-500/40 rounded-xl text-blue-400">
+            <FlaskConical size={20} />
+          </div>
+          <div>
+            <h1 className="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
+              <span>Simulador de Laboratorio: Química Analítica Cuantitativa</span>
+              <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full font-mono">
+                UMSS 5to Semestre
+              </span>
+            </h1>
+            <p className="text-[11px] text-slate-400 hidden sm:block">
+              Práctica 4: Estandarización de NaOH 0.1 N con Biftalato de Potasio y Fenolftaleína
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsAuditModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 rounded-xl text-xs font-semibold shadow transition-all"
+          >
+            <ShieldCheck size={16} />
+            <span className="hidden sm:inline">Auditoría Tríada Digital</span>
+            <span className="sm:hidden">Auditoría</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Contenedor Principal con Layout Responsivo */}
+      <main className="flex-1 p-3 sm:p-5 flex flex-col lg:flex-row gap-4 overflow-hidden relative">
+        {/* Mesada Virtual 2D (60% en desktop, 100% en móvil) */}
+        <section className="flex-1 h-[calc(100vh-5rem)] min-h-[560px]">
+          <LabBench
+            currentDeliveredMl={deliveredMl}
+            isStopcockOpen={isStopcockOpen}
+            flowRate={flowRate}
+            hasBubble={!isBubblePurged}
+            indicatorDrops={indicatorDrops}
+            isBubblePurged={isBubblePurged}
+            isStirring={isStirring}
+            equilibrium={equilibrium}
+            onToggleStopcock={handleToggleStopcock}
+            onSetFlowRate={setFlowRate}
+            onOpenLoupe={() => setIsLoupeOpen(true)}
+            onAddIndicator={handleAddIndicator}
+            onPurgeBubble={handlePurgeBubble}
+            onToggleStirring={handleToggleStirring}
+            onResetBench={handleResetBench}
+            onTickTitration={handleTickTitration}
+          />
+        </section>
+
+        {/* Libreta de Laboratorio Digital (Desktop: 40% fijo al costado) */}
+        <section className="hidden lg:block w-[420px] h-[calc(100vh-5rem)] shrink-0">
+          <LabNotebook
+            initialVolume={recordedV0}
+            finalVolume={recordedVf}
+            sampleMass={sampleMass}
+            trueNormality={trueNormality}
+            defects={engineRef.current.getState().defects}
+            onOpenAuditModal={() => setIsAuditModalOpen(true)}
+          />
+        </section>
+
+        {/* Botón Flotante en Móviles para abrir la Libreta (Bottom Sheet) */}
+        <div className="lg:hidden fixed bottom-4 right-4 z-40">
+          <button
+            onClick={() => setIsMobileNotebookOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-full shadow-2xl border border-blue-400 active:scale-95 transition-all"
+          >
+            <BookOpen size={16} />
+            <span>Abrir Libreta de Laboratorio</span>
+            <ChevronUp size={16} />
+          </button>
+        </div>
+
+        {/* Cajón Deslizable Inferior (Bottom Sheet) para Smartphones */}
+        {isMobileNotebookOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-sm animate-in fade-in">
+            <div className="h-[80vh] w-full bg-slate-900 rounded-t-3xl border-t border-slate-700 shadow-2xl overflow-hidden flex flex-col">
+              <div className="p-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
+                <span className="text-xs font-bold text-slate-200">Libreta de Laboratorio</span>
+                <button
+                  onClick={() => setIsMobileNotebookOpen(false)}
+                  className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold text-slate-300"
+                >
+                  Volver a Mesada ✕
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                <LabNotebook
+                  initialVolume={recordedV0}
+                  finalVolume={recordedVf}
+                  sampleMass={sampleMass}
+                  trueNormality={trueNormality}
+                  defects={engineRef.current.getState().defects}
+                  onOpenAuditModal={() => setIsAuditModalOpen(true)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Modales de Inspección y Auditoría */}
+      <MeniscusLoupeModal
+        isOpen={isLoupeOpen}
+        currentActualVolumeMl={deliveredMl}
+        initialReadingRecorded={recordedV0 > 0}
+        onClose={() => setIsLoupeOpen(false)}
+        onTransferReading={handleTransferReading}
+        onParallaxChanged={handleParallaxChanged}
+      />
+
+      <AuditModal
+        isOpen={isAuditModalOpen}
+        defects={engineRef.current.getState().defects}
+        onClose={() => setIsAuditModalOpen(false)}
+      />
+    </div>
+  );
+};
+
+export default App;
