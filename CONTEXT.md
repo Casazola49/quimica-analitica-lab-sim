@@ -31,3 +31,16 @@ _Avoid_: Mensaje de error genérico, pista
 **Especificación Curricular Canónica**:
 Ontología JSON formal (`data/curriculum_spec.json`) que define las 13 prácticas de laboratorio con sus objetivos, reactivos, instrumental, reacciones químicas, fórmulas de cálculo y referencias bibliográficas.
 _Avoid_: Configuración de prácticas, archivo de datos
+
+**Hito Procedimental (Milestone)**:
+Punto de control experimental observable en la mesada (ej. carga de bureta, enrase verificado, alícuota descargada, indicador añadido, punto final detectado) que marca el avance del protocolo.
+_Avoid_: Nivel, paso obligatorio bloqueante
+
+**Auditoría de Defectos de Técnica (TDA)**:
+Subsistema evaluador que rastrea desviaciones de buenas prácticas analíticas (burbujas no purgadas, soplado de pipeta aforada, error de paralaje, sobretitulación) y propaga su efecto físico a las lecturas del simulador.
+_Avoid_: Sistema de penalización de juego, detector de trampas
+
+**Defecto de Técnica Analítica**:
+Acción incorrecta o incompleta del estudiante con impacto metrológico cuantificable en las mediciones de volumen o masa.
+_Avoid_: Error de clic, bug de usuario
+
