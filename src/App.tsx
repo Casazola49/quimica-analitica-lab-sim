@@ -5,12 +5,16 @@ import { MeniscusLoupeModal } from './components/inspection/MeniscusLoupeModal';
 import { AuditModal } from './components/feedback/AuditModal';
 import { MaterialSelectionModal } from './components/preparation/MaterialSelectionModal';
 import { LabGuideModal } from './components/guide/LabGuideModal';
+import { PracticeSelectorModal } from './components/navigation/PracticeSelectorModal';
 import { ProcedureEngine } from './engine/procedureFsm';
 import { evaluateBenchEquilibrium } from './engine/equilibrium';
 import { PRACTICE_4_CONFIG } from './data/practiceConfig';
-import { FlaskConical, BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle } from 'lucide-react';
+import { FlaskConical, BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle, Layers } from 'lucide-react';
 
 export const App: React.FC = () => {
+  // Práctica actualmente seleccionada (por defecto P4: Estandarización de NaOH)
+  const [currentPracticeNumber, setCurrentPracticeNumber] = useState<number>(4);
+
   // Parámetros de la sesión aleatorizados para el estudiante:
   // Masa nominal de KHP: entre 0.2050 y 0.2350 g
   // Normalidad verdadera de NaOH: entre 0.0985 y 0.1035 N
@@ -40,6 +44,7 @@ export const App: React.FC = () => {
   const [isAuditModalOpen, setIsAuditModalOpen] = useState<boolean>(false);
   const [isMaterialsModalOpen, setIsMaterialsModalOpen] = useState<boolean>(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState<boolean>(false);
+  const [isPracticeSelectorOpen, setIsPracticeSelectorOpen] = useState<boolean>(false);
   const [isMobileNotebookOpen, setIsMobileNotebookOpen] = useState<boolean>(false);
 
   // Evaluación físico-química del punto instantáneo (pH y color del erlenmeyer)
@@ -114,28 +119,46 @@ export const App: React.FC = () => {
     setRecordedVf(0);
   };
 
+  const handleSelectPractice = (practiceNum: number) => {
+    setCurrentPracticeNumber(practiceNum);
+    handleResetBench();
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased">
       {/* Barra de Navegación Superior */}
       <header className="h-14 px-3 sm:px-6 bg-slate-900 border-b border-slate-800 flex items-center justify-between z-30 shrink-0">
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="p-2 bg-blue-600/20 border border-blue-500/40 rounded-xl text-blue-400">
             <FlaskConical size={18} />
           </div>
           <div>
             <h1 className="text-xs sm:text-base font-bold text-slate-100 flex items-center gap-1.5 sm:gap-2">
-              <span className="truncate max-w-[200px] sm:max-w-none">Simulador de Laboratorio: Química Analítica</span>
+              <span className="truncate max-w-[170px] sm:max-w-none">Simulador de Laboratorio: Química Analítica</span>
               <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full font-mono hidden md:inline">
                 UMSS 5to Semestre
               </span>
             </h1>
             <p className="text-[10px] sm:text-[11px] text-slate-400 hidden sm:block">
-              Práctica 4: Estandarización de NaOH 0.1 N con Biftalato de Potasio y Fenolftaleína
+              {currentPracticeNumber === 4
+                ? 'Práctica 4: Estandarización de NaOH 0.1 N con Biftalato de Potasio'
+                : `Práctica ${currentPracticeNumber}: Volumetría Ácido-Base`}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Botón Selector de las 13 Prácticas */}
+          <button
+            onClick={() => setIsPracticeSelectorOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
+            title="Ver catálogo de las 13 prácticas del plan de estudios"
+          >
+            <Layers size={15} className="text-blue-400" />
+            <span className="hidden sm:inline">Prácticas (13)</span>
+            <span className="sm:hidden">P{currentPracticeNumber}</span>
+          </button>
+
           {/* Botón Guía Oficial */}
           <button
             onClick={() => setIsGuideModalOpen(true)}
@@ -268,7 +291,7 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Modales de Inspección, Materiales, Guía y Auditoría */}
+      {/* Modales de Inspección, Materiales, Guía, Selector de Prácticas y Auditoría */}
       <MeniscusLoupeModal
         isOpen={isLoupeOpen}
         currentActualVolumeMl={deliveredMl}
@@ -289,6 +312,13 @@ export const App: React.FC = () => {
       <LabGuideModal
         isOpen={isGuideModalOpen}
         onClose={() => setIsGuideModalOpen(false)}
+      />
+
+      <PracticeSelectorModal
+        isOpen={isPracticeSelectorOpen}
+        currentPracticeNumber={currentPracticeNumber}
+        onClose={() => setIsPracticeSelectorOpen(false)}
+        onSelectPractice={handleSelectPractice}
       />
 
       <AuditModal
