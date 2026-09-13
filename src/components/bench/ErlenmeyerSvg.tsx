@@ -30,8 +30,12 @@ export const ErlenmeyerSvg: React.FC<ErlenmeyerSvgProps> = ({
   const vortexDepth = isStirring ? 14 : 3;
 
   return (
-    <div className="relative flex flex-col items-center select-none -mt-4">
-      <svg width="220" height="200" viewBox="0 0 220 200" className="overflow-visible">
+    <div className="relative flex flex-col items-center select-none -mt-2 shrink min-h-0">
+      <svg
+        viewBox="0 0 220 200"
+        className="h-[18vh] min-h-[120px] max-h-[175px] w-auto overflow-visible select-none shrink"
+        preserveAspectRatio="xMidYMid meet"
+      >
         <defs>
           {/* Sombra de la base del erlenmeyer */}
           <radialGradient id="baseShadow" cx="50%" cy="50%" r="50%">

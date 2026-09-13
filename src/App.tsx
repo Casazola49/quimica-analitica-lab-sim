@@ -128,18 +128,20 @@ export const App: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased">
       {/* Barra de Navegación Superior */}
       <header className="h-14 px-3 sm:px-6 bg-slate-900 border-b border-slate-800 flex items-center justify-between z-30 shrink-0">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="p-2 bg-blue-600/20 border border-blue-500/40 rounded-xl text-blue-400">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="p-2 bg-blue-600/20 border border-blue-500/40 rounded-xl text-blue-400 shrink-0">
             <FlaskConical size={18} />
           </div>
-          <div>
-            <h1 className="text-xs sm:text-base font-bold text-slate-100 flex items-center gap-1.5 sm:gap-2">
-              <span className="truncate max-w-[170px] sm:max-w-none">Simulador de Laboratorio: Química Analítica</span>
-              <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full font-mono hidden md:inline">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-xs sm:text-base font-bold text-slate-100 truncate">
+                Simulador de Laboratorio: Química Analítica
+              </h1>
+              <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full font-mono shrink-0 hidden md:inline">
                 UMSS 5to Semestre
               </span>
-            </h1>
-            <p className="text-[10px] sm:text-[11px] text-slate-400 hidden sm:block">
+            </div>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 truncate hidden sm:block">
               {currentPracticeNumber === 4
                 ? 'Práctica 4: Estandarización de NaOH 0.1 N con Biftalato de Potasio'
                 : `Práctica ${currentPracticeNumber}: Volumetría Ácido-Base`}
@@ -216,9 +218,9 @@ export const App: React.FC = () => {
       )}
 
       {/* Contenedor Principal con Layout Responsivo */}
-      <main className="flex-1 p-3 sm:p-5 flex flex-col lg:flex-row gap-4 overflow-hidden relative">
+      <main className="flex-1 p-2.5 sm:p-4 flex flex-col lg:flex-row gap-3 sm:gap-4 overflow-hidden min-h-0 relative">
         {/* Mesada Virtual 2D (60% en desktop, 100% en móvil) */}
-        <section className="flex-1 h-[calc(100vh-5rem)] min-h-[560px]">
+        <section className="flex-1 h-full min-h-0 flex flex-col">
           <LabBench
             currentDeliveredMl={deliveredMl}
             isStopcockOpen={isStopcockOpen}
@@ -240,7 +242,7 @@ export const App: React.FC = () => {
         </section>
 
         {/* Libreta de Laboratorio Digital (Desktop: 40% fijo al costado) */}
-        <section className="hidden lg:block w-[420px] h-[calc(100vh-5rem)] shrink-0">
+        <section className="hidden lg:flex flex-col w-[380px] xl:w-[420px] h-full min-h-0 shrink-0">
           <LabNotebook
             initialVolume={recordedV0}
             finalVolume={recordedVf}

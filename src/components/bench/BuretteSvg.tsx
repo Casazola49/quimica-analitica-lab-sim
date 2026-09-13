@@ -32,15 +32,16 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
   const liquidY = topY + 15 + (Math.min(maxVolumeDisplayed, currentDeliveredMl) / maxVolumeDisplayed) * (tubeHeight - 35);
 
   return (
-    <div className="relative flex flex-col items-center select-none">
+    <div className="relative flex flex-col items-center select-none shrink min-h-0">
       {/* Botón flotante para abrir la Lupa de Menisco */}
       <button
         onClick={onOpenLoupe}
-        className="absolute top-8 -right-16 z-20 flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-600/90 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-lg border border-blue-400/40 backdrop-blur transition-all active:scale-95"
+        className="absolute top-2 -right-14 z-20 flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-600/90 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-lg border border-blue-400/40 backdrop-blur transition-all active:scale-95"
         title="Inspeccionar menisco con aumento 4x"
       >
-        <ZoomIn size={15} />
-        <span>Lupa Menisco</span>
+        <ZoomIn size={14} />
+        <span className="hidden sm:inline">Lupa Menisco</span>
+        <span className="sm:hidden">Lupa</span>
       </button>
 
       {/* Alerta sutil si hay burbuja en el pico */}
@@ -51,7 +52,11 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
         </div>
       )}
 
-      <svg width="180" height="490" viewBox="0 0 180 490" className="overflow-visible">
+      <svg
+        viewBox="0 0 180 490"
+        className="h-[34vh] min-h-[220px] max-h-[340px] w-auto overflow-visible select-none shrink"
+        preserveAspectRatio="xMidYMid meet"
+      >
         <defs>
           {/* Gradiente de vidrio para la bureta */}
           <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="0%">
