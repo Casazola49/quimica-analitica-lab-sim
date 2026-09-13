@@ -5,20 +5,24 @@ interface ErlenmeyerSvgProps {
   liquidColorRgba: string;
   volumeAddedMl: number;
   initialVolumeMl: number; // 50 mL de disolución inicial
+  isSampleDissolved: boolean; // si ya se preparó la disolución de KHP
   isStirring: boolean;
   hasIndicator: boolean;
   pH: number;
   onToggleStirring: () => void;
+  onOpenBalanceModal?: () => void;
 }
 
 export const ErlenmeyerSvg: React.FC<ErlenmeyerSvgProps> = ({
   liquidColorRgba,
   volumeAddedMl,
   initialVolumeMl,
+  isSampleDissolved,
   isStirring,
   hasIndicator,
   pH,
   onToggleStirring,
+  onOpenBalanceModal,
 }) => {
   const currentTotalMl = initialVolumeMl + volumeAddedMl;
   // Mapeo de volumen (50 mL a 80 mL) a altura del líquido dentro del matraz
@@ -68,53 +72,73 @@ export const ErlenmeyerSvg: React.FC<ErlenmeyerSvgProps> = ({
 
         {/* 2. Cuerpo del Matraz Erlenmeyer de 250 mL */}
         <g id="flaskBody">
-          {/* Líquido coloreado recortado con la máscara cónica */}
-          <g clipPath="url(#flaskClip)">
-            {/* Masa de líquido con transición de color fluida */}
-            <rect
-              x="20"
-              y={fillLevelY}
-              width="180"
-              height={185 - fillLevelY}
-              fill={liquidColorRgba}
-              className="transition-colors duration-300"
-            />
+          {/* Líquido coloreado recortado con la máscara cónica (solo si la muestra fue disuelta) */}
+          {isSampleDissolved ? (
+            <g clipPath="url(#flaskClip)">
+              {/* Masa de líquido con transición de color fluida */}
+              <rect
+                x="20"
+                y={fillLevelY}
+                width="180"
+                height={185 - fillLevelY}
+                fill={liquidColorRgba}
+                className="transition-colors duration-300"
+              />
 
-            {/* Superficie libre del líquido con curvatura de menisco o depresión por vórtice */}
-            <path
-              d={`M 30 ${fillLevelY} Q 110 ${fillLevelY + vortexDepth} 190 ${fillLevelY} L 190 ${fillLevelY + 2} Q 110 ${fillLevelY + vortexDepth + 2} 30 ${fillLevelY + 2} Z`}
-              fill="rgba(255, 255, 255, 0.45)"
-            />
+              {/* Superficie libre del líquido con curvatura de menisco o depresión por vórtice */}
+              <path
+                d={`M 30 ${fillLevelY} Q 110 ${fillLevelY + vortexDepth} 190 ${fillLevelY} L 190 ${fillLevelY + 2} Q 110 ${fillLevelY + vortexDepth + 2} 30 ${fillLevelY + 2} Z`}
+                fill="rgba(255, 255, 255, 0.45)"
+              />
 
-            {/* Espiral interna y ondas del vórtice cuando está en agitación constante */}
-            {isStirring && (
-              <g opacity="0.6">
-                {/* Remolino cónico descendente */}
-                <path
-                  d={`M 104 ${fillLevelY + 2} Q 110 ${fillLevelY + 14} 116 ${fillLevelY + 2} Q 110 ${fillLevelY + 24} 107 ${fillLevelY + 36}`}
-                  stroke="rgba(255,255,255,0.7)"
-                  strokeWidth="1.8"
-                  fill="none"
-                  strokeLinecap="round"
-                  className="animate-pulse"
-                />
-                <path
-                  d={`M 108 ${fillLevelY + 8} Q 110 ${fillLevelY + 18} 112 ${fillLevelY + 28}`}
-                  stroke="rgba(255,255,255,0.5)"
-                  strokeWidth="1.2"
-                  fill="none"
-                />
-                {/* Microburbujas generadas por la agitación en el seno del líquido */}
-                <circle cx="102" cy={fillLevelY + 22} r="1" fill="#ffffff" opacity="0.8" />
-                <circle cx="118" cy={fillLevelY + 28} r="1.2" fill="#ffffff" opacity="0.7" />
-                <circle cx="98" cy={fillLevelY + 35} r="0.8" fill="#ffffff" opacity="0.6" />
+              {/* Espiral interna y ondas del vórtice cuando está en agitación constante */}
+              {isStirring && (
+                <g opacity="0.6">
+                  {/* Remolino cónico descendente */}
+                  <path
+                    d={`M 104 ${fillLevelY + 2} Q 110 ${fillLevelY + 14} 116 ${fillLevelY + 2} Q 110 ${fillLevelY + 24} 107 ${fillLevelY + 36}`}
+                    stroke="rgba(255,255,255,0.7)"
+                    strokeWidth="1.8"
+                    fill="none"
+                    strokeLinecap="round"
+                    className="animate-pulse"
+                  />
+                  <path
+                    d={`M 108 ${fillLevelY + 8} Q 110 ${fillLevelY + 18} 112 ${fillLevelY + 28}`}
+                    stroke="rgba(255,255,255,0.5)"
+                    strokeWidth="1.2"
+                    fill="none"
+                  />
+                  {/* Microburbujas generadas por la agitación en el seno del líquido */}
+                  <circle cx="102" cy={fillLevelY + 22} r="1" fill="#ffffff" opacity="0.8" />
+                  <circle cx="118" cy={fillLevelY + 28} r="1.2" fill="#ffffff" opacity="0.7" />
+                  <circle cx="98" cy={fillLevelY + 35} r="0.8" fill="#ffffff" opacity="0.6" />
+                </g>
+              )}
+
+              {/* Barra magnética de teflón (Pez magnético) en el fondo del matraz */}
+              <g transform="translate(110, 175)">
+                <g className={isStirring ? 'animate-stir-bar' : ''}>
+                  <rect
+                    x="-12"
+                    y="-3"
+                    width="24"
+                    height="6"
+                    rx="3"
+                    fill="url(#teflonGrad)"
+                    stroke="#64748b"
+                    strokeWidth="0.8"
+                    filter="drop-shadow(0 1px 2px rgba(0,0,0,0.3))"
+                  />
+                  <line x1="0" y1="-3" x2="0" y2="3" stroke="#94a3b8" strokeWidth="1" />
+                </g>
               </g>
-            )}
-
-            {/* Barra magnética de teflón (Pez magnético) en el fondo del matraz */}
-            <g transform="translate(110, 175)">
-              <g className={isStirring ? 'animate-stir-bar' : ''}>
-                {/* Forma de cápsula cilíndrica de teflón blanca */}
+            </g>
+          ) : (
+            // Matraz vacío antes de transferir muestra
+            <g clipPath="url(#flaskClip)">
+              {/* Pez de teflón en el fondo seco */}
+              <g transform="translate(110, 175)">
                 <rect
                   x="-12"
                   y="-3"
@@ -124,13 +148,10 @@ export const ErlenmeyerSvg: React.FC<ErlenmeyerSvgProps> = ({
                   fill="url(#teflonGrad)"
                   stroke="#64748b"
                   strokeWidth="0.8"
-                  filter="drop-shadow(0 1px 2px rgba(0,0,0,0.3))"
                 />
-                {/* Anillo central estabilizador de la barra */}
-                <line x1="0" y1="-3" x2="0" y2="3" stroke="#94a3b8" strokeWidth="1" />
               </g>
             </g>
-          </g>
+          )}
 
           {/* Vidrio exterior del matraz (boca esmerilada, cuello recto y cono) */}
           <path
@@ -168,28 +189,39 @@ export const ErlenmeyerSvg: React.FC<ErlenmeyerSvgProps> = ({
 
       {/* Panel de control de agitación y lecturas instantáneas */}
       <div className="flex items-center gap-2.5 mt-1 text-xs">
-        <button
-          onClick={onToggleStirring}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border font-medium transition-all shadow-sm active:scale-95 ${
-            isStirring
-              ? 'bg-emerald-950/70 border-emerald-500 text-emerald-300 shadow-emerald-950/50'
-              : 'bg-slate-800 border-slate-600 text-slate-400 hover:text-slate-200'
-          }`}
-          title="Conmutar agitación magnética continua"
-        >
-          <Waves size={14} className={isStirring ? 'text-emerald-400 animate-pulse' : ''} />
-          <span>{isStirring ? 'Agitación: 450 RPM (Vórtice)' : 'Agitación: Detenida'}</span>
-        </button>
+        {isSampleDissolved ? (
+          <>
+            <button
+              onClick={onToggleStirring}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border font-medium transition-all shadow-sm active:scale-95 ${
+                isStirring
+                  ? 'bg-emerald-950/70 border-emerald-500 text-emerald-300 shadow-emerald-950/50'
+                  : 'bg-slate-800 border-slate-600 text-slate-400 hover:text-slate-200'
+              }`}
+              title="Conmutar agitación magnética continua"
+            >
+              <Waves size={14} className={isStirring ? 'text-emerald-400 animate-pulse' : ''} />
+              <span>{isStirring ? 'Agitación: 450 RPM (Vórtice)' : 'Agitación: Detenida'}</span>
+            </button>
 
-        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/90 border border-slate-700 rounded-xl text-slate-300 font-mono">
-          <span className="text-slate-400 text-[11px]">pH:</span>
-          <span className="font-bold text-amber-300 text-xs">{pH.toFixed(2)}</span>
-        </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/90 border border-slate-700 rounded-xl text-slate-300 font-mono">
+              <span className="text-slate-400 text-[11px]">pH:</span>
+              <span className="font-bold text-amber-300 text-xs">{pH.toFixed(2)}</span>
+            </div>
 
-        {!hasIndicator && (
-          <span className="text-[11px] text-rose-400 font-semibold px-2 py-0.5 bg-rose-950/40 border border-rose-800/40 rounded-lg animate-pulse">
-            ⚠️ Sin indicador
-          </span>
+            {!hasIndicator && (
+              <span className="text-[11px] text-rose-400 font-semibold px-2 py-0.5 bg-rose-950/40 border border-rose-800/40 rounded-lg animate-pulse">
+                ⚠️ Sin indicador
+              </span>
+            )}
+          </>
+        ) : (
+          <button
+            onClick={onOpenBalanceModal}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold rounded-xl border border-purple-400 shadow-lg text-xs transition-all animate-pulse"
+          >
+            <span>Matraz vacío: Pesar KHP en Balanza Analítica ➔</span>
+          </button>
         )}
       </div>
     </div>

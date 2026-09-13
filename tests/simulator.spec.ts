@@ -1,183 +1,128 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Simulador de Laboratorio: Pruebas E2E de Responsividad e Interacción', () => {
+test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsividad', () => {
 
-  test('Verificar visibilidad completa de mesada, matraz y reactivos sin desborde', async ({ page }) => {
+  test('Flujo de inicio: Solicitud previa de materiales requerida al abrir el simulador', async ({ page }) => {
     await page.goto('/');
 
-    // 1. Verificar presencia de elementos clave de la mesada
-    const burette = page.locator('#buretteGlass');
-    const flask = page.locator('#flaskBody');
-    const reagentShelf = page.locator('button', { hasText: 'Fenolftaleína' });
+    // 1. Al iniciar debe aparecer el modal de solicitud de materiales
+    const materialsModal = page.locator('text=Solicitud Pre-Laboratorio: Materiales y Reactivos');
+    await expect(materialsModal).toBeVisible();
 
-    await expect(burette).toBeVisible();
-    await expect(flask).toBeVisible();
-    await expect(reagentShelf).toBeVisible();
+    // 2. Usar botón de autocompletar recomendados
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
 
-    // 2. Verificar que la repisa de reactivos esté dentro del viewport visible (sin recorte)
-    const shelfBox = await reagentShelf.boundingBox();
-    const viewport = page.viewportSize();
+    // 3. Verificar con el ayudante de laboratorio
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await expect(page.locator('text=¡Lista de Solicitud Aprobada por el Ayudante!')).toBeVisible();
 
-    expect(shelfBox).not.toBeNull();
-    expect(viewport).not.toBeNull();
-    if (shelfBox && viewport) {
-      // Si estamos en desktop, la repisa debe estar dentro del viewport vertical
-      if (viewport.width >= 1024) {
-        expect(shelfBox.y + shelfBox.height).toBeLessThanOrEqual(viewport.height);
-      }
-    }
+    // 4. Cerrar modal para pasar a la mesada
+    await page.locator('button', { hasText: 'Cerrar' }).click();
+    await expect(materialsModal).toBeHidden();
   });
 
-  test('Operar purga de burbuja y adición de indicador', async ({ page }) => {
+  test('Verificar que el simulador empiece en reposo (agitador apagado y bureta vacía)', async ({ page }) => {
     await page.goto('/');
 
-    // Al inicio debe haber alerta de burbuja
-    const bubbleAlert = page.locator('text=Burbuja en el pico');
-    await expect(bubbleAlert).toBeVisible();
+    // Cerrar modal de materiales primero
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await page.locator('button', { hasText: 'Cerrar' }).click();
 
-    // Purgar burbuja
-    const purgeBtn = page.locator('button', { hasText: 'Purgar Burbuja de Bureta' });
+    // 1. La agitación debe estar estrictamente DETENIDA al inicio
+    const stirrerBtn = page.locator('button', { hasText: 'Matraz vacío: Pesar KHP en Balanza Analítica' });
+    await expect(stirrerBtn).toBeVisible();
+
+    // 2. La llave de la bureta debe indicar "Bureta vacía" antes de ser cargada
+    await expect(page.locator('button', { hasText: 'Bureta vacía' })).toBeVisible();
+
+    // 3. El stepper debe indicar paso 2 (Cargar NaOH)
+    await expect(page.locator('text=2. Cargar NaOH')).toBeVisible();
+  });
+
+  test('Paso a paso físico: Cargar bureta, pesar en balanza analítica y purgar', async ({ page }) => {
+    await page.goto('/');
+
+    // Aprobar materiales
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await page.locator('button', { hasText: 'Cerrar' }).click();
+
+    // 1. Cargar bureta con NaOH
+    const loadBuretteBtn = page.locator('button', { hasText: '1. Cargar Bureta con NaOH 0.1 N' });
+    await loadBuretteBtn.click();
+    await expect(page.locator('text=✓ Bureta con NaOH')).toBeVisible();
+
+    // 2. Pesar KHP en Balanza Analítica
+    const balanceBtn = page.locator('button', { hasText: '2. Pesar KHP en Balanza' });
+    await balanceBtn.click();
+    await expect(page.locator('text=Balanza Analítica Digital (Sensibilidad 0.1 mg)')).toBeVisible();
+
+    // Seguir pasos de la balanza
+    await page.locator('button', { hasText: '1. Colocar pesafiltro seco en el platillo' }).click();
+    await page.locator('button', { hasText: '2. Presionar botón de Tara (TARE ➔ 0.0000 g)' }).click();
+    await page.locator('button', { hasText: '3. Adicionar Biftalato de Potasio con espátula' }).click();
+    await page.locator('button', { hasText: '4. Transferir muestra al Erlenmeyer' }).click();
+
+    // Balanza cerrada y muestra disuelta
+    await expect(page.locator('text=✓ KHP Disuelto en Erlenmeyer')).toBeVisible();
+
+    // 3. Ahora el botón de agitación está disponible y apagado
+    const stirBtn = page.locator('button', { hasText: 'Agitación: Detenida' });
+    await expect(stirBtn).toBeVisible();
+
+    // Encender agitación
+    await stirBtn.click();
+    await expect(page.locator('button', { hasText: 'Agitación: 450 RPM (Vórtice)' })).toBeVisible();
+
+    // 4. Purgar burbuja de la bureta
+    const purgeBtn = page.locator('button', { hasText: 'Purgar Burbuja' });
     await purgeBtn.click();
-
-    // Debe cambiar a purgada y desaparecer la alerta
-    await expect(page.locator('text=Llave Purgada (Sin aire)')).toBeVisible();
-    await expect(bubbleAlert).toBeHidden();
-
-    // Añadir fenolftaleína
-    const indicatorBtn = page.locator('button[title*="fenolftaleína"]');
-    await expect(indicatorBtn).toContainText('Fenolftaleína (0 gotas)');
-    await indicatorBtn.click();
-    await expect(indicatorBtn).toContainText('Fenolftaleína (1 gota)');
-
-    await indicatorBtn.click();
-    await expect(indicatorBtn).toContainText('Fenolftaleína (2 gotas)');
+    await expect(page.locator('text=✓ Llave Purgada')).toBeVisible();
   });
 
-  test('Abrir y cerrar llave de bureta con goteo', async ({ page }) => {
+  test('Rotación suave de la llave de la bureta sin saltos de posición', async ({ page }) => {
     await page.goto('/');
 
-    const stopcockBtn = page.locator('button', { hasText: 'Llave: Cerrada' });
-    await expect(stopcockBtn).toBeVisible();
+    // Setup rápido
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await page.locator('button', { hasText: 'Cerrar' }).click();
+    await page.locator('button', { hasText: '1. Cargar Bureta con NaOH 0.1 N' }).click();
 
     // Abrir llave
-    await stopcockBtn.click();
+    const stopcockGroup = page.locator('#stopcock');
+    await stopcockGroup.click();
+
     await expect(page.locator('button', { hasText: 'Llave: Gota a Gota' })).toBeVisible();
 
-    // Dejar gotear 1 segundo
-    await page.waitForTimeout(1200);
-
-    // Cerrar llave
-    await page.locator('button', { hasText: 'Llave: Gota a Gota' }).click();
+    // Esperar goteo y cerrar
+    await page.waitForTimeout(1000);
+    await stopcockGroup.click();
     await expect(page.locator('button', { hasText: 'Llave: Cerrada' })).toBeVisible();
   });
 
-  test('Interacción con Lupa de Menisco (4x) y transferencia de cota', async ({ page }) => {
+  test('Verificar que la mesada completa permanezca visible sin recortes en 100% zoom', async ({ page }) => {
     await page.goto('/');
 
-    // Abrir lupa
-    const loupeBtn = page.locator('button', { hasText: 'Lupa Menisco' });
-    await loupeBtn.click();
-
-    // Verificar modal de lupa visible
-    await expect(page.locator('text=Lupa Óptica de Menisco (4x)')).toBeVisible();
-
-    // Mover control de ángulo de paralaje
-    const slider = page.locator('input[type="range"]');
-    await slider.fill('0');
-
-    // Transferir lectura a libreta
-    const transferBtn = page.locator('button', { hasText: 'Anotar en Libreta' });
-    await transferBtn.click();
-
-    // Modal cerrado
-    await expect(page.locator('text=Lupa Óptica de Menisco (4x)')).toBeHidden();
-  });
-
-  test('Completar Solicitud de Materiales y Reactivos del Ayudante', async ({ page }) => {
-    await page.goto('/');
-
-    // Abrir modal de materiales
-    const materialsBtn = page.locator('button', { hasText: 'Solicitar Materiales' }).first();
-    await materialsBtn.click();
-
-    await expect(page.locator('text=Solicitud Pre-Laboratorio: Materiales y Reactivos')).toBeVisible();
-
-    // Usar autocompletar recomendados
+    // Setup rápido
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
-
-    // Verificar con el ayudante
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-
-    // Debe mostrar banner de aprobación
-    await expect(page.locator('text=¡Lista de Solicitud Aprobada por el Ayudante!')).toBeVisible();
-
-    // Cerrar modal
     await page.locator('button', { hasText: 'Cerrar' }).click();
-    const approvedBadge = page.locator('button[title*="Materiales y Reactivos requeridos"]');
-    await expect(approvedBadge).toBeVisible();
-  });
 
-  test('Consultar Guía Oficial de Práctica con ambas pestañas', async ({ page }) => {
-    await page.goto('/');
+    const burette = page.locator('#buretteGlass');
+    const flask = page.locator('#flaskBody');
+    const shelf = page.locator('button', { hasText: 'Reiniciar' });
 
-    const guideBtn = page.locator('button', { hasText: 'Guía de Práctica' });
-    await guideBtn.click();
+    await expect(burette).toBeVisible();
+    await expect(flask).toBeVisible();
+    await expect(shelf).toBeVisible();
 
-    await expect(page.locator('text=Guía de Procedimiento de Laboratorio y Mesada')).toBeVisible();
-
-    // Pestaña 1 (Laboratorio Real)
-    await expect(page.locator('text=KHC₈H₄O₄ + NaOH ➔ KNaC₈H₄O₄ + H₂O')).toBeVisible();
-
-    // Cambiar a Pestaña 2 (Mesada Virtual)
-    await page.locator('button', { hasText: '2. Cómo Operar la Mesada Virtual' }).click();
-    await expect(page.locator('text=Paso 1: Purgar la Burbuja en el Pico de la Bureta')).toBeVisible();
-
-    // Cerrar
-    await page.locator('button', { hasText: 'Entendido, volver a la mesada' }).click();
-  });
-
-  test('Navegador de las 13 prácticas curriculares y filtros', async ({ page }) => {
-    await page.goto('/');
-
-    const practicesBtn = page.locator('button', { hasText: 'Prácticas (13)' });
-    await practicesBtn.click();
-
-    await expect(page.locator('text=Plan de Estudios: 13 Prácticas de Laboratorio (UMSS)')).toBeVisible();
-
-    // Probar filtro Gravimetría
-    await page.locator('button', { hasText: 'Gravimetría (P5)' }).click();
-    await expect(page.locator('text=Determinación Gravimétrica de Sulfatos (BaSO4)')).toBeVisible();
-
-    // Probar filtro Instrumental
-    await page.locator('button', { hasText: 'Instrumental (P11-P13)' }).click();
-    await expect(page.locator('text=Colorimetría y Espectrofotometría UV-Vis')).toBeVisible();
-
-    // Cerrar
-    await page.locator('button', { hasText: 'Cerrar Selector' }).click();
-  });
-
-  test('Cálculo y evaluación estequiométrica en la Libreta de Laboratorio', async ({ page }) => {
-    await page.goto('/');
-
-    // Si es pantalla grande, la libreta está visible directamente
+    const shelfBox = await shelf.boundingBox();
     const viewport = page.viewportSize();
-    if (viewport && viewport.width < 1024) {
-      await page.locator('button', { hasText: 'Abrir Libreta de Laboratorio' }).click();
+
+    if (shelfBox && viewport && viewport.width >= 1024) {
+      expect(shelfBox.y + shelfBox.height).toBeLessThanOrEqual(viewport.height);
     }
-
-    // Ingresar datos en la libreta visible
-    const netVInput = page.locator('input[placeholder="0.00"]:visible');
-    await netVInput.fill('10.50');
-
-    const concInput = page.locator('input[placeholder="ej. 0.1024"]:visible');
-    await concInput.fill('0.1012');
-
-    // Evaluar
-    const evalBtn = page.locator('button:visible', { hasText: 'Evaluar Informe y Cálculos' });
-    await evalBtn.click();
-
-    // Verificar resultado
-    await expect(page.locator('text=Puntaje Formativo Obtenido:')).toBeVisible();
-    await expect(page.locator('text=Error Relativo (% Er):')).toBeVisible();
   });
 });

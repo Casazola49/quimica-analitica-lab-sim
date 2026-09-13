@@ -6,6 +6,8 @@ import { EquilibriumPoint } from '../../engine/equilibrium';
 
 interface LabBenchProps {
   currentDeliveredMl: number;
+  isBuretteLoaded: boolean;
+  isSampleDissolved: boolean;
   isStopcockOpen: boolean;
   flowRate: 'dropwise' | 'fast' | 'closed';
   hasBubble: boolean;
@@ -16,6 +18,8 @@ interface LabBenchProps {
   onToggleStopcock: () => void;
   onSetFlowRate: (rate: 'dropwise' | 'fast' | 'closed') => void;
   onOpenLoupe: () => void;
+  onLoadBurette: () => void;
+  onOpenBalanceModal: () => void;
   onAddIndicator: () => void;
   onPurgeBubble: () => void;
   onToggleStirring: () => void;
@@ -25,6 +29,8 @@ interface LabBenchProps {
 
 export const LabBench: React.FC<LabBenchProps> = ({
   currentDeliveredMl,
+  isBuretteLoaded,
+  isSampleDissolved,
   isStopcockOpen,
   flowRate,
   hasBubble,
@@ -35,6 +41,8 @@ export const LabBench: React.FC<LabBenchProps> = ({
   onToggleStopcock,
   onSetFlowRate,
   onOpenLoupe,
+  onLoadBurette,
+  onOpenBalanceModal,
   onAddIndicator,
   onPurgeBubble,
   onToggleStirring,
@@ -44,9 +52,9 @@ export const LabBench: React.FC<LabBenchProps> = ({
   const animFrameRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(performance.now());
 
-  // Bucle de simulación en tiempo real a 60 FPS cuando la llave está abierta
+  // Bucle de simulación en tiempo real a 60 FPS cuando la llave está abierta y la bureta tiene líquido
   useEffect(() => {
-    if (!isStopcockOpen || flowRate === 'closed') {
+    if (!isStopcockOpen || flowRate === 'closed' || !isBuretteLoaded) {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       return;
     }
@@ -54,12 +62,12 @@ export const LabBench: React.FC<LabBenchProps> = ({
     lastTimeRef.current = performance.now();
 
     const loop = (now: number) => {
-      const dt = (now - lastTimeRef.current) / 1000; // segundos
+      const dt = (now - lastTimeRef.current) / 1000;
       lastTimeRef.current = now;
 
       // Velocidad de flujo:
-      // Dropwise: 0.15 mL/segundo (~3 gotas por segundo, cada gota 0.05 mL)
-      // Fast: 1.20 mL/segundo
+      // Dropwise: 0.18 mL/segundo (~3.5 gotas/s)
+      // Fast: 1.25 mL/segundo
       const rateMlPerSec = flowRate === 'dropwise' ? 0.18 : 1.25;
       const deltaMl = rateMlPerSec * dt;
 
@@ -73,7 +81,7 @@ export const LabBench: React.FC<LabBenchProps> = ({
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [isStopcockOpen, flowRate, onTickTitration]);
+  }, [isStopcockOpen, flowRate, isBuretteLoaded, onTickTitration]);
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-between p-3 sm:p-4 lab-bench-bg rounded-2xl border border-slate-700/80 shadow-2xl relative overflow-y-auto overflow-x-hidden min-h-0">
@@ -104,7 +112,7 @@ export const LabBench: React.FC<LabBenchProps> = ({
         </div>
 
         {/* Notificación de Viraje en tiempo real */}
-        {equilibrium.endpointQuality !== 'none' && (
+        {equilibrium.endpointQuality !== 'none' && isSampleDissolved && (
           <div
             className={`px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-bold border shadow animate-in fade-in shrink-0 ${
               equilibrium.endpointQuality === 'perfect'
@@ -123,6 +131,7 @@ export const LabBench: React.FC<LabBenchProps> = ({
       <div className="flex flex-col items-center justify-center my-auto py-1 relative shrink min-h-0">
         <BuretteSvg
           currentDeliveredMl={currentDeliveredMl}
+          isBuretteLoaded={isBuretteLoaded}
           isStopcockOpen={isStopcockOpen}
           flowRate={flowRate}
           hasBubble={hasBubble}
@@ -134,18 +143,24 @@ export const LabBench: React.FC<LabBenchProps> = ({
           liquidColorRgba={equilibrium.liquidRgba}
           volumeAddedMl={currentDeliveredMl}
           initialVolumeMl={50}
+          isSampleDissolved={isSampleDissolved}
           isStirring={isStirring}
           hasIndicator={indicatorDrops > 0}
           pH={equilibrium.pH}
           onToggleStirring={onToggleStirring}
+          onOpenBalanceModal={onOpenBalanceModal}
         />
       </div>
 
       {/* Superficie de madera de la mesada de laboratorio con reactivos */}
       <div className="w-full z-10 shrink-0 pt-1">
         <ReagentShelf
+          isBuretteLoaded={isBuretteLoaded}
+          isSampleDissolved={isSampleDissolved}
           indicatorDrops={indicatorDrops}
           isBubblePurged={isBubblePurged}
+          onLoadBurette={onLoadBurette}
+          onOpenBalanceModal={onOpenBalanceModal}
           onAddIndicator={onAddIndicator}
           onPurgeBubble={onPurgeBubble}
           onResetBench={onResetBench}

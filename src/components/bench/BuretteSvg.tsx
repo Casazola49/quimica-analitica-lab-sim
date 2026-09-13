@@ -3,6 +3,7 @@ import { ZoomIn, AlertCircle } from 'lucide-react';
 
 interface BuretteSvgProps {
   currentDeliveredMl: number; // volumen entregado acumulado (mL)
+  isBuretteLoaded: boolean; // si ya fue cargada con NaOH
   isStopcockOpen: boolean;
   flowRate: 'dropwise' | 'fast' | 'closed';
   hasBubble: boolean;
@@ -12,6 +13,7 @@ interface BuretteSvgProps {
 
 export const BuretteSvg: React.FC<BuretteSvgProps> = ({
   currentDeliveredMl,
+  isBuretteLoaded,
   isStopcockOpen,
   flowRate,
   hasBubble,
@@ -26,26 +28,33 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
   const tipHeight = 50;
 
   // Mapeo de volumen (0 mL a 25 mL) a posición Y del líquido
-  // Nivel inicial en 0 mL: Y = topY + 10
+  // Nivel inicial en 0 mL: Y = topY + 15
   // Nivel a 25 mL: Y = topY + tubeHeight - 20
   const maxVolumeDisplayed = 25;
-  const liquidY = topY + 15 + (Math.min(maxVolumeDisplayed, currentDeliveredMl) / maxVolumeDisplayed) * (tubeHeight - 35);
+  const liquidY = !isBuretteLoaded
+    ? stopcockY // Vacía
+    : topY + 15 + (Math.min(maxVolumeDisplayed, currentDeliveredMl) / maxVolumeDisplayed) * (tubeHeight - 35);
+
+  // Ángulo de rotación de la llave: 0deg = cerrada (horizontal), 45deg = gota a gota, 90deg = vertical abierta
+  const stopcockAngle = isStopcockOpen ? (flowRate === 'dropwise' ? 45 : 90) : 0;
 
   return (
     <div className="relative flex flex-col items-center select-none shrink min-h-0">
       {/* Botón flotante para abrir la Lupa de Menisco */}
-      <button
-        onClick={onOpenLoupe}
-        className="absolute top-2 -right-14 z-20 flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-600/90 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-lg border border-blue-400/40 backdrop-blur transition-all active:scale-95"
-        title="Inspeccionar menisco con aumento 4x"
-      >
-        <ZoomIn size={14} />
-        <span className="hidden sm:inline">Lupa Menisco</span>
-        <span className="sm:hidden">Lupa</span>
-      </button>
+      {isBuretteLoaded && (
+        <button
+          onClick={onOpenLoupe}
+          className="absolute top-2 -right-14 z-20 flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-600/90 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-lg border border-blue-400/40 backdrop-blur transition-all active:scale-95"
+          title="Inspeccionar menisco con aumento 4x"
+        >
+          <ZoomIn size={14} />
+          <span className="hidden sm:inline">Lupa Menisco</span>
+          <span className="sm:hidden">Lupa</span>
+        </button>
+      )}
 
       {/* Alerta sutil si hay burbuja en el pico */}
-      {hasBubble && (
+      {hasBubble && isBuretteLoaded && (
         <div className="absolute top-1/2 -left-28 z-20 flex items-center gap-1 px-2 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] rounded shadow-md backdrop-blur">
           <AlertCircle size={13} className="text-amber-400 shrink-0" />
           <span>Burbuja en el pico</span>
@@ -104,8 +113,8 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
             strokeWidth="1.5"
           />
 
-          {/* Líquido contenido en la bureta (desde liquidY hasta la llave) */}
-          {liquidY < stopcockY && (
+          {/* Líquido contenido en la bureta si está cargada */}
+          {isBuretteLoaded && liquidY < stopcockY && (
             <rect
               x={90 - tubeWidth / 2 + 1}
               y={liquidY}
@@ -116,17 +125,19 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
           )}
 
           {/* Menisco cóncavo interactivo (clic para lupa) */}
-          <g className="cursor-pointer group" onClick={onOpenLoupe}>
-            <path
-              d={`M ${90 - tubeWidth / 2 + 1} ${liquidY} Q 90 ${liquidY + 4} ${90 + tubeWidth / 2 - 1} ${liquidY}`}
-              stroke="#38bdf8"
-              strokeWidth="2.5"
-              fill="rgba(56, 189, 248, 0.4)"
-              className="group-hover:stroke-blue-400 group-hover:stroke-[3.5px] transition-all"
-            />
-            {/* Círculo guía transparente para facilitar el toque en móviles */}
-            <circle cx="90" cy={liquidY} r="16" fill="transparent" />
-          </g>
+          {isBuretteLoaded && (
+            <g className="cursor-pointer group" onClick={onOpenLoupe}>
+              <path
+                d={`M ${90 - tubeWidth / 2 + 1} ${liquidY} Q 90 ${liquidY + 4} ${90 + tubeWidth / 2 - 1} ${liquidY}`}
+                stroke="#38bdf8"
+                strokeWidth="2.5"
+                fill="rgba(56, 189, 248, 0.4)"
+                className="group-hover:stroke-blue-400 group-hover:stroke-[3.5px] transition-all"
+              />
+              {/* Círculo guía transparente para facilitar el toque en móviles */}
+              <circle cx="90" cy={liquidY} r="16" fill="transparent" />
+            </g>
+          )}
 
           {/* Graduaciones volumétricas cada 1 mL y 0.5 mL */}
           {Array.from({ length: 26 }).map((_, i) => {
@@ -172,17 +183,25 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
         </g>
 
         {/* 3. Llave de Bureta (Stopcock con válvula de teflón) */}
+        {/* Usamos translate(90, stopcockY + 8) como origen exacto para que el vástago gire en su propio centro (0, 0) sin saltar de posición */}
         <g id="stopcock" className="cursor-pointer" onClick={onToggleStopcock}>
-          {/* Cuerpo de la llave */}
-          <rect x={90 - 9} y={stopcockY} width="18" height="16" rx="2" fill="#64748b" stroke="#cbd5e1" strokeWidth="1" />
-          
-          {/* Vástago giratorio de la llave (horizontal = cerrada, vertical = abierta) */}
-          <g
-            transform={`rotate(${isStopcockOpen ? (flowRate === 'dropwise' ? 45 : 90) : 0}, 90, ${stopcockY + 8})`}
-            className="transition-transform duration-150"
-          >
-            <rect x="74" y={stopcockY + 5} width="32" height="6" rx="3" fill="#0284c7" stroke="#38bdf8" strokeWidth="1" />
-            <circle cx="90" cy={stopcockY + 8} r="4" fill="#f8fafc" />
+          {/* Cuerpo cilíndrico fijo de la llave */}
+          <rect x={90 - 9} y={stopcockY} width="18" height="16" rx="2" fill="#475569" stroke="#cbd5e1" strokeWidth="1" />
+          <circle cx="90" cy={stopcockY + 8} r="5" fill="#334155" />
+
+          {/* Vástago giratorio centrado en (0, 0) relativo al pivote (90, stopcockY + 8) */}
+          <g transform={`translate(90, ${stopcockY + 8})`}>
+            <g
+              style={{
+                transform: `rotate(${stopcockAngle}deg)`,
+                transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
+            >
+              {/* Válvula de teflón azul con maneta de agarre */}
+              <rect x="-16" y="-3.5" width="32" height="7" rx="3.5" fill="#0284c7" stroke="#38bdf8" strokeWidth="1.2" />
+              {/* Botón central del vástago */}
+              <circle cx="0" cy="0" r="3.5" fill="#f8fafc" stroke="#0284c7" strokeWidth="0.8" />
+            </g>
           </g>
         </g>
 
@@ -191,13 +210,13 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
           {/* Punta cónica de vidrio */}
           <path
             d={`M ${90 - 5} ${stopcockY + 16} L ${90 - 1.5} ${stopcockY + 16 + tipHeight} L ${90 + 1.5} ${stopcockY + 16 + tipHeight} L ${90 + 5} ${stopcockY + 16} Z`}
-            fill="url(#naohGrad)"
+            fill={isBuretteLoaded ? "url(#naohGrad)" : "none"}
             stroke="rgba(255,255,255,0.5)"
             strokeWidth="1"
           />
 
           {/* Simulación visual de burbuja atrapada en la punta si no fue purgada */}
-          {hasBubble && (
+          {hasBubble && isBuretteLoaded && (
             <ellipse
               cx="90"
               cy={stopcockY + 30}
@@ -211,7 +230,7 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
           )}
 
           {/* Gota o Chorro cayendo hacia el Erlenmeyer */}
-          {isStopcockOpen && (
+          {isStopcockOpen && isBuretteLoaded && (
             <g id="streamEffect">
               {flowRate === 'fast' ? (
                 // Chorro continuo
@@ -226,7 +245,7 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
                   className="animate-pulse"
                 />
               ) : (
-                // Gota discreta cayendo (animación CSS suave)
+                // Gota discreta cayendo
                 <circle
                   cx="90"
                   cy={stopcockY + 16 + tipHeight + 20}
@@ -244,13 +263,22 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
       <div className="mt-1 flex items-center gap-2">
         <button
           onClick={onToggleStopcock}
+          disabled={!isBuretteLoaded}
           className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors shadow ${
-            isStopcockOpen
+            !isBuretteLoaded
+              ? 'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed'
+              : isStopcockOpen
               ? 'bg-emerald-600/80 border-emerald-400 text-white'
               : 'bg-slate-700/80 border-slate-500 text-slate-200 hover:bg-slate-600'
           }`}
         >
-          {isStopcockOpen ? (flowRate === 'dropwise' ? 'Llave: Gota a Gota' : 'Llave: Flujo Rápido') : 'Llave: Cerrada'}
+          {!isBuretteLoaded
+            ? 'Bureta vacía'
+            : isStopcockOpen
+            ? flowRate === 'dropwise'
+              ? 'Llave: Gota a Gota'
+              : 'Llave: Flujo Rápido'
+            : 'Llave: Cerrada'}
         </button>
       </div>
     </div>

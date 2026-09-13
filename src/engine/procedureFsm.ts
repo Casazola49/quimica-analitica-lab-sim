@@ -32,7 +32,7 @@ export class ProcedureEngine {
       isBubblePurged: false,
       bubbleVolumeMl: 0.20, // 0.20 mL de burbuja en el pico
       indicatorDrops: 0,
-      isStirring: true,
+      isStirring: false, // Inicia estrictamente detenido
       parallaxAngle: 0,
     };
   }
