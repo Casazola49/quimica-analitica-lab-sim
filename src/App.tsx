@@ -3,10 +3,12 @@ import { LabBench } from './components/bench/LabBench';
 import { LabNotebook } from './components/notebook/LabNotebook';
 import { MeniscusLoupeModal } from './components/inspection/MeniscusLoupeModal';
 import { AuditModal } from './components/feedback/AuditModal';
+import { MaterialSelectionModal } from './components/preparation/MaterialSelectionModal';
+import { LabGuideModal } from './components/guide/LabGuideModal';
 import { ProcedureEngine } from './engine/procedureFsm';
 import { evaluateBenchEquilibrium } from './engine/equilibrium';
 import { PRACTICE_4_CONFIG } from './data/practiceConfig';
-import { FlaskConical, BookOpen, ShieldCheck, ChevronUp } from 'lucide-react';
+import { FlaskConical, BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Parámetros de la sesión aleatorizados para el estudiante:
@@ -26,6 +28,9 @@ export const App: React.FC = () => {
   const [isBubblePurged, setIsBubblePurged] = useState<boolean>(false);
   const [isStirring, setIsStirring] = useState<boolean>(true);
 
+  // Control de preparación de materiales y reactivos
+  const [isMaterialsApproved, setIsMaterialsApproved] = useState<boolean>(false);
+
   // Lecturas registradas transferidas a la libreta
   const [recordedV0, setRecordedV0] = useState<number>(0);
   const [recordedVf, setRecordedVf] = useState<number>(0);
@@ -33,6 +38,8 @@ export const App: React.FC = () => {
   // Modales y vistas
   const [isLoupeOpen, setIsLoupeOpen] = useState<boolean>(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState<boolean>(false);
+  const [isMaterialsModalOpen, setIsMaterialsModalOpen] = useState<boolean>(false);
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState<boolean>(false);
   const [isMobileNotebookOpen, setIsMobileNotebookOpen] = useState<boolean>(false);
 
   // Evaluación físico-química del punto instantáneo (pH y color del erlenmeyer)
@@ -110,35 +117,80 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased">
       {/* Barra de Navegación Superior */}
-      <header className="h-14 px-4 sm:px-6 bg-slate-900 border-b border-slate-800 flex items-center justify-between z-30 shrink-0">
-        <div className="flex items-center gap-3">
+      <header className="h-14 px-3 sm:px-6 bg-slate-900 border-b border-slate-800 flex items-center justify-between z-30 shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <div className="p-2 bg-blue-600/20 border border-blue-500/40 rounded-xl text-blue-400">
-            <FlaskConical size={20} />
+            <FlaskConical size={18} />
           </div>
           <div>
-            <h1 className="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
-              <span>Simulador de Laboratorio: Química Analítica Cuantitativa</span>
-              <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full font-mono">
+            <h1 className="text-xs sm:text-base font-bold text-slate-100 flex items-center gap-1.5 sm:gap-2">
+              <span className="truncate max-w-[200px] sm:max-w-none">Simulador de Laboratorio: Química Analítica</span>
+              <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full font-mono hidden md:inline">
                 UMSS 5to Semestre
               </span>
             </h1>
-            <p className="text-[11px] text-slate-400 hidden sm:block">
+            <p className="text-[10px] sm:text-[11px] text-slate-400 hidden sm:block">
               Práctica 4: Estandarización de NaOH 0.1 N con Biftalato de Potasio y Fenolftaleína
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Botón Guía Oficial */}
+          <button
+            onClick={() => setIsGuideModalOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-blue-950/60 hover:bg-blue-900/80 border border-blue-700/60 text-blue-300 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
+            title="Ver Guía de Laboratorio Real y de la Mesada"
+          >
+            <HelpCircle size={15} />
+            <span className="hidden sm:inline">Guía de Práctica</span>
+            <span className="sm:hidden">Guía</span>
+          </button>
+
+          {/* Botón Solicitud Materiales y Reactivos */}
+          <button
+            onClick={() => setIsMaterialsModalOpen(true)}
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border shadow transition-all active:scale-95 ${
+              isMaterialsApproved
+                ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300'
+                : 'bg-purple-950/70 hover:bg-purple-900 border-purple-600 text-purple-200 animate-pulse'
+            }`}
+            title="Seleccionar Materiales y Reactivos requeridos"
+          >
+            <PackageCheck size={15} />
+            <span className="hidden md:inline">{isMaterialsApproved ? '✓ Materiales Aprobados' : 'Solicitar Materiales'}</span>
+            <span className="md:hidden">Materiales</span>
+          </button>
+
+          {/* Botón Auditoría RAG */}
           <button
             onClick={() => setIsAuditModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 rounded-xl text-xs font-semibold shadow transition-all"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
           >
-            <ShieldCheck size={16} />
-            <span className="hidden sm:inline">Auditoría Tríada Digital</span>
-            <span className="sm:hidden">Auditoría</span>
+            <ShieldCheck size={15} />
+            <span className="hidden sm:inline">Auditoría RAG</span>
+            <span className="sm:hidden">RAG</span>
           </button>
         </div>
       </header>
+
+      {/* Banner Notificación de Solicitud de Materiales si aún no fue realizada */}
+      {!isMaterialsApproved && (
+        <div className="bg-purple-950/80 border-b border-purple-800/80 px-4 py-2 flex items-center justify-between text-xs text-purple-200">
+          <div className="flex items-center gap-2">
+            <PackageCheck size={16} className="text-purple-400 shrink-0" />
+            <span>
+              <strong>Control de Entrada de Laboratorio:</strong> Antes de comenzar, debes presentar al ayudante la lista de materiales y reactivos que vas a utilizar.
+            </span>
+          </div>
+          <button
+            onClick={() => setIsMaterialsModalOpen(true)}
+            className="px-3 py-1 bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold rounded-lg text-xs shadow transition-all shrink-0 ml-2"
+          >
+            Llenar Solicitud ➔
+          </button>
+        </div>
+      )}
 
       {/* Contenedor Principal con Layout Responsivo */}
       <main className="flex-1 p-3 sm:p-5 flex flex-col lg:flex-row gap-4 overflow-hidden relative">
@@ -216,7 +268,7 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Modales de Inspección y Auditoría */}
+      {/* Modales de Inspección, Materiales, Guía y Auditoría */}
       <MeniscusLoupeModal
         isOpen={isLoupeOpen}
         currentActualVolumeMl={deliveredMl}
@@ -224,6 +276,19 @@ export const App: React.FC = () => {
         onClose={() => setIsLoupeOpen(false)}
         onTransferReading={handleTransferReading}
         onParallaxChanged={handleParallaxChanged}
+      />
+
+      <MaterialSelectionModal
+        isOpen={isMaterialsModalOpen}
+        onClose={() => setIsMaterialsModalOpen(false)}
+        onValidationSuccess={() => {
+          setIsMaterialsApproved(true);
+        }}
+      />
+
+      <LabGuideModal
+        isOpen={isGuideModalOpen}
+        onClose={() => setIsGuideModalOpen(false)}
       />
 
       <AuditModal
