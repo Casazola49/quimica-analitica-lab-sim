@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { CheckSquare, Square, AlertCircle, CheckCircle2, PackageCheck, HelpCircle, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { CheckSquare, Square, AlertCircle, CheckCircle2, PackageCheck, HelpCircle, X, ArrowRight, RotateCcw } from 'lucide-react';
 
 export interface MaterialItem {
   id: string;
@@ -39,6 +39,16 @@ export const LAB_ITEMS: MaterialItem[] = [
   { id: 'd_k2cr2o7', name: 'Dicromato de potasio (K2Cr2O7) patrón primario', category: 'reagent', isRequired: false, reason: 'Incorrecto: Patrón oxidante para volumetría redox (P8).' }
 ];
 
+// Función de barajado aleatorio (Fisher-Yates) para que los elementos nunca estén en orden predecible
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 interface MaterialSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -51,7 +61,18 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
   onValidationSuccess,
 }) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [submitted, setSubmitted] = useState<boolean>(false);
+  const [shuffledMaterials, setShuffledMaterials] = useState<MaterialItem[]>([]);
+  const [shuffledReagents, setShuffledReagents] = useState<MaterialItem[]>([]);
+  const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
+
+  // Cada vez que se abre el modal, mezclar aleatoriamente las listas
+  useEffect(() => {
+    if (isOpen) {
+      setShuffledMaterials(shuffleArray(LAB_ITEMS.filter((i) => i.category === 'material')));
+      setShuffledReagents(shuffleArray(LAB_ITEMS.filter((i) => i.category === 'reagent')));
+      setShowFeedbackModal(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -63,22 +84,20 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
       next.add(id);
     }
     setSelectedIds(next);
-    setSubmitted(false);
   };
-
-  const requiredMaterials = LAB_ITEMS.filter((i) => i.category === 'material' && i.isRequired);
-  const requiredReagents = LAB_ITEMS.filter((i) => i.category === 'reagent' && i.isRequired);
 
   const missingRequired = LAB_ITEMS.filter((i) => i.isRequired && !selectedIds.has(i.id));
   const chosenDistractors = LAB_ITEMS.filter((i) => !i.isRequired && selectedIds.has(i.id));
-
   const isPerfect = missingRequired.length === 0 && chosenDistractors.length === 0;
 
-  const handleSubmit = () => {
-    setSubmitted(true);
-    if (isPerfect) {
-      onValidationSuccess();
-    }
+  const handleVerify = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const handleAcceptSuccess = () => {
+    onValidationSuccess();
+    setShowFeedbackModal(false);
+    onClose();
   };
 
   return (
@@ -93,7 +112,7 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
                 Solicitud Pre-Laboratorio: Materiales y Reactivos
               </h3>
               <p className="text-[11px] text-slate-400">
-                Seleccione el instrumental y reactivos estrictamente necesarios para la Estandarización de NaOH con KHP.
+                Seleccione el instrumental y reactivos estrictamente necesarios (la lista está mezclada aleatoriamente).
               </p>
             </div>
           </div>
@@ -105,29 +124,42 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
           </button>
         </div>
 
-        {/* Contenido dividido en 2 columnas: Materiales vs Reactivos */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 text-xs">
-          <div className="p-3 bg-blue-950/40 border border-blue-800/50 rounded-xl flex items-start gap-2 text-blue-200">
-            <HelpCircle size={16} className="shrink-0 mt-0.5 text-blue-400" />
-            <p className="text-[11px] leading-relaxed">
-              <strong>Control de Entrada de la Cátedra (UMSS):</strong> El ayudante de laboratorio exige presentar la lista exacta de reactivos y materiales antes de autorizar el ingreso a la mesada. Seleccione con cuidado; evite instrumentos de baja precisión o reactivos ajenos a esta práctica.
-            </p>
+        {/* Contenido dividido en 2 columnas mezcladas dinámicamente */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs">
+          <div className="p-3 bg-blue-950/40 border border-blue-800/50 rounded-xl flex items-start justify-between gap-2 text-blue-200">
+            <div className="flex items-start gap-2">
+              <HelpCircle size={16} className="shrink-0 mt-0.5 text-blue-400" />
+              <p className="text-[11px] leading-relaxed">
+                <strong>Control de Entrada (UMSS):</strong> Identifique los materiales y reactivos correctos entre los distractores. Los reactivos e instrumentos cambian de posición aleatoriamente para desafiar su criterio técnico.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setShuffledMaterials(shuffleArray(LAB_ITEMS.filter((i) => i.category === 'material')));
+                setShuffledReagents(shuffleArray(LAB_ITEMS.filter((i) => i.category === 'reagent')));
+              }}
+              className="shrink-0 flex items-center gap-1 text-[10px] px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700"
+              title="Volver a mezclar posiciones"
+            >
+              <RotateCcw size={11} />
+              <span>Mezclar</span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Columna 1: Instrumental y Materiales */}
+            {/* Columna 1: Instrumental y Materiales (Barajados dinámicamente) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between pb-1 border-b border-slate-700">
                 <span className="font-bold text-slate-200 uppercase text-[11px] tracking-wider">
                   1. Instrumental y Vidriería
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono">
-                  {LAB_ITEMS.filter((i) => i.category === 'material' && selectedIds.has(i.id)).length} seleccionados
+                  {shuffledMaterials.filter((i) => selectedIds.has(i.id)).length} seleccionados
                 </span>
               </div>
 
               <div className="space-y-1.5">
-                {LAB_ITEMS.filter((i) => i.category === 'material').map((item) => {
+                {shuffledMaterials.map((item) => {
                   const isChecked = selectedIds.has(item.id);
                   return (
                     <div
@@ -151,19 +183,19 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
               </div>
             </div>
 
-            {/* Columna 2: Reactivos Químicos */}
+            {/* Columna 2: Reactivos Químicos (Barajados dinámicamente) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between pb-1 border-b border-slate-700">
                 <span className="font-bold text-slate-200 uppercase text-[11px] tracking-wider">
                   2. Reactivos Químicos y Patrones
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono">
-                  {LAB_ITEMS.filter((i) => i.category === 'reagent' && selectedIds.has(i.id)).length} seleccionados
+                  {shuffledReagents.filter((i) => selectedIds.has(i.id)).length} seleccionados
                 </span>
               </div>
 
               <div className="space-y-1.5">
-                {LAB_ITEMS.filter((i) => i.category === 'reagent').map((item) => {
+                {shuffledReagents.map((item) => {
                   const isChecked = selectedIds.has(item.id);
                   return (
                     <div
@@ -187,66 +219,17 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Resultado de la Validación */}
-          {submitted && (
-            <div className="mt-4 p-4 rounded-xl border animate-in fade-in space-y-2.5">
-              {isPerfect ? (
-                <div className="flex items-center gap-3 text-emerald-300 bg-emerald-950/60 border border-emerald-500 p-3.5 rounded-xl">
-                  <CheckCircle2 size={24} className="text-emerald-400 shrink-0" />
-                  <div>
-                    <h4 className="font-bold text-xs uppercase tracking-wider">
-                      ¡Lista de Solicitud Aprobada por el Ayudante!
-                    </h4>
-                    <p className="text-[11px] text-emerald-200">
-                      Has seleccionado exactamente los {requiredMaterials.length} materiales y {requiredReagents.length} reactivos canónicos requeridos sin distractores. Podés proceder con seguridad a la mesada virtual.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2 bg-rose-950/40 border border-rose-800/60 p-3.5 rounded-xl text-rose-200">
-                  <div className="flex items-center gap-2 font-bold text-xs text-rose-300">
-                    <AlertCircle size={18} className="text-rose-400 shrink-0" />
-                    <span>Solicitud Observada: Corrija su selección</span>
-                  </div>
-
-                  {missingRequired.length > 0 && (
-                    <div className="text-[11px] space-y-1">
-                      <strong className="text-amber-300">Elementos requeridos faltantes ({missingRequired.length}):</strong>
-                      <ul className="list-disc list-inside text-slate-300">
-                        {missingRequired.map((m) => (
-                          <li key={m.id}><span className="font-semibold text-white">{m.name}</span>: {m.reason}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {chosenDistractors.length > 0 && (
-                    <div className="text-[11px] space-y-1 pt-2 border-t border-rose-900/50">
-                      <strong className="text-rose-300">Materiales o reactivos distractores innecesarios ({chosenDistractors.length}):</strong>
-                      <ul className="list-disc list-inside text-slate-300">
-                        {chosenDistractors.map((d) => (
-                          <li key={d.id}><span className="font-semibold text-rose-200">{d.name}</span>: {d.reason}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Pie de modal con acciones */}
         <div className="p-4 bg-slate-800 border-t border-slate-700 flex items-center justify-between gap-3">
           <button
             onClick={() => {
-              // Seleccionar todos los correctos automáticamente como ayuda
+              // Seleccionar todos los correctos automáticamente
               const autoSet = new Set(LAB_ITEMS.filter((i) => i.isRequired).map((i) => i.id));
               setSelectedIds(autoSet);
-              setSubmitted(false);
             }}
-            className="text-[11px] text-slate-400 hover:text-cyan-300 underline"
+            className="text-[11px] text-slate-300 hover:text-cyan-300 underline font-medium"
           >
             Autocompletar recomendados
           </button>
@@ -259,13 +242,89 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
               Cerrar
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={handleVerify}
               className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold shadow-lg transition-all"
             >
               Verificar Lista con Ayudante
             </button>
           </div>
         </div>
+
+        {/* NOTIFICACIÓN CENTRADA AL MEDIO (INMEDIATA, SIN SCROLL) */}
+        {showFeedbackModal && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
+            <div className="w-full max-w-md bg-slate-900 border-2 rounded-2xl p-5 shadow-2xl space-y-4 text-center">
+              {isPerfect ? (
+                <>
+                  <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-emerald-400">
+                    <CheckCircle2 size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-emerald-400 uppercase tracking-wide">
+                      ¡Solicitud Aprobada por el Ayudante!
+                    </h3>
+                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                      Has seleccionado con precisión los 8 materiales volumétricos y los 4 reactivos necesarios sin distractores. Podés ingresar a la mesada para pesar en la balanza analítica y cargar la bureta.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleAcceptSuccess}
+                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all"
+                  >
+                    <span>Ingresar a la Mesada Virtual</span>
+                    <ArrowRight size={15} />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="w-14 h-14 mx-auto rounded-full bg-amber-500/20 border-2 border-amber-500 flex items-center justify-center text-amber-400">
+                    <AlertCircle size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-amber-400 uppercase tracking-wide">
+                      Solicitud Observada: Corregir Lista
+                    </h3>
+                    <p className="text-xs text-slate-300 mt-1">
+                      El ayudante de laboratorio no puede despacharte los materiales por los siguientes motivos:
+                    </p>
+                  </div>
+
+                  <div className="max-h-48 overflow-y-auto text-left text-[11px] space-y-2.5 p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
+                    {missingRequired.length > 0 && (
+                      <div>
+                        <strong className="text-amber-400">Faltan ({missingRequired.length}) necesarios:</strong>
+                        <ul className="list-disc list-inside text-slate-300 mt-0.5 space-y-0.5">
+                          {missingRequired.map((m) => (
+                            <li key={m.id} className="truncate">{m.name}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {chosenDistractors.length > 0 && (
+                      <div className="pt-1 border-t border-slate-800">
+                        <strong className="text-rose-400">Distractores innecesarios ({chosenDistractors.length}):</strong>
+                        <ul className="list-disc list-inside text-slate-300 mt-0.5 space-y-0.5">
+                          {chosenDistractors.map((d) => (
+                            <li key={d.id} className="text-rose-300 truncate">{d.name} ({d.reason})</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => setShowFeedbackModal(false)}
+                    className="w-full py-2.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold rounded-xl text-xs transition-all"
+                  >
+                    Revisar y Corregir Lista
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

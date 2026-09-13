@@ -12,22 +12,22 @@ test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsi
     // 2. Usar botón de autocompletar recomendados
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
 
-    // 3. Verificar con el ayudante de laboratorio
+    // 3. Verificar con el ayudante de laboratorio (notificación centrada inmediata)
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await expect(page.locator('text=¡Lista de Solicitud Aprobada por el Ayudante!')).toBeVisible();
+    await expect(page.locator('text=¡Solicitud Aprobada por el Ayudante!')).toBeVisible();
 
-    // 4. Cerrar modal para pasar a la mesada
-    await page.locator('button', { hasText: 'Cerrar' }).click();
+    // 4. Ingresar a la mesada
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
     await expect(materialsModal).toBeHidden();
   });
 
   test('Verificar que el simulador empiece en reposo (agitador apagado y bureta vacía)', async ({ page }) => {
     await page.goto('/');
 
-    // Cerrar modal de materiales primero
+    // Cerrar modal de materiales primero ingresando a la mesada
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Cerrar' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
 
     // 1. La agitación debe estar estrictamente DETENIDA al inicio
     const stirrerBtn = page.locator('button', { hasText: 'Matraz vacío: Pesar KHP en Balanza Analítica' });
@@ -46,7 +46,7 @@ test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsi
     // Aprobar materiales
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Cerrar' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
 
     // 1. Cargar bureta con NaOH
     const loadBuretteBtn = page.locator('button', { hasText: '1. Cargar Bureta con NaOH 0.1 N' });
@@ -87,7 +87,7 @@ test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsi
     // Setup rápido
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Cerrar' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
     await page.locator('button', { hasText: '1. Cargar Bureta con NaOH 0.1 N' }).click();
 
     // Abrir llave
@@ -108,7 +108,7 @@ test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsi
     // Setup rápido
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Cerrar' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
 
     const burette = page.locator('#buretteGlass');
     const flask = page.locator('#flaskBody');
