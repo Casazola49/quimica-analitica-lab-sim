@@ -6,7 +6,7 @@ test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsi
     await page.goto('/');
 
     // 1. Al iniciar debe aparecer el modal de solicitud de materiales
-    const materialsModal = page.locator('text=Solicitud Pre-Laboratorio: Materiales y Reactivos');
+    const materialsModal = page.locator('text=Solicitud Pre-Laboratorio');
     await expect(materialsModal).toBeVisible();
 
     // 2. Usar botón de autocompletar recomendados
@@ -40,7 +40,7 @@ test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsi
     await expect(page.locator('text=2. Cargar NaOH')).toBeVisible();
   });
 
-  test('Paso a paso físico: Cargar bureta, pesar en balanza analítica y purgar', async ({ page }) => {
+  test('Paso a paso físico P4: Cargar bureta, pesar en balanza analítica y purgar', async ({ page }) => {
     await page.goto('/');
 
     // Aprobar materiales
@@ -79,6 +79,51 @@ test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsi
     const purgeBtn = page.locator('button', { hasText: 'Purgar Burbuja' });
     await purgeBtn.click();
     await expect(page.locator('text=✓ Llave Purgada')).toBeVisible();
+  });
+
+  test('Práctica 7 (Potenciometría de HCl): Pipeteo con propipeta, electrodo de pH y curva de 1ra derivada', async ({ page }) => {
+    await page.goto('/');
+
+    // Cerrar modal inicial
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
+
+    // Cambiar a Práctica 7 desde el selector
+    await page.locator('button', { hasText: 'Prácticas (13)' }).click();
+    await page.locator('text=P7').click();
+    await page.locator('button', { hasText: 'Cargar Práctica 7 en la Mesada Virtual' }).click();
+
+    // En P7 se abre de nuevo el modal de materiales específico para P7
+    await expect(page.locator('text=Práctica 7 (Titulación Potenciométrica HCl)')).toBeVisible();
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
+
+    // Cargar NaOH
+    await page.locator('button', { hasText: '1. Cargar Bureta con NaOH 0.1 N' }).click();
+
+    // Abrir Pipeta de 25.00 mL
+    const pipetteBtn = page.locator('button', { hasText: '2. Pipetear 25.00 mL de HCl' });
+    await pipetteBtn.click();
+
+    // Pasos de la pipeta
+    await page.locator('button', { hasText: '1. Aspirar solución de HCl' }).click();
+    await page.locator('button', { hasText: '2. Ajustar menisco cóncavo' }).click();
+    await page.locator('button', { hasText: '3. Descarga libre vertical' }).click();
+    // Decisión de la gota (retirar sin soplar)
+    await page.locator('button', { hasText: 'Retirar sin soplar' }).click();
+
+    // Debe mostrar la alícuota con electrodo
+    await expect(page.locator('text=✓ 25.00 mL HCl + Electrodo pH')).toBeVisible();
+    await expect(page.locator('#phElectrode')).toBeVisible();
+
+    // Si es pantalla grande, verificar pestaña de Curva Potenciométrica en la libreta
+    const viewport = page.viewportSize();
+    if (viewport && viewport.width >= 1024) {
+      await page.locator('button', { hasText: 'Curva pH & 1ra Derivada' }).click();
+      await expect(page.locator('text=Curva Potenciométrica en Tiempo Real')).toBeVisible();
+    }
   });
 
   test('Rotación suave de la llave de la bureta sin saltos de posición', async ({ page }) => {

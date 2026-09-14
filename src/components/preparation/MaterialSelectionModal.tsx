@@ -9,8 +9,8 @@ export interface MaterialItem {
   reason: string;
 }
 
-export const LAB_ITEMS: MaterialItem[] = [
-  // Materiales Requeridos
+export const P4_ITEMS: MaterialItem[] = [
+  // Materiales Requeridos P4
   { id: 'm_burette', name: 'Bureta de 50 mL Clase A (graduada cada 0.1 mL)', category: 'material', isRequired: true, reason: 'Instrumento volumétrico fundamental para la entrega controlada del titulante NaOH.' },
   { id: 'm_stand', name: 'Soporte universal con pinza mariposa para bureta', category: 'material', isRequired: true, reason: 'Sujeta la bureta verticalmente asegurando estabilidad durante el enrase y titulación.' },
   { id: 'm_erlenmeyer', name: 'Matraz Erlenmeyer de 250 mL (boca estrecha)', category: 'material', isRequired: true, reason: 'Recipiente óptimo para la titulación porque su forma cónica evita salpicaduras al agitar.' },
@@ -20,26 +20,57 @@ export const LAB_ITEMS: MaterialItem[] = [
   { id: 'm_washbottle', name: 'Frasco lavador (pizeta) con agua destilada', category: 'material', isRequired: true, reason: 'Para disolver el patrón y lavar las paredes internas del erlenmeyer durante la valoración.' },
   { id: 'm_watchglass', name: 'Pesafiltro o vidrio de reloj seco', category: 'material', isRequired: true, reason: 'Soporte para pesar el biftalato en la balanza analítica sin contaminar el platillo.' },
 
-  // Materiales Distractores
+  // Distractores P4
   { id: 'd_cylinder', name: 'Probeta graduada de 100 mL', category: 'material', isRequired: false, reason: 'Incorrecto: La probeta tiene un error de ±1 mL y no tiene precisión analítica cuantitativa.' },
   { id: 'd_crucible', name: 'Crisol de porcelana con tapa', category: 'material', isRequired: false, reason: 'Incorrecto: El crisol es material para calcinación gravimétrica (P5), no para volumetría.' },
   { id: 'd_testtube', name: 'Tubos de ensayo con gradilla de madera', category: 'material', isRequired: false, reason: 'Incorrecto: Material de química cualitativa preparatoria, no para volumetría cuantitativa.' },
   { id: 'd_bunsen', name: 'Mechero Bunsen con trípode y tela de amianto', category: 'material', isRequired: false, reason: 'Incorrecto: La estandarización de NaOH con KHP se realiza estrictamente a temperatura ambiente.' },
 
-  // Reactivos Requeridos
+  // Reactivos Requeridos P4
   { id: 'r_khp', name: 'Biftalato de potasio (KHC8H4O4, KHP) patrón primario desecado a 110 °C', category: 'reagent', isRequired: true, reason: 'Patrón primario ácido de alta pureza (MW = 204.22 g/eq) que reacciona estequiométricamente 1:1 con NaOH.' },
   { id: 'r_naoh', name: 'Solución de Hidróxido de Sodio (NaOH) ~0.1 N a estandarizar', category: 'reagent', isRequired: true, reason: 'Reactivo titulante alcalino cuya concentración exacta se busca determinar.' },
   { id: 'r_phenolphthalein', name: 'Solución de Fenolftaleína al 0.1% en etanol', category: 'reagent', isRequired: true, reason: 'Indicador visual cuyo viraje (incoloro a rosa pálido tenue, pH 8.2-10.0) coincide con el punto de equivalencia.' },
   { id: 'r_water', name: 'Agua destilada desionizada recientemente hervida (exenta de CO2)', category: 'reagent', isRequired: true, reason: 'Medio disolvente libre de dióxido de carbono disuelto que interferiría como ácido carbónico.' },
 
-  // Reactivos Distractores
+  // Distractores P4
   { id: 'd_hcl', name: 'Ácido clorhídrico concentrado (HCl 37% p/p)', category: 'reagent', isRequired: false, reason: 'Incorrecto: El HCl es una solución ácida secundaria; aquí el ácido patrón es el biftalato sólido.' },
   { id: 'd_bacl2', name: 'Cloruro de Bario (BaCl2) al 5%', category: 'reagent', isRequired: false, reason: 'Incorrecto: Reactivo precipitante de sulfatos para gravimetría (P5).' },
   { id: 'd_net', name: 'Negro de Eriocromo T (NET) en polvo con NaCl', category: 'reagent', isRequired: false, reason: 'Incorrecto: Indicador metalocrómico utilizado en complejometría con EDTA (P10).' },
-  { id: 'd_k2cr2o7', name: 'Dicromato de potasio (K2Cr2O7) patrón primario', category: 'reagent', isRequired: false, reason: 'Incorrecto: Patrón oxidante para volumetría redox (P8).' }
+  { id: 'd_k2cr2o7', name: 'Dicromato de potasio (K2Cr2O7) patrón primario', category: 'reagent', isRequired: false, reason: 'Incorrecto: Patrón oxidante para volumetría redox (P8).' },
 ];
 
-// Función de barajado aleatorio (Fisher-Yates) para que los elementos nunca estén en orden predecible
+export const P7_ITEMS: MaterialItem[] = [
+  // Materiales Requeridos P7
+  { id: 'm_phmeter', name: 'pH-metro digital de mesa (resolución 0.01 pH)', category: 'material', isRequired: true, reason: 'Instrumento potenciométrico para medir la f.e.m. y el pH continuo de la celda galvánica.' },
+  { id: 'm_electrode', name: 'Electrodo combinado de vidrio y referencia Ag/AgCl con KCl 3M', category: 'material', isRequired: true, reason: 'Sensor electroquímico sensible a la actividad de iones H+ sumergido en la disolución.' },
+  { id: 'm_pipette', name: 'Pipeta volumétrica aforada de 25.00 mL Clase A', category: 'material', isRequired: true, reason: 'Instrumento de máxima exactitud para tomar la alícuota líquida de HCl.' },
+  { id: 'm_propipette', name: 'Propipeta de goma de 3 vías (pera de succión)', category: 'material', isRequired: true, reason: 'Dispositivo de bioseguridad para aspirar el ácido clorhídrico sin pipetear jamás con la boca.' },
+  { id: 'm_burette', name: 'Bureta de 25 o 50 mL Clase A con llave de teflón', category: 'material', isRequired: true, reason: 'Para suministrar el reactivo titulante NaOH en incrementos de volumen exactos.' },
+  { id: 'm_stand', name: 'Soporte universal con pinza doble para bureta y electrodo', category: 'material', isRequired: true, reason: 'Fija sólidamente la bureta y sostiene el electrodo suspendido sin tocar la barra magnética.' },
+  { id: 'm_beaker', name: 'Vaso de precipitados de 150 mL de forma alta (recipiente de titulación)', category: 'material', isRequired: true, reason: 'Permite acomodar simultáneamente el electrodo de vidrio, el pico de bureta y la barra magnética.' },
+  { id: 'm_stirrer', name: 'Agitador magnético con barra recubierta de teflón', category: 'material', isRequired: true, reason: 'Garantiza mezclado rápido y respuesta estable del electrodo de vidrio sin golpearlo.' },
+  { id: 'm_washbottle', name: 'Frasco lavador con agua destilada neutra', category: 'material', isRequired: true, reason: 'Para enjuagar minuciosamente el electrodo de vidrio entre lecturas y calibraciones.' },
+
+  // Distractores P7
+  { id: 'd_balance', name: 'Balanza analítica digital (0.1 mg)', category: 'material', isRequired: false, reason: 'Incorrecto: En P7 la muestra de HCl es una solución líquida medida con pipeta aforada; no se realiza pesada de sólidos.' },
+  { id: 'd_cylinder', name: 'Probeta graduada de 100 mL', category: 'material', isRequired: false, reason: 'Incorrecto: La probeta tiene un error volumétrico inaceptable para medir la alícuota analítica.' },
+  { id: 'd_crucible', name: 'Crisol de porcelana para calcinación', category: 'material', isRequired: false, reason: 'Incorrecto: El crisol es exclusivo de gravimetría por calcinación en mufla (P5).' },
+  { id: 'd_bunsen', name: 'Mechero Bunsen con trípode', category: 'material', isRequired: false, reason: 'Incorrecto: La titulación potenciométrica ácido fuerte - base fuerte se realiza a 25 °C.' },
+
+  // Reactivos Requeridos P7
+  { id: 'r_hcl', name: 'Solución de Ácido Clorhídrico (HCl ~0.1 N) problema a valorar', category: 'reagent', isRequired: true, reason: 'Analito ácido fuerte cuya normalidad exacta se determinará potenciométricamente.' },
+  { id: 'r_naoh', name: 'Solución estandarizada de NaOH ~0.1 N (titulante de P4)', category: 'reagent', isRequired: true, reason: 'Base fuerte patrón de concentración exactamente conocida estandarizada previamente.' },
+  { id: 'r_buffers', name: 'Soluciones amortiguadoras de calibración: pH 4.00, 7.00 y 10.00', category: 'reagent', isRequired: true, reason: 'Imprescindibles para calibrar la pendiente (Nernst) y el cero del electrodo en el pH-metro.' },
+  { id: 'r_phenolphthalein', name: 'Solución de Fenolftaleína al 0.1% en etanol', category: 'reagent', isRequired: true, reason: 'Para contrastar el punto final visual frente al punto de equivalencia potenciométrico (Skoog Cap. 14).' },
+  { id: 'r_water', name: 'Agua destilada neutra recién hervida', category: 'reagent', isRequired: true, reason: 'Para dilución de la alícuota e inmersión adecuada del bulbo del electrodo.' },
+
+  // Distractores P7
+  { id: 'd_khp', name: 'Biftalato de potasio sólido desecado a 110 °C', category: 'reagent', isRequired: false, reason: 'Incorrecto: El KHP se usó como patrón primario en P4; en P7 el analito ya es la solución de HCl.' },
+  { id: 'd_bacl2', name: 'Cloruro de bario (BaCl2 al 5%)', category: 'reagent', isRequired: false, reason: 'Incorrecto: Reactivo precipitante de sulfatos en gravimetría (P5).' },
+  { id: 'd_edta', name: 'Sal disódica de EDTA 0.01 M', category: 'reagent', isRequired: false, reason: 'Incorrecto: Agente quelante para valoración de dureza de agua Ca2+/Mg2+ (P10).' },
+  { id: 'd_k2cr2o7', name: 'Dicromato de potasio patrón primario', category: 'reagent', isRequired: false, reason: 'Incorrecto: Oxidante patrón para volumetría redox de hierro (P8).' },
+];
+
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -51,28 +82,32 @@ function shuffleArray<T>(array: T[]): T[] {
 
 interface MaterialSelectionModalProps {
   isOpen: boolean;
+  practiceNumber?: number;
   onClose: () => void;
   onValidationSuccess: () => void;
 }
 
 export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
   isOpen,
+  practiceNumber = 4,
   onClose,
   onValidationSuccess,
 }) => {
+  const baseItems = practiceNumber === 7 ? P7_ITEMS : P4_ITEMS;
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [shuffledMaterials, setShuffledMaterials] = useState<MaterialItem[]>([]);
   const [shuffledReagents, setShuffledReagents] = useState<MaterialItem[]>([]);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
 
-  // Cada vez que se abre el modal, mezclar aleatoriamente las listas
   useEffect(() => {
     if (isOpen) {
-      setShuffledMaterials(shuffleArray(LAB_ITEMS.filter((i) => i.category === 'material')));
-      setShuffledReagents(shuffleArray(LAB_ITEMS.filter((i) => i.category === 'reagent')));
+      setShuffledMaterials(shuffleArray(baseItems.filter((i) => i.category === 'material')));
+      setShuffledReagents(shuffleArray(baseItems.filter((i) => i.category === 'reagent')));
       setShowFeedbackModal(false);
+      setSelectedIds(new Set());
     }
-  }, [isOpen]);
+  }, [isOpen, practiceNumber]);
 
   if (!isOpen) return null;
 
@@ -86,8 +121,8 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
     setSelectedIds(next);
   };
 
-  const missingRequired = LAB_ITEMS.filter((i) => i.isRequired && !selectedIds.has(i.id));
-  const chosenDistractors = LAB_ITEMS.filter((i) => !i.isRequired && selectedIds.has(i.id));
+  const missingRequired = baseItems.filter((i) => i.isRequired && !selectedIds.has(i.id));
+  const chosenDistractors = baseItems.filter((i) => !i.isRequired && selectedIds.has(i.id));
   const isPerfect = missingRequired.length === 0 && chosenDistractors.length === 0;
 
   const handleVerify = () => {
@@ -109,10 +144,10 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
             <PackageCheck className="text-blue-400" size={22} />
             <div>
               <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wide">
-                Solicitud Pre-Laboratorio: Materiales y Reactivos
+                Solicitud Pre-Laboratorio: {practiceNumber === 7 ? 'Práctica 7 (Titulación Potenciométrica HCl)' : 'Práctica 4 (Estandarización NaOH)'}
               </h3>
               <p className="text-[11px] text-slate-400">
-                Seleccione el instrumental y reactivos estrictamente necesarios (la lista está mezclada aleatoriamente).
+                Seleccione el instrumental y reactivos estrictamente necesarios (lista barajada dinámicamente).
               </p>
             </div>
           </div>
@@ -130,13 +165,13 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
             <div className="flex items-start gap-2">
               <HelpCircle size={16} className="shrink-0 mt-0.5 text-blue-400" />
               <p className="text-[11px] leading-relaxed">
-                <strong>Control de Entrada (UMSS):</strong> Identifique los materiales y reactivos correctos entre los distractores. Los reactivos e instrumentos cambian de posición aleatoriamente para desafiar su criterio técnico.
+                <strong>Control de Entrada de la Cátedra (UMSS):</strong> El ayudante exige presentar la lista exacta de reactivos e instrumental antes de autorizar el ingreso a la mesada. Los ítems cambian de posición aleatoriamente para desafiar su criterio técnico.
               </p>
             </div>
             <button
               onClick={() => {
-                setShuffledMaterials(shuffleArray(LAB_ITEMS.filter((i) => i.category === 'material')));
-                setShuffledReagents(shuffleArray(LAB_ITEMS.filter((i) => i.category === 'reagent')));
+                setShuffledMaterials(shuffleArray(baseItems.filter((i) => i.category === 'material')));
+                setShuffledReagents(shuffleArray(baseItems.filter((i) => i.category === 'reagent')));
               }}
               className="shrink-0 flex items-center gap-1 text-[10px] px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700"
               title="Volver a mezclar posiciones"
@@ -225,8 +260,7 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
         <div className="p-4 bg-slate-800 border-t border-slate-700 flex items-center justify-between gap-3">
           <button
             onClick={() => {
-              // Seleccionar todos los correctos automáticamente
-              const autoSet = new Set(LAB_ITEMS.filter((i) => i.isRequired).map((i) => i.id));
+              const autoSet = new Set(baseItems.filter((i) => i.isRequired).map((i) => i.id));
               setSelectedIds(autoSet);
             }}
             className="text-[11px] text-slate-300 hover:text-cyan-300 underline font-medium"
@@ -264,7 +298,7 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
                       ¡Solicitud Aprobada por el Ayudante!
                     </h3>
                     <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                      Has seleccionado con precisión los 8 materiales volumétricos y los 4 reactivos necesarios sin distractores. Podés ingresar a la mesada para pesar en la balanza analítica y cargar la bureta.
+                      Has seleccionado con precisión los {baseItems.filter((i) => i.category === 'material' && i.isRequired).length} materiales y {baseItems.filter((i) => i.category === 'reagent' && i.isRequired).length} reactivos requeridos sin distractores. Podés ingresar a la mesada virtual.
                     </p>
                   </div>
 

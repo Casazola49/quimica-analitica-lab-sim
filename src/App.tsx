@@ -3,6 +3,7 @@ import { LabBench } from './components/bench/LabBench';
 import { LabNotebook } from './components/notebook/LabNotebook';
 import { MeniscusLoupeModal } from './components/inspection/MeniscusLoupeModal';
 import { AnalyticalBalanceModal } from './components/inspection/AnalyticalBalanceModal';
+import { PipetteTransferModal } from './components/inspection/PipetteTransferModal';
 import { AuditModal } from './components/feedback/AuditModal';
 import { MaterialSelectionModal } from './components/preparation/MaterialSelectionModal';
 import { LabGuideModal } from './components/guide/LabGuideModal';
@@ -13,24 +14,28 @@ import { PRACTICE_4_CONFIG } from './data/practiceConfig';
 import { FlaskConical, BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle, Layers, CheckCircle2, Circle } from 'lucide-react';
 
 export const App: React.FC = () => {
-  // Práctica actualmente seleccionada (por defecto P4: Estandarización de NaOH)
+  // Práctica actualmente seleccionada (P4 o P7)
   const [currentPracticeNumber, setCurrentPracticeNumber] = useState<number>(4);
 
-  // Masa nominal aleatoria objetivo para la balanza (~0.2150 g)
+  // Parámetros aleatorizados de la sesión:
+  // P4: Masa KHP objetivo (~0.2150 g)
   const [targetMass] = useState<number>(() => Number((0.2150 + (Math.random() - 0.5) * 0.02).toFixed(4)));
-  // Masa real pesada por el alumno (inicia en 0 hasta que pese en la balanza)
   const [actualSampleMass, setActualSampleMass] = useState<number>(0);
-  const [trueNormality] = useState<number>(() => Number((0.1015 + (Math.random() - 0.5) * 0.006).toFixed(4)));
+  const [trueNormalityP4] = useState<number>(() => Number((0.1015 + (Math.random() - 0.5) * 0.006).toFixed(4)));
+
+  // P7: Normalidad real de HCl (~0.1010 N) y normalidad de NaOH titulante (~0.1015 N)
+  const [trueNormalityP7] = useState<number>(() => Number((0.1010 + (Math.random() - 0.5) * 0.005).toFixed(4)));
+  const titrantNormality = 0.1015;
 
   // Instancia de la Máquina de Estados Procedimental (TDA)
   const engineRef = useRef<ProcedureEngine>(new ProcedureEngine());
 
-  // Estado del flujo físico del experimento desde el inicio:
+  // Estado del flujo físico del experimento:
   const [isMaterialsApproved, setIsMaterialsApproved] = useState<boolean>(false);
   const [isBuretteLoaded, setIsBuretteLoaded] = useState<boolean>(false);
   const [isSampleDissolved, setIsSampleDissolved] = useState<boolean>(false);
 
-  // La agitación empieza estrictamente APAGADA (en reposo, el alumno debe accionarla)
+  // La agitación empieza estrictamente APAGADA al inicio
   const [isStirring, setIsStirring] = useState<boolean>(false);
 
   // Estado de simulación de fluidos
@@ -40,26 +45,31 @@ export const App: React.FC = () => {
   const [indicatorDrops, setIndicatorDrops] = useState<number>(0);
   const [isBubblePurged, setIsBubblePurged] = useState<boolean>(false);
 
-  // Lecturas registradas transferidas a la libreta
+  // Lecturas transferidas a la libreta
   const [recordedV0, setRecordedV0] = useState<number>(0);
   const [recordedVf, setRecordedVf] = useState<number>(0);
 
-  // Modales interactivos (el modal de materiales se abre de entrada si no fue aprobado aún)
+  // Modales interactivos
   const [isMaterialsModalOpen, setIsMaterialsModalOpen] = useState<boolean>(true);
   const [isBalanceModalOpen, setIsBalanceModalOpen] = useState<boolean>(false);
+  const [isPipetteModalOpen, setIsPipetteModalOpen] = useState<boolean>(false);
   const [isLoupeOpen, setIsLoupeOpen] = useState<boolean>(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState<boolean>(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState<boolean>(false);
   const [isPracticeSelectorOpen, setIsPracticeSelectorOpen] = useState<boolean>(false);
   const [isMobileNotebookOpen, setIsMobileNotebookOpen] = useState<boolean>(false);
 
-  // Evaluación físico-química del punto instantáneo (pH y color del erlenmeyer)
+  // Concentración verdadera según práctica
+  const activeTrueConcentration = currentPracticeNumber === 7 ? trueNormalityP7 : trueNormalityP4;
+
+  // Evaluación físico-química del punto instantáneo (pH y color del matraz/vaso)
   const equilibrium = evaluateBenchEquilibrium(
-    actualSampleMass > 0 ? actualSampleMass : targetMass,
-    PRACTICE_4_CONFIG.primaryStandard.equivalentWeight,
-    trueNormality,
+    currentPracticeNumber === 7 ? trueNormalityP7 : actualSampleMass > 0 ? actualSampleMass : targetMass,
+    PRACTICE_4_CONFIG.analyte.equivalentWeight,
+    titrantNormality,
     deliveredMl,
-    indicatorDrops
+    indicatorDrops,
+    currentPracticeNumber
   );
 
   // Manejo de titulación continua a 60 FPS
@@ -90,10 +100,27 @@ export const App: React.FC = () => {
     engineRef.current.completeMilestone('MS_BURETTE_LOADED');
   };
 
+  const handleOpenTransferModal = () => {
+    if (currentPracticeNumber === 7) {
+      setIsPipetteModalOpen(true);
+    } else {
+      setIsBalanceModalOpen(true);
+    }
+  };
+
   const handleSampleWeighedAndDissolved = (mass: number) => {
     setActualSampleMass(mass);
     setIsSampleDissolved(true);
     engineRef.current.completeMilestone('MS_ALIQUOT_DELIVERED');
+  };
+
+  const handleAliquotTransferred = (_volumeMl: number, blewDrop: boolean) => {
+    setIsSampleDissolved(true);
+    engineRef.current.completeMilestone('MS_ALIQUOT_DELIVERED');
+    if (blewDrop) {
+      // Regla de técnica de pipetas aforadas TD/Ex
+      engineRef.current.completeMilestone('MS_ALIQUOT_DELIVERED');
+    }
   };
 
   const handlePurgeBubble = () => {
@@ -133,7 +160,7 @@ export const App: React.FC = () => {
     setFlowRate('dropwise');
     setIndicatorDrops(0);
     setIsBubblePurged(false);
-    setIsStirring(false); // Siempre apagado al reiniciar
+    setIsStirring(false);
     setIsBuretteLoaded(false);
     setIsSampleDissolved(false);
     setActualSampleMass(0);
@@ -143,10 +170,12 @@ export const App: React.FC = () => {
 
   const handleSelectPractice = (practiceNum: number) => {
     setCurrentPracticeNumber(practiceNum);
+    setIsMaterialsApproved(false);
+    setIsMaterialsModalOpen(true);
     handleResetBench();
   };
 
-  // Determinar paso actual para el Stepper de Laboratorio
+  // Determinar paso actual para el Stepper
   const currentStep = !isMaterialsApproved
     ? 1
     : !isBuretteLoaded
@@ -177,15 +206,15 @@ export const App: React.FC = () => {
               </span>
             </div>
             <p className="text-[10px] sm:text-[11px] text-slate-400 truncate hidden sm:block">
-              {currentPracticeNumber === 4
-                ? 'Práctica 4: Estandarización de NaOH 0.1 N con Biftalato de Potasio'
-                : `Práctica ${currentPracticeNumber}: Volumetría Ácido-Base`}
+              {currentPracticeNumber === 7
+                ? 'Práctica 7: Titulación Potenciométrica de HCl con NaOH estándar'
+                : 'Práctica 4: Estandarización de NaOH 0.1 N con Biftalato de Potasio'}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Botón Selector de las 13 Prácticas */}
+          {/* Selector de Prácticas */}
           <button
             onClick={() => setIsPracticeSelectorOpen(true)}
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
@@ -193,10 +222,10 @@ export const App: React.FC = () => {
           >
             <Layers size={15} className="text-blue-400" />
             <span className="hidden sm:inline">Prácticas (13)</span>
-            <span className="sm:hidden">P{currentPracticeNumber}</span>
+            <span className="sm:hidden font-bold text-cyan-300">P{currentPracticeNumber}</span>
           </button>
 
-          {/* Botón Guía Oficial */}
+          {/* Guía Oficial */}
           <button
             onClick={() => setIsGuideModalOpen(true)}
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-blue-950/60 hover:bg-blue-900/80 border border-blue-700/60 text-blue-300 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
@@ -207,7 +236,7 @@ export const App: React.FC = () => {
             <span className="sm:hidden">Guía</span>
           </button>
 
-          {/* Botón Solicitud Materiales y Reactivos */}
+          {/* Solicitud Materiales */}
           <button
             onClick={() => setIsMaterialsModalOpen(true)}
             className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border shadow transition-all active:scale-95 ${
@@ -222,7 +251,7 @@ export const App: React.FC = () => {
             <span className="md:hidden">Materiales</span>
           </button>
 
-          {/* Botón Auditoría RAG */}
+          {/* Auditoría RAG */}
           <button
             onClick={() => setIsAuditModalOpen(true)}
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
@@ -234,7 +263,7 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Stepper de Laboratorio: Guía de Pasos Procedimentales */}
+      {/* Stepper de Laboratorio */}
       <div className="bg-slate-900/90 border-b border-slate-800 px-3 sm:px-6 py-2 overflow-x-auto flex items-center justify-between gap-3 text-[11px] shrink-0">
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <div className={`flex items-center gap-1.5 ${isMaterialsApproved ? 'text-emerald-400 font-semibold' : 'text-purple-400 font-bold animate-pulse'}`}>
@@ -251,7 +280,7 @@ export const App: React.FC = () => {
 
           <div className={`flex items-center gap-1.5 ${isSampleDissolved ? 'text-emerald-400 font-semibold' : currentStep === 3 ? 'text-purple-400 font-bold animate-pulse' : 'text-slate-500'}`}>
             {isSampleDissolved ? <CheckCircle2 size={13} /> : <Circle size={13} />}
-            <span>3. Pesar KHP</span>
+            <span>{currentPracticeNumber === 7 ? '3. Pipetear HCl' : '3. Pesar KHP'}</span>
           </div>
           <span className="text-slate-600">➔</span>
 
@@ -269,27 +298,28 @@ export const App: React.FC = () => {
 
           <div className={`flex items-center gap-1.5 ${currentStep === 6 ? 'text-emerald-400 font-bold' : 'text-slate-500'}`}>
             <Circle size={13} />
-            <span>6. Titular & Evaluar</span>
+            <span>6. Titular & Curva</span>
           </div>
         </div>
 
         <div className="text-[10px] text-slate-400 font-mono hidden xl:block">
           *Paso actual: {
-            currentStep === 1 ? 'Presentar lista al ayudante' :
-            currentStep === 2 ? 'Cargar bureta con solución de NaOH' :
-            currentStep === 3 ? 'Pesar KHP en balanza y disolver' :
+            currentStep === 1 ? 'Presentar lista de materiales al ayudante' :
+            currentStep === 2 ? 'Cargar solución de NaOH en la bureta' :
+            currentStep === 3 ? (currentPracticeNumber === 7 ? 'Pipetear 25.00 mL de HCl con propipeta' : 'Pesar KHP en balanza y disolver') :
             currentStep === 4 ? 'Purgar burbuja y enrasar' :
-            currentStep === 5 ? 'Agregar gotas de fenolftaleína y activar agitador' :
-            'Goteo hasta primer viraje rosa tenue'
+            currentStep === 5 ? 'Agregar gotas de fenolftaleína y encender agitador' :
+            (currentPracticeNumber === 7 ? 'Titular y registrar curva de pH / primera derivada' : 'Goteo hasta primer viraje rosa tenue')
           }
         </div>
       </div>
 
-      {/* Contenedor Principal con Layout Responsivo */}
+      {/* Contenedor Principal */}
       <main className="flex-1 p-2.5 sm:p-4 flex flex-col lg:flex-row gap-3 sm:gap-4 overflow-hidden min-h-0 relative">
-        {/* Mesada Virtual 2D (60% en desktop, 100% en móvil) */}
+        {/* Mesada Virtual 2D */}
         <section className="flex-1 h-full min-h-0 flex flex-col">
           <LabBench
+            practiceNumber={currentPracticeNumber}
             currentDeliveredMl={deliveredMl}
             isBuretteLoaded={isBuretteLoaded}
             isSampleDissolved={isSampleDissolved}
@@ -304,7 +334,7 @@ export const App: React.FC = () => {
             onSetFlowRate={setFlowRate}
             onOpenLoupe={() => setIsLoupeOpen(true)}
             onLoadBurette={handleLoadBurette}
-            onOpenBalanceModal={() => setIsBalanceModalOpen(true)}
+            onOpenTransferModal={handleOpenTransferModal}
             onAddIndicator={handleAddIndicator}
             onPurgeBubble={handlePurgeBubble}
             onToggleStirring={handleToggleStirring}
@@ -313,19 +343,22 @@ export const App: React.FC = () => {
           />
         </section>
 
-        {/* Libreta de Laboratorio Digital (Desktop: 40% fijo al costado) */}
-        <section className="hidden lg:flex flex-col w-[380px] xl:w-[420px] h-full min-h-0 shrink-0">
+        {/* Libreta de Laboratorio Digital (Desktop) */}
+        <section className="hidden lg:flex flex-col w-[380px] xl:w-[430px] h-full min-h-0 shrink-0">
           <LabNotebook
+            practiceNumber={currentPracticeNumber}
             initialVolume={recordedV0}
             finalVolume={recordedVf}
             sampleMass={actualSampleMass > 0 ? actualSampleMass : targetMass}
-            trueNormality={trueNormality}
+            trueConcentration={activeTrueConcentration}
+            currentDeliveredMl={deliveredMl}
+            currentPH={equilibrium.pH}
             defects={engineRef.current.getState().defects}
             onOpenAuditModal={() => setIsAuditModalOpen(true)}
           />
         </section>
 
-        {/* Botón Flotante en Móviles para abrir la Libreta (Bottom Sheet) */}
+        {/* Botón Flotante en Móviles para abrir la Libreta */}
         <div className="lg:hidden fixed bottom-4 right-4 z-40">
           <button
             onClick={() => setIsMobileNotebookOpen(true)}
@@ -352,10 +385,13 @@ export const App: React.FC = () => {
               </div>
               <div className="flex-1 overflow-y-auto">
                 <LabNotebook
+                  practiceNumber={currentPracticeNumber}
                   initialVolume={recordedV0}
                   finalVolume={recordedVf}
                   sampleMass={actualSampleMass > 0 ? actualSampleMass : targetMass}
-                  trueNormality={trueNormality}
+                  trueConcentration={activeTrueConcentration}
+                  currentDeliveredMl={deliveredMl}
+                  currentPH={equilibrium.pH}
                   defects={engineRef.current.getState().defects}
                   onOpenAuditModal={() => setIsAuditModalOpen(true)}
                 />
@@ -365,9 +401,10 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Modales de Inspección, Materiales, Balanza, Guía, Selector de Prácticas y Auditoría */}
+      {/* Modales de Inspección, Materiales, Balanza (P4), Pipeta (P7), Guía y Auditoría */}
       <MaterialSelectionModal
         isOpen={isMaterialsModalOpen}
+        practiceNumber={currentPracticeNumber}
         onClose={() => setIsMaterialsModalOpen(false)}
         onValidationSuccess={() => {
           setIsMaterialsApproved(true);
@@ -381,6 +418,13 @@ export const App: React.FC = () => {
         onSampleWeighedAndDissolved={handleSampleWeighedAndDissolved}
       />
 
+      <PipetteTransferModal
+        isOpen={isPipetteModalOpen}
+        aliquotVolumeMl={25.00}
+        onClose={() => setIsPipetteModalOpen(false)}
+        onAliquotTransferred={handleAliquotTransferred}
+      />
+
       <MeniscusLoupeModal
         isOpen={isLoupeOpen}
         currentActualVolumeMl={deliveredMl}
@@ -392,6 +436,7 @@ export const App: React.FC = () => {
 
       <LabGuideModal
         isOpen={isGuideModalOpen}
+        practiceNumber={currentPracticeNumber}
         onClose={() => setIsGuideModalOpen(false)}
       />
 

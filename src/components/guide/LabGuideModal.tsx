@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { BookOpen, Monitor, ShieldAlert, CheckCircle2, X, FlaskConical, Target } from 'lucide-react';
+import { BookOpen, Monitor, ShieldAlert, X, FlaskConical, Target } from 'lucide-react';
 
 interface LabGuideModalProps {
   isOpen: boolean;
+  practiceNumber?: number;
   onClose: () => void;
 }
 
-export const LabGuideModal: React.FC<LabGuideModalProps> = ({ isOpen, onClose }) => {
+export const LabGuideModal: React.FC<LabGuideModalProps> = ({ isOpen, practiceNumber = 4, onClose }) => {
   const [activeTab, setActiveTab] = useState<'real_lab' | 'simulator'>('real_lab');
 
   if (!isOpen) return null;
@@ -22,10 +23,10 @@ export const LabGuideModal: React.FC<LabGuideModalProps> = ({ isOpen, onClose })
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wide">
-                Guía de Procedimiento de Laboratorio y Mesada
+                Guía de Procedimiento: {practiceNumber === 7 ? 'Práctica 7 (Titulación Potenciométrica HCl)' : 'Práctica 4 (Estandarización NaOH)'}
               </h3>
               <p className="text-[11px] text-slate-400">
-                Práctica 4: Preparación y Estandarización de Soluciones de NaOH (UMSS 5to Semestre)
+                Departamento de Química — Facultad de Ciencias y Tecnología (UMSS 5to Semestre)
               </p>
             </div>
           </div>
@@ -75,7 +76,9 @@ export const LabGuideModal: React.FC<LabGuideModalProps> = ({ isOpen, onClose })
                   <span>Objetivo de la Práctica</span>
                 </div>
                 <p className="text-slate-300 leading-relaxed text-[11px]">
-                  Determinar con exactitud analítica la normalidad de una solución de hidróxido de sodio (~0.1 N) mediante titulación de neutralización ácido-base frente a biftalato de potasio (KHP) como patrón primario ácido, empleando fenolftaleína como indicador de viraje visual.
+                  {practiceNumber === 7
+                    ? 'Titular una alícuota de 25.00 mL de ácido clorhídrico (~0.1 N) con NaOH estandarizado, evaluando simultáneamente el viraje del indicador de fenolftaleína y la respuesta potenciométrica de un electrodo combinado de vidrio, para construir la curva sigmoidal y aplicar el método de la primera derivada numérica (dpH/dV) en la detección del punto de equivalencia.'
+                    : 'Determinar con exactitud analítica la normalidad de una solución de hidróxido de sodio (~0.1 N) mediante titulación de neutralización ácido-base frente a biftalato de potasio (KHP) como patrón primario ácido, empleando fenolftaleína como indicador de viraje visual.'}
                 </p>
               </div>
 
@@ -85,10 +88,14 @@ export const LabGuideModal: React.FC<LabGuideModalProps> = ({ isOpen, onClose })
                   Reacción Química Estequiométrica
                 </span>
                 <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 font-mono text-[11px] text-cyan-300 text-center">
-                  KHC₈H₄O₄ + NaOH ➔ KNaC₈H₄O₄ + H₂O
+                  {practiceNumber === 7
+                    ? 'HCl (ac) + NaOH (ac) ➔ NaCl (ac) + H₂O (l)'
+                    : 'KHC₈H₄O₄ + NaOH ➔ KNaC₈H₄O₄ + H₂O'}
                 </div>
                 <p className="text-[11px] text-slate-400 leading-relaxed">
-                  El biftalato de potasio (KHP) actúa como ácido monoprótico con un peso equivalente igual a su peso molecular (204.22 g/eq). En el punto de equivalencia estequiométrico el pH es débilmente básico (~8.7) por la hidrólisis del ion ftalato, motivo por el cual la fenolftaleína (rango de viraje pH 8.2 - 10.0) es el indicador ideal según Skoog (Cap. 14).
+                  {practiceNumber === 7
+                    ? 'En la neutralización de un ácido fuerte con una base fuerte, antes del punto de equivalencia el pH está gobernado por la concentración de H+ no reaccionado. En el punto de equivalencia exacto, la solución contiene únicamente agua y NaCl neutro (pH = 7.00). El salto de pH es vertical y abrupto (de ~3.5 a ~10.5 en apenas 0.05 mL), lo que permite que el viraje de fenolftaleína (pH 8.3-8.5) coincida prácticamente con el punto de equivalencia estequiométrico con un error menor al 0.1%.'
+                    : 'El biftalato de potasio (KHP) actúa como ácido monoprótico con un peso equivalente igual a su peso molecular (204.22 g/eq). En el punto de equivalencia estequiométrico el pH es débilmente básico (~8.7) por la hidrólisis del ion ftalato, motivo por el cual la fenolftaleína (rango de viraje pH 8.2 - 10.0) es el indicador ideal según Skoog (Cap. 14).'}
                 </p>
               </div>
 
@@ -99,47 +106,61 @@ export const LabGuideModal: React.FC<LabGuideModalProps> = ({ isOpen, onClose })
                 </span>
 
                 <ol className="space-y-2 text-[11px] list-none">
-                  <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
-                    <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 1</span>
-                    <p>
-                      <strong>Pesada en Balanza Analítica:</strong> Pesar con exactitud en pesafiltro entre 0.2000 g y 0.2500 g de biftalato de potasio previamente desecado en estufa a 110 °C durante 2 horas. Anotar la masa con 4 cifras decimales (0.1 mg).
-                    </p>
-                  </li>
-
-                  <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
-                    <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 2</span>
-                    <p>
-                      <strong>Disolución en Erlenmeyer:</strong> Transferir cuantitativamente la sal al matraz Erlenmeyer de 250 mL lavando el pesafiltro con agua destilada recién hervida (exenta de CO₂) hasta un volumen aproximado de 50 mL. Agitar suavemente hasta disolución total.
-                    </p>
-                  </li>
-
-                  <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
-                    <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 3</span>
-                    <p>
-                      <strong>Carga y Purga de la Bureta:</strong> Enjuagar la bureta de 50 mL con pequeñas porciones de la solución de NaOH. Llenar la bureta por encima del cero. <strong>Purgar enérgicamente la llave</strong> abriéndola de golpe hacia un vaso de desecho para desalojar cualquier burbuja de aire atrapada en la punta capilar.
-                    </p>
-                  </li>
-
-                  <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
-                    <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 4</span>
-                    <p>
-                      <strong>Enrase y Cota Inicial (V0):</strong> Ajustar el menisco a 0.00 mL o registrar la cota exacta colocando los ojos rigurosamente a la altura del menisco tangencial para evitar error de paralaje.
-                    </p>
-                  </li>
-
-                  <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
-                    <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 5</span>
-                    <p>
-                      <strong>Adición de Indicador y Titulación:</strong> Añadir 2 a 3 gotas de solución alcohólica de fenolftaleína al matraz. Colocar el erlenmeyer sobre un fondo blanco (o plato de agitador). Iniciar el goteo de NaOH con la mano izquierda manipulando la llave y la mano derecha agitando continuamente el matraz.
-                    </p>
-                  </li>
-
-                  <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
-                    <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 6</span>
-                    <p>
-                      <strong>Detección del Punto Final:</strong> Al observar que el halo rosado transitorio tarda en disiparse, agregar gota a gota estricta (e incluso fracciones de gota lavando la punta con pizeta). Detener la titulación ante la aparición del <strong>primer color rosa muy tenue que persista durante al menos 30 segundos</strong>. Registrar el volumen final (Vf).
-                    </p>
-                  </li>
+                  {practiceNumber === 7 ? (
+                    <>
+                      <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
+                        <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 1</span>
+                        <p>
+                          <strong>Calibración del pH-metro:</strong> Calibrar el instrumento con tampones estándar certificados de pH 7.00 y 4.00 (calibración en dos puntos). Enjuagar minuciosamente el electrodo de vidrio con pizeta de agua destilada y secar con papel tissue suave sin frotar el bulbo.
+                        </p>
+                      </li>
+                      <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
+                        <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 2</span>
+                        <p>
+                          <strong>Toma de Alícuota con Pipeta Aforada:</strong> Emplear la propipeta de tres vías para aspirar 25.00 mL de solución de HCl. Enrasar el menisco a la altura de los ojos y transferir al vaso de 150 mL tocando la pared por gravedad libre. <strong>No soplar la última gota retenida en la punta</strong>.
+                        </p>
+                      </li>
+                      <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
+                        <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 3</span>
+                        <p>
+                          <strong>Montaje de Celda y Carga de Bureta:</strong> Sumergir el electrodo de vidrio asegurando que el bulbo y el diafragma queden completamente cubiertos de líquido sin tocar la barra magnética. Cargar la bureta con NaOH 0.1 N estandarizado y purgar la burbuja de aire.
+                        </p>
+                      </li>
+                      <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
+                        <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 4</span>
+                        <p>
+                          <strong>Titulación y Registro Potenciométrico:</strong> Agregar 2 gotas de fenolftaleína. Activar la agitación magnética. Titular gota a gota registrando los pares de datos de volumen entregado y pH medido. Observar la primera derivada para identificar el salto abrupto de pH y anotar el volumen de viraje.
+                        </p>
+                      </li>
+                    </>
+                  ) : (
+                    <>
+                      <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
+                        <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 1</span>
+                        <p>
+                          <strong>Pesada en Balanza Analítica:</strong> Pesar con exactitud en pesafiltro entre 0.2000 g y 0.2500 g de biftalato de potasio previamente desecado en estufa a 110 °C durante 2 horas. Anotar la masa con 4 cifras decimales (0.1 mg).
+                        </p>
+                      </li>
+                      <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
+                        <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 2</span>
+                        <p>
+                          <strong>Disolución en Erlenmeyer:</strong> Transferir la sal al matraz lavando con agua destilada recién hervida (exenta de CO₂) hasta ~50 mL. Agitar hasta disolución total.
+                        </p>
+                      </li>
+                      <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
+                        <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 3</span>
+                        <p>
+                          <strong>Carga y Purga de la Bureta:</strong> Llenar la bureta con NaOH 0.1 N y purgar enérgicamente la llave abriéndola de golpe hacia un vaso de desecho para desalojar cualquier burbuja de aire en la punta.
+                        </p>
+                      </li>
+                      <li className="p-2.5 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-2.5">
+                        <span className="font-bold font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded border border-blue-700/60">Paso 4</span>
+                        <p>
+                          <strong>Detección del Punto Final:</strong> Agregar 2 gotas de fenolftaleína y titular con agitación continua hasta el primer rosa tenue que persista al menos 30 segundos.
+                        </p>
+                      </li>
+                    </>
+                  )}
                 </ol>
               </div>
 
@@ -149,88 +170,51 @@ export const LabGuideModal: React.FC<LabGuideModalProps> = ({ isOpen, onClose })
                 <div className="space-y-1 text-[11px]">
                   <strong>Normas de Bioseguridad y Cuidados Críticos:</strong>
                   <ul className="list-disc list-inside text-slate-300">
-                    <li>El NaOH es fuertemente cáustico: usar gafas de seguridad y guantes de nitrilo. En caso de salpicadura lavar con abundante agua.</li>
-                    <li>No soplar jamás la última gota retenida en la punta de pipetas volumétricas de transferencia (calibradas TD/Ex).</li>
-                    <li>No dejar la solución alcalina de NaOH en la bureta después de terminar la práctica, pues ataca el vidrio esmerilado de la llave.</li>
+                    <li>El bulbo de vidrio del electrodo es de membrana delgada (~0.1 mm): cuidarse de no golpearlo con la barra de agitación magnética.</li>
+                    <li>No soplar jamás la última gota retenida en pipetas volumétricas aforadas (calibradas TD/Ex).</li>
+                    <li>Mantener el electrodo hidratado en solución de KCl 3M cuando no esté en uso; no dejar secar al aire.</li>
                   </ul>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="space-y-4 animate-in fade-in">
+            <div className="space-y-3 animate-in fade-in text-[11px]">
               <div className="p-3.5 bg-cyan-950/40 border border-cyan-800/50 rounded-xl flex items-start gap-2 text-cyan-200">
                 <Monitor size={16} className="shrink-0 mt-0.5 text-cyan-400" />
-                <p className="text-[11px] leading-relaxed">
-                  <strong>Guía Interactiva de la Mesada Virtual:</strong> El simulador modela la física volumétrica y la técnica analítica en tiempo real. Siga este flujo paso a paso para evitar penalizaciones en su reporte de auditoría.
+                <p className="leading-relaxed">
+                  <strong>Instrucciones para la Mesada Virtual de {practiceNumber === 7 ? 'P7' : 'P4'}:</strong>
                 </p>
               </div>
 
-              <div className="space-y-2.5">
-                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl space-y-1.5">
-                  <div className="flex items-center gap-2 text-cyan-300 font-bold">
-                    <CheckCircle2 size={16} />
-                    <span>Paso 1: Purgar la Burbuja en el Pico de la Bureta</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 pl-6">
-                    Mire la punta capilar de la bureta: si observa una burbuja parpadeante en el pico, presione el botón ámbar <strong>"Purgar Burbuja de Bureta"</strong> en la bandeja inferior de reactivos. Si titula con aire atrapado, el volumen desalojado falseará su gasto neto (TDA penalizará error por exceso).
-                  </p>
+              <div className="space-y-2">
+                <div className="p-2.5 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  <strong>Paso 1: Requisición de Materiales:</strong> Presentar al ayudante la lista de materiales requeridos aprobando el control de entrada.
                 </div>
-
-                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl space-y-1.5">
-                  <div className="flex items-center gap-2 text-cyan-300 font-bold">
-                    <CheckCircle2 size={16} />
-                    <span>Paso 2: Inspeccionar el Menisco con la Lupa 4x y Anotar V0</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 pl-6">
-                    Haga clic sobre el menisco en la bureta o presione el botón flotante <strong>"Lupa Menisco"</strong>. Ajuste el control deslizante de ángulo a 0° para anular el error de paralaje y presione <strong>"Anotar en Libreta (Cota Inicial V0)"</strong>.
-                  </p>
+                <div className="p-2.5 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  <strong>Paso 2: Cargar NaOH:</strong> Pulsar "1. Cargar Bureta con NaOH 0.1 N".
                 </div>
-
-                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl space-y-1.5">
-                  <div className="flex items-center gap-2 text-cyan-300 font-bold">
-                    <CheckCircle2 size={16} />
-                    <span>Paso 3: Añadir 2-3 Gotas de Fenolftaleína</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 pl-6">
-                    En la repisa inferior, haga clic en el gotero de <strong>"Fenolftaleína"</strong> hasta añadir al menos 2 gotas al matraz. Sin indicador, no habrá viraje visible y sobretitulará la muestra sin notarlo.
-                  </p>
+                <div className="p-2.5 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  {practiceNumber === 7
+                    ? 'Paso 3: Pipetear 25.00 mL de HCl con la propipeta y transferir sin soplar la última gota.'
+                    : 'Paso 3: Pesar ~0.21 g de KHP en la Balanza Analítica digital (tarando a 0.0000 g).'}
                 </div>
-
-                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl space-y-1.5">
-                  <div className="flex items-center gap-2 text-cyan-300 font-bold">
-                    <CheckCircle2 size={16} />
-                    <span>Paso 4: Abrir la Llave de la Bureta (Gota a Gota vs Flujo Rápido)</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 pl-6">
-                    Presione sobre la llave giratoria o el botón de la llave para abrir el flujo. Utilice el modo <strong>"Gota a Gota"</strong> cuando se aproxime al volumen esperado (~10-11 mL) para evitar sobretitular. Asegúrese de que el agitador magnético esté encendido ("Agitación: 450 RPM").
-                  </p>
+                <div className="p-2.5 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  <strong>Paso 4: Purgar y Enrasar:</strong> Purgar la burbuja del pico y registrar V0 con la Lupa 4x sin error de paralaje.
                 </div>
-
-                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl space-y-1.5">
-                  <div className="flex items-center gap-2 text-cyan-300 font-bold">
-                    <CheckCircle2 size={16} />
-                    <span>Paso 5: Detener el Flujo ante el Primer Viraje Rosa Tenue</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 pl-6">
-                    En cuanto el matraz adquiera una tonalidad rosa translúcida muy pálida (pH ~8.3-8.5), cierre inmediatamente la llave. Si la solución se torna fucsia intenso, se registrará un defecto de sobretitulación.
-                  </p>
+                <div className="p-2.5 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  <strong>Paso 5: Indicador y Agitación:</strong> Agregar gotas de fenolftaleína y encender el agitador magnético.
                 </div>
-
-                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl space-y-1.5">
-                  <div className="flex items-center gap-2 text-cyan-300 font-bold">
-                    <CheckCircle2 size={16} />
-                    <span>Paso 6: Abrir la Lupa para Vf y Realizar los Cálculos en la Libreta</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 pl-6">
-                    Abra nuevamente la lupa de menisco y transfiera la lectura final como Vf. En la Libreta Digital (a la derecha en PC o en el botón flotante en móviles), calcule ΔV, aplique la fórmula estequiométrica ingresando su concentración con 4 cifras significativas y presione <strong>"Evaluar Informe y Cálculos"</strong>.
-                  </p>
+                <div className="p-2.5 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  {practiceNumber === 7
+                    ? 'Paso 6: Titular hasta viraje. En la libreta consultar la pestaña "Curva pH & 1ra Derivada" para verificar el pico Veq y evaluar con 4 cifras significativas.'
+                    : 'Paso 6: Titular hasta viraje rosa tenue, anotar Vf con la Lupa y evaluar el informe en la libreta.'}
                 </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Pie de página */}
+        {/* Pie */}
         <div className="p-4 bg-slate-800 border-t border-slate-700 flex items-center justify-between">
           <span className="text-[11px] text-slate-400 font-mono">
             Química Analítica Cuantitativa — Depto. Química UMSS

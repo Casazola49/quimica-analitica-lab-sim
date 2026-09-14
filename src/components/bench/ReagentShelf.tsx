@@ -2,24 +2,26 @@ import React from 'react';
 import { Droplet, Wind, RefreshCw, FlaskConical, Scale } from 'lucide-react';
 
 interface ReagentShelfProps {
+  practiceNumber?: number;
   isBuretteLoaded: boolean;
   isSampleDissolved: boolean;
   indicatorDrops: number;
   isBubblePurged: boolean;
   onLoadBurette: () => void;
-  onOpenBalanceModal: () => void;
+  onOpenTransferModal: () => void;
   onAddIndicator: () => void;
   onPurgeBubble: () => void;
   onResetBench: () => void;
 }
 
 export const ReagentShelf: React.FC<ReagentShelfProps> = ({
+  practiceNumber = 4,
   isBuretteLoaded,
   isSampleDissolved,
   indicatorDrops,
   isBubblePurged,
   onLoadBurette,
-  onOpenBalanceModal,
+  onOpenTransferModal,
   onAddIndicator,
   onPurgeBubble,
   onResetBench,
@@ -42,19 +44,19 @@ export const ReagentShelf: React.FC<ReagentShelfProps> = ({
         </span>
       )}
 
-      {/* Botón de Pesar KHP si aún no fue pesado */}
+      {/* Botón de Pesar KHP (P4) o Pipetear HCl (P7) */}
       {!isSampleDissolved ? (
         <button
-          onClick={onOpenBalanceModal}
+          onClick={onOpenTransferModal}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold rounded-xl text-xs shadow-lg transition-all animate-pulse"
-          title="Pesar patrón primario KHP en la balanza analítica"
+          title={practiceNumber === 7 ? "Pipetear 25.00 mL de HCl con propipeta" : "Pesar patrón primario KHP en la balanza analítica"}
         >
           <Scale size={14} />
-          <span>2. Pesar KHP en Balanza</span>
+          <span>{practiceNumber === 7 ? '2. Pipetear 25.00 mL de HCl' : '2. Pesar KHP en Balanza'}</span>
         </button>
       ) : (
         <span className="flex items-center gap-1 px-2.5 py-1 bg-purple-950/60 border border-purple-700/50 text-purple-300 rounded-xl text-[11px] font-semibold">
-          ✓ KHP Disuelto en Erlenmeyer
+          {practiceNumber === 7 ? '✓ 25.00 mL HCl + Electrodo pH' : '✓ KHP Disuelto en Erlenmeyer'}
         </span>
       )}
 

@@ -5,6 +5,7 @@ import { ReagentShelf } from './ReagentShelf';
 import { EquilibriumPoint } from '../../engine/equilibrium';
 
 interface LabBenchProps {
+  practiceNumber?: number;
   currentDeliveredMl: number;
   isBuretteLoaded: boolean;
   isSampleDissolved: boolean;
@@ -19,7 +20,7 @@ interface LabBenchProps {
   onSetFlowRate: (rate: 'dropwise' | 'fast' | 'closed') => void;
   onOpenLoupe: () => void;
   onLoadBurette: () => void;
-  onOpenBalanceModal: () => void;
+  onOpenTransferModal: () => void;
   onAddIndicator: () => void;
   onPurgeBubble: () => void;
   onToggleStirring: () => void;
@@ -28,6 +29,7 @@ interface LabBenchProps {
 }
 
 export const LabBench: React.FC<LabBenchProps> = ({
+  practiceNumber = 4,
   currentDeliveredMl,
   isBuretteLoaded,
   isSampleDissolved,
@@ -42,7 +44,7 @@ export const LabBench: React.FC<LabBenchProps> = ({
   onSetFlowRate,
   onOpenLoupe,
   onLoadBurette,
-  onOpenBalanceModal,
+  onOpenTransferModal,
   onAddIndicator,
   onPurgeBubble,
   onToggleStirring,
@@ -144,23 +146,26 @@ export const LabBench: React.FC<LabBenchProps> = ({
           volumeAddedMl={currentDeliveredMl}
           initialVolumeMl={50}
           isSampleDissolved={isSampleDissolved}
+          hasElectrode={practiceNumber === 7 && isSampleDissolved}
           isStirring={isStirring}
           hasIndicator={indicatorDrops > 0}
           pH={equilibrium.pH}
+          practiceNumber={practiceNumber}
           onToggleStirring={onToggleStirring}
-          onOpenBalanceModal={onOpenBalanceModal}
+          onOpenTransferModal={onOpenTransferModal}
         />
       </div>
 
       {/* Superficie de madera de la mesada de laboratorio con reactivos */}
       <div className="w-full z-10 shrink-0 pt-1">
         <ReagentShelf
+          practiceNumber={practiceNumber}
           isBuretteLoaded={isBuretteLoaded}
           isSampleDissolved={isSampleDissolved}
           indicatorDrops={indicatorDrops}
           isBubblePurged={isBubblePurged}
           onLoadBurette={onLoadBurette}
-          onOpenBalanceModal={onOpenBalanceModal}
+          onOpenTransferModal={onOpenTransferModal}
           onAddIndicator={onAddIndicator}
           onPurgeBubble={onPurgeBubble}
           onResetBench={onResetBench}

@@ -5,12 +5,14 @@ interface ErlenmeyerSvgProps {
   liquidColorRgba: string;
   volumeAddedMl: number;
   initialVolumeMl: number; // 50 mL de disolución inicial
-  isSampleDissolved: boolean; // si ya se preparó la disolución de KHP
+  isSampleDissolved: boolean; // si ya se preparó la disolución
+  hasElectrode?: boolean; // si está insertado el electrodo de pH (P7)
   isStirring: boolean;
   hasIndicator: boolean;
   pH: number;
+  practiceNumber?: number;
   onToggleStirring: () => void;
-  onOpenBalanceModal?: () => void;
+  onOpenTransferModal?: () => void;
 }
 
 export const ErlenmeyerSvg: React.FC<ErlenmeyerSvgProps> = ({
@@ -18,11 +20,13 @@ export const ErlenmeyerSvg: React.FC<ErlenmeyerSvgProps> = ({
   volumeAddedMl,
   initialVolumeMl,
   isSampleDissolved,
+  hasElectrode = false,
   isStirring,
   hasIndicator,
   pH,
+  practiceNumber = 4,
   onToggleStirring,
-  onOpenBalanceModal,
+  onOpenTransferModal,
 }) => {
   const currentTotalMl = initialVolumeMl + volumeAddedMl;
   // Mapeo de volumen (50 mL a 80 mL) a altura del líquido dentro del matraz
@@ -164,6 +168,26 @@ export const ErlenmeyerSvg: React.FC<ErlenmeyerSvgProps> = ({
           {/* Reborde reforzado de la boca del matraz */}
           <ellipse cx="110" cy="35" rx="19" ry="4" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="2" />
 
+          {/* Electrodo combinado de pH de vidrio sumergido (P7: Titulación Potenciométrica) */}
+          {hasElectrode && (
+            <g id="phElectrode" transform="translate(122, 10)">
+              {/* Cable coaxial negro superior */}
+              <path d="M 6 0 Q 18 -15 35 -10" fill="none" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+              {/* Tapa plástica protectora superior */}
+              <rect x="1" y="0" width="10" height="18" rx="2" fill="#0f172a" stroke="#334155" strokeWidth="1" />
+              {/* Cuerpo cilíndrico de vidrio del electrodo */}
+              <rect x="2" y="18" width="8" height="120" rx="1" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.7)" strokeWidth="1" />
+              {/* Solución interna de KCl 3M */}
+              <rect x="3" y="35" width="6" height="100" fill="rgba(56, 189, 248, 0.2)" />
+              {/* Alambre de referencia interno de Ag/AgCl */}
+              <line x1="6" y1="18" x2="6" y2="128" stroke="#64748b" strokeWidth="1.2" />
+              {/* Bulbo esférico de vidrio sensible a pH sumergido */}
+              <circle cx="6" cy="140" r="6.5" fill="rgba(56, 189, 248, 0.4)" stroke="#38bdf8" strokeWidth="1.5" />
+              {/* Diafragma cerámico poroso */}
+              <circle cx="2" cy="126" r="1.5" fill="#f8fafc" />
+            </g>
+          )}
+
           {/* Graduaciones serigrafiadas blancas en el vidrio (100, 150, 200 mL) */}
           <line x1="85" y1="145" x2="105" y2="145" stroke="rgba(255,255,255,0.5)" strokeWidth="1" />
           <text x="108" y="148" fill="rgba(255,255,255,0.7)" fontSize="7.5" fontFamily="monospace">100 mL</text>
@@ -217,10 +241,14 @@ export const ErlenmeyerSvg: React.FC<ErlenmeyerSvgProps> = ({
           </>
         ) : (
           <button
-            onClick={onOpenBalanceModal}
+            onClick={onOpenTransferModal}
             className="flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold rounded-xl border border-purple-400 shadow-lg text-xs transition-all animate-pulse"
           >
-            <span>Matraz vacío: Pesar KHP en Balanza Analítica ➔</span>
+            <span>
+              {practiceNumber === 7
+                ? 'Vaso vacío: Pipetear 25.00 mL de HCl con Propipeta ➔'
+                : 'Matraz vacío: Pesar KHP en Balanza Analítica ➔'}
+            </span>
           </button>
         )}
       </div>
