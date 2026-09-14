@@ -70,5 +70,61 @@ export const PEDAGOGICAL_CITATIONS: Record<string, PedagogicalCitation> = {
     pedagogicalImpact: 'La sobretitulación incrementa el volumen medido más allá del punto estequiométrico, produciendo un error por exceso en la concentración de analito calculada.',
     remediationAdvice: 'Al observar que las gotas de titulante dejan un halo de color transitorio que tarda en disiparse, disminuya la velocidad de flujo a gota a gota estricta con agitación constante.',
     ragDeepLinkQuery: 'como detectar el viraje exacto de fenolftaleina sin sobretitular'
+  },
+  CITE_NO_DIGESTION: {
+    id: 'CITE_NO_DIGESTION',
+    defectType: 'DEFECT_NO_DIGESTION',
+    practiceId: 5,
+    book: 'Skoog',
+    edition: '9na Edición (2014)',
+    chapter: 12,
+    chapterTitle: 'Gravimetría de precipitación',
+    pagePhysical: 288,
+    exactQuote: 'La digestión de un precipitado consiste en dejarlo en contacto con el licor madre caliente durante un periodo prolongado. Durante este proceso, las partículas coloidales pequeñas se disuelven y recristalizan sobre las partículas más grandes (maduración de Ostwald), produciendo un precipitado más denso, cristalino y fácil de filtrar.',
+    pedagogicalImpact: 'Filtrar sin digerir provoca que los microcristales coloidales de BaSO4 atraviesen los poros del papel filtro, perdiendo masa analítica y originando un error negativo en el % de sulfatos.',
+    remediationAdvice: 'Mantenga el vaso tapado con vidrio de reloj sobre la plancha a 85-90 °C durante 45 minutos sin que hierva hasta observar líquido sobrenadante límpido.',
+    ragDeepLinkQuery: 'maduracion de ostwald digestion termica precipitados gravimetria'
+  },
+  CITE_INCOMPLETE_WASHING: {
+    id: 'CITE_INCOMPLETE_WASHING',
+    defectType: 'DEFECT_INCOMPLETE_WASHING',
+    practiceId: 5,
+    book: 'Day & Underwood',
+    edition: '6ta Edición (1989)',
+    chapter: 4,
+    chapterTitle: 'Análisis gravimétrico',
+    pagePhysical: 82,
+    exactQuote: 'El lavado del precipitado de sulfato de bario debe continuarse con porciones sucesivas de agua caliente hasta que el filtrado dé prueba negativa de cloruros con nitrato de plata. Los iones cloruro y bario adsorbidos que no se eliminen causarán un error por exceso en el peso final calcinado.',
+    pedagogicalImpact: 'Las impurezas de coprecipitación de BaCl2 y cloruros aumentan falsamente el peso del crisol, generando un cálculo inflado por exceso de analito.',
+    remediationAdvice: 'Lave con pequeñas porciones de agua caliente tantas veces como sea necesario hasta que al añadir AgNO3 al líquido de lavado no se observe turbidez lechosa.',
+    ragDeepLinkQuery: 'lavado de precipitado baso4 test agno3 cloruros'
+  },
+  CITE_REDUCTION_TO_BAS: {
+    id: 'CITE_REDUCTION_TO_BAS',
+    defectType: 'DEFECT_REDUCTION_TO_BAS',
+    practiceId: 5,
+    book: 'Skoog',
+    edition: '9na Edición (2014)',
+    chapter: 12,
+    chapterTitle: 'Gravimetría de precipitación',
+    pagePhysical: 296,
+    exactQuote: 'Durante la carbonización del papel de filtro en el crisol, debe evitarse el contacto con la llama reductora y permitir libre acceso de aire. El carbón incandescente en atmósfera deficiente en oxígeno reduce el sulfato de bario a sulfuro de bario: BaSO4 + 4C -> BaS + 4CO, provocando una pérdida inaceptable de masa.',
+    pedagogicalImpact: 'La formación de BaS (PM = 169.4) en lugar de BaSO4 (PM = 233.4) produce un error grave por defecto en la masa del residuo calcinado.',
+    remediationAdvice: 'Incline el crisol sobre el soporte con la tapa entreabierta y caliente con llama oxidante suave sin que el papel se encienda en llamas.',
+    ragDeepLinkQuery: 'reduccion de baso4 a bas carbonizacion papel filtro'
+  },
+  CITE_NOT_CONSTANT_WEIGHT: {
+    id: 'CITE_NOT_CONSTANT_WEIGHT',
+    defectType: 'DEFECT_NOT_CONSTANT_WEIGHT',
+    practiceId: 5,
+    book: 'Aguilar',
+    edition: '2da Edición (1999)',
+    chapter: 4,
+    chapterTitle: 'Operaciones gravimétricas cuantitativas',
+    pagePhysical: 88,
+    exactQuote: 'Para garantizar la expulsión total de agua ocluidos y la calcinación estequiométrica, se deben realizar ciclos sucesivos de calentamiento, enfriamiento en desecador y pesada hasta que dos pesadas consecutivas no difieran en más de 0.2 a 0.3 mg (peso constante).',
+    pedagogicalImpact: 'Una sola pesada no garantiza la remoción de humedad ni la combustión total del carbón.',
+    remediationAdvice: 'Repita el ciclo de mufla por 15 minutos, enfríe 30 minutos en desecador y vuelva a pesar hasta que |m2 - m1| <= 0.0002 g.',
+    ragDeepLinkQuery: 'criterio de peso constante en gravimetria analitica'
   }
 };

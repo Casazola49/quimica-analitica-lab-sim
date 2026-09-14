@@ -71,6 +71,40 @@ export const P7_ITEMS: MaterialItem[] = [
   { id: 'd_k2cr2o7', name: 'Dicromato de potasio patrón primario', category: 'reagent', isRequired: false, reason: 'Incorrecto: Oxidante patrón para volumetría redox de hierro (P8).' },
 ];
 
+export const P5_ITEMS: MaterialItem[] = [
+  // Materiales Requeridos P5 (Gravimetría)
+  { id: 'm_beaker400', name: 'Vaso de precipitados de 400 mL de forma alta', category: 'material', isRequired: true, reason: 'Recipiente amplio para contener la disolución caliente de sulfatos sin pérdidas por proyección.' },
+  { id: 'm_hotplate', name: 'Placa calefactora de laboratorio con control de temperatura', category: 'material', isRequired: true, reason: 'Para mantener la digestión térmica a 85-90 °C durante la maduración de Ostwald.' },
+  { id: 'm_funnel', name: 'Embudo analítico cónico de 60° con vástago largo lleno', category: 'material', isRequired: true, reason: 'Asegura una columna líquida continua en el vástago para una filtración por gravedad rápida y cuantitativa.' },
+  { id: 'm_whatman', name: 'Papel filtro cuantitativo sin cenizas Whatman N° 42 (banda azul)', category: 'material', isRequired: true, reason: 'Papel de poro fino que retiene los cristales de BaSO4 y cuyas cenizas tras calcinación son despreciables (≤0.00008 g).' },
+  { id: 'm_testtube', name: 'Tubos de ensayo en gradilla para control de lavado', category: 'material', isRequired: true, reason: 'Para recolectar porciones de las aguas de filtrado y ensayar la presencia de cloruros residuales.' },
+  { id: 'm_crucible', name: 'Crisol de porcelana refractario con tapa', category: 'material', isRequired: true, reason: 'Recipiente inerte para la carbonización del papel y calcinación del BaSO4 a 800 °C en mufla.' },
+  { id: 'm_muffle', name: 'Horno mufla de alta temperatura (800 - 900 °C)', category: 'material', isRequired: true, reason: 'Permite calcinar cuantitativamente el precipitado hasta descomposición total del carbón residual.' },
+  { id: 'm_desiccator', name: 'Desecador de vidrio con gel de sílice activa deshidratante', category: 'material', isRequired: true, reason: 'Enfría el crisol caliente hasta temperatura ambiente en atmósfera seca antes de la pesada analítica.' },
+  { id: 'm_balance', name: 'Balanza analítica digital (sensibilidad 0.1 mg / 0.0001 g)', category: 'material', isRequired: true, reason: 'Fundamental para las pesadas del crisol vacío y con precipitado hasta masa constante.' },
+  { id: 'm_glassrod', name: 'Varilla de vidrio con policía de goma', category: 'material', isRequired: true, reason: 'Para guiar el chorro de líquido hacia el embudo y arrastrar cuantitativamente partículas adheridas a las paredes.' },
+  { id: 'm_washbottle', name: 'Frasco lavador con agua destilada caliente', category: 'material', isRequired: true, reason: 'El lavado en caliente aumenta la solubilidad de las impurezas adsorbidas facilitando su eliminación.' },
+
+  // Distractores P5
+  { id: 'd_burette', name: 'Bureta graduada de 50 mL Clase A', category: 'material', isRequired: false, reason: 'Incorrecto: La bureta es material de análisis volumétrico; en gravimetría se determina masa calcinada, no volumen gastado.' },
+  { id: 'd_pipette', name: 'Pipeta volumétrica aforada de 25 mL', category: 'material', isRequired: false, reason: 'Incorrecto: En gravimetría la muestra sólida se pesa en balanza analítica, no se requiere pipeta aforada de precisión.' },
+  { id: 'd_phmeter', name: 'pH-metro digital de mesa con electrodo', category: 'material', isRequired: false, reason: 'Incorrecto: El pH-metro es instrumental potenciométrico (P7), no aplicable a gravimetría clásica de BaSO4.' },
+  { id: 'd_cylinder', name: 'Probeta graduada de 100 mL', category: 'material', isRequired: false, reason: 'Incorrecto: La probeta no posee precisión analítica cuantitativa.' },
+
+  // Reactivos Requeridos P5
+  { id: 'r_sample', name: 'Muestra problema con sulfatos soluble (Na2SO4 / sulfato)', category: 'reagent', isRequired: true, reason: 'Muestra analítica cuya concentración de SO4(2-) se determinará por precipitación cuantitativa.' },
+  { id: 'r_bacl2', name: 'Solución de Cloruro de Bario (BaCl2 al 5% p/v)', category: 'reagent', isRequired: true, reason: 'Reactivo precipitante que aporta iones Ba(2+) para formar el precipitado insoluble de BaSO4.' },
+  { id: 'r_hcl', name: 'Ácido clorhídrico concentrado (HCl diluido 1:1)', category: 'reagent', isRequired: true, reason: 'Medio ácido necesario para prevenir la coprecipitación de sales de bario insolubles en medio básico (como BaCO3).' },
+  { id: 'r_agno3', name: 'Solución de Nitrato de Plata (AgNO3 0.1 N)', category: 'reagent', isRequired: true, reason: 'Reactivo para el ensayo de cloruros: precipita AgCl blanco lechoso si el lavado del precipitado aún es incompleto.' },
+  { id: 'r_hotwater', name: 'Agua destilada recién hervida (caliente)', category: 'reagent', isRequired: true, reason: 'Medio de lavado continuo para arrastrar iones Ba(2+) y Cl(-) del cono de papel filtro.' },
+
+  // Distractores P5
+  { id: 'd_naoh', name: 'Solución de Hidróxido de Sodio (NaOH 0.1 N)', category: 'reagent', isRequired: false, reason: 'Incorrecto: El NaOH es un reactivo titulante alcalino para volumetría de neutralización (P4/P7).' },
+  { id: 'd_phenolphthalein', name: 'Solución de Fenolftaleína al 0.1%', category: 'reagent', isRequired: false, reason: 'Incorrecto: Indicador de pH volumétrico innecesario en determinaciones gravimétricas de sulfatos.' },
+  { id: 'd_edta', name: 'Sal disódica de EDTA 0.01 M', category: 'reagent', isRequired: false, reason: 'Incorrecto: Agente quelante para dureza de agua en complejometría (P10).' },
+  { id: 'd_k2cr2o7', name: 'Dicromato de potasio patrón primario', category: 'reagent', isRequired: false, reason: 'Incorrecto: Patrón oxidante de volumetría redox de hierro (P8).' },
+];
+
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -93,7 +127,7 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
   onClose,
   onValidationSuccess,
 }) => {
-  const baseItems = practiceNumber === 7 ? P7_ITEMS : P4_ITEMS;
+  const baseItems = practiceNumber === 5 ? P5_ITEMS : practiceNumber === 7 ? P7_ITEMS : P4_ITEMS;
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [shuffledMaterials, setShuffledMaterials] = useState<MaterialItem[]>([]);
@@ -144,7 +178,7 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
             <PackageCheck className="text-blue-400" size={22} />
             <div>
               <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wide">
-                Solicitud Pre-Laboratorio: {practiceNumber === 7 ? 'Práctica 7 (Titulación Potenciométrica HCl)' : 'Práctica 4 (Estandarización NaOH)'}
+                Solicitud Pre-Laboratorio: {practiceNumber === 5 ? 'Práctica 5 (Gravimetría de BaSO4)' : practiceNumber === 7 ? 'Práctica 7 (Titulación Potenciométrica HCl)' : 'Práctica 4 (Estandarización NaOH)'}
               </h3>
               <p className="text-[11px] text-slate-400">
                 Seleccione el instrumental y reactivos estrictamente necesarios (lista barajada dinámicamente).

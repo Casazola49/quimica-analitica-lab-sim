@@ -126,6 +126,71 @@ test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsi
     }
   });
 
+  test('Práctica 5 (Gravimetría de BaSO4): Flujo completo de 5 estaciones y cálculo gravimétrico', async ({ page }) => {
+    await page.goto('/');
+
+    // Cerrar modal inicial
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
+
+    // Cambiar a Práctica 5 desde el selector
+    await page.locator('button', { hasText: 'Prácticas (13)' }).click();
+    await page.locator('text=Determinación Gravimétrica de Sulfatos (BaSO4)').click();
+    await page.locator('button', { hasText: 'Cargar Práctica 5 en la Mesada Virtual' }).click();
+
+    // Aprobar materiales P5
+    await expect(page.locator('text=Práctica 5 (Gravimetría de BaSO4)')).toBeVisible();
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
+
+    // Estación 1: Precipitación
+    await expect(page.locator('text=Estación 1: Precipitación en Caliente')).toBeVisible();
+    await page.locator('button', { hasText: 'Adición Lenta Gota a Gota' }).click();
+    await page.locator('button', { hasText: 'Pasar a Estación 2' }).click();
+
+    // Estación 2: Digestión
+    await expect(page.locator('text=Estación 2: Digestión Térmica')).toBeVisible();
+    await page.locator('button', { hasText: 'Iniciar Digestión Térmica' }).click();
+    await page.waitForTimeout(1500); // Esperar digestión
+    await page.locator('button', { hasText: 'Pasar a Estación 3' }).click();
+
+    // Estación 3: Filtración
+    await expect(page.locator('text=Estación 3: Filtración por Gravedad')).toBeVisible();
+    await page.locator('button', { hasText: 'Verter por varilla' }).click();
+    await page.locator('button', { hasText: 'Pasar a Estación 4' }).click();
+
+    // Estación 4: Test AgNO3
+    await expect(page.locator('text=Estación 4: Ensayo de Cloruros')).toBeVisible();
+    // 3 lavados con agua caliente
+    await page.locator('button', { hasText: 'Lavar precipitado' }).click();
+    await page.locator('button', { hasText: 'Lavar precipitado' }).click();
+    await page.locator('button', { hasText: 'Lavar precipitado' }).click();
+    await page.locator('button', { hasText: '+1 gota AgNO3' }).click();
+    await expect(page.locator('text=Ensayo negativo de cloruros')).toBeVisible();
+    await page.locator('button', { hasText: 'Pasar a Estación 5' }).click();
+
+    // Estación 5: Calcinación y Peso Constante
+    await expect(page.locator('text=Estación 5: Calcinación')).toBeVisible();
+    await page.locator('button', { hasText: 'Calcinar crisol en mufla' }).click();
+    await page.locator('button', { hasText: 'Enfriar 30 min en Desecador' }).click();
+    await page.locator('button', { hasText: 'Realizar Pesada 1' }).click();
+    await page.locator('button', { hasText: 'Calcinación adicional 15 min' }).click();
+
+    await expect(page.locator('text=¡Peso Constante Alcanzado!')).toBeVisible();
+
+    // Libreta: Evaluar % SO4
+    const viewport = page.viewportSize();
+    if (viewport && viewport.width < 1024) {
+      await page.locator('button', { hasText: 'Abrir Libreta de Laboratorio' }).click();
+    }
+    const percentInput = page.locator('input[placeholder="ej. 28.98"]:visible');
+    await percentInput.fill('28.98');
+    await page.locator('button:visible', { hasText: 'Evaluar Informe y Cálculos' }).click();
+    await expect(page.locator('text=Puntaje Formativo:').first()).toBeVisible();
+  });
+
   test('Rotación suave de la llave de la bureta sin saltos de posición', async ({ page }) => {
     await page.goto('/');
 

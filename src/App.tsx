@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { LabBench } from './components/bench/LabBench';
+import { GravimetryBench } from './components/bench/GravimetryBench';
 import { LabNotebook } from './components/notebook/LabNotebook';
 import { MeniscusLoupeModal } from './components/inspection/MeniscusLoupeModal';
 import { AnalyticalBalanceModal } from './components/inspection/AnalyticalBalanceModal';
@@ -11,21 +12,26 @@ import { PracticeSelectorModal } from './components/navigation/PracticeSelectorM
 import { ProcedureEngine } from './engine/procedureFsm';
 import { evaluateBenchEquilibrium } from './engine/equilibrium';
 import { PRACTICE_4_CONFIG } from './data/practiceConfig';
+import { TechniqueDefectType } from './types';
 import { FlaskConical, BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle, Layers, CheckCircle2, Circle } from 'lucide-react';
 
 export const App: React.FC = () => {
-  // Práctica actualmente seleccionada (P4 o P7)
+  // Práctica actualmente seleccionada (P4, P5 o P7)
   const [currentPracticeNumber, setCurrentPracticeNumber] = useState<number>(4);
 
   // Parámetros aleatorizados de la sesión:
   // P4: Masa KHP objetivo (~0.2150 g)
-  const [targetMass] = useState<number>(() => Number((0.2150 + (Math.random() - 0.5) * 0.02).toFixed(4)));
-  const [actualSampleMass, setActualSampleMass] = useState<number>(0);
+  const [targetMassP4] = useState<number>(() => Number((0.2150 + (Math.random() - 0.5) * 0.02).toFixed(4)));
+  const [actualSampleMassP4, setActualSampleMassP4] = useState<number>(0);
   const [trueNormalityP4] = useState<number>(() => Number((0.1015 + (Math.random() - 0.5) * 0.006).toFixed(4)));
 
-  // P7: Normalidad real de HCl (~0.1010 N) y normalidad de NaOH titulante (~0.1015 N)
+  // P7: Normalidad real de HCl (~0.1010 N)
   const [trueNormalityP7] = useState<number>(() => Number((0.1010 + (Math.random() - 0.5) * 0.005).toFixed(4)));
   const titrantNormality = 0.1015;
+
+  // P5: Masa de muestra sulfatos (~0.5000 g) y % verdadero (~28.95%)
+  const [sampleMassP5] = useState<number>(() => Number((0.5000 + (Math.random() - 0.5) * 0.03).toFixed(4)));
+  const [truePercentSO4] = useState<number>(() => Number((28.95 + (Math.random() - 0.5) * 0.8).toFixed(2)));
 
   // Instancia de la Máquina de Estados Procedimental (TDA)
   const engineRef = useRef<ProcedureEngine>(new ProcedureEngine());
@@ -38,7 +44,7 @@ export const App: React.FC = () => {
   // La agitación empieza estrictamente APAGADA al inicio
   const [isStirring, setIsStirring] = useState<boolean>(false);
 
-  // Estado de simulación de fluidos
+  // Estado de simulación de fluidos volumétricos (P4/P7)
   const [deliveredMl, setDeliveredMl] = useState<number>(0);
   const [isStopcockOpen, setIsStopcockOpen] = useState<boolean>(false);
   const [flowRate, setFlowRate] = useState<'dropwise' | 'fast' | 'closed'>('dropwise');
@@ -60,11 +66,30 @@ export const App: React.FC = () => {
   const [isMobileNotebookOpen, setIsMobileNotebookOpen] = useState<boolean>(false);
 
   // Concentración verdadera según práctica
-  const activeTrueConcentration = currentPracticeNumber === 7 ? trueNormalityP7 : trueNormalityP4;
+  const activeTrueConcentration =
+    currentPracticeNumber === 5
+      ? truePercentSO4
+      : currentPracticeNumber === 7
+      ? trueNormalityP7
+      : trueNormalityP4;
+
+  // Masa activa
+  const activeSampleMass =
+    currentPracticeNumber === 5
+      ? sampleMassP5
+      : currentPracticeNumber === 7
+      ? 25.0
+      : actualSampleMassP4 > 0
+      ? actualSampleMassP4
+      : targetMassP4;
 
   // Evaluación físico-química del punto instantáneo (pH y color del matraz/vaso)
   const equilibrium = evaluateBenchEquilibrium(
-    currentPracticeNumber === 7 ? trueNormalityP7 : actualSampleMass > 0 ? actualSampleMass : targetMass,
+    currentPracticeNumber === 7
+      ? trueNormalityP7
+      : actualSampleMassP4 > 0
+      ? actualSampleMassP4
+      : targetMassP4,
     PRACTICE_4_CONFIG.analyte.equivalentWeight,
     titrantNormality,
     deliveredMl,
@@ -109,7 +134,7 @@ export const App: React.FC = () => {
   };
 
   const handleSampleWeighedAndDissolved = (mass: number) => {
-    setActualSampleMass(mass);
+    setActualSampleMassP4(mass);
     setIsSampleDissolved(true);
     engineRef.current.completeMilestone('MS_ALIQUOT_DELIVERED');
   };
@@ -118,7 +143,6 @@ export const App: React.FC = () => {
     setIsSampleDissolved(true);
     engineRef.current.completeMilestone('MS_ALIQUOT_DELIVERED');
     if (blewDrop) {
-      // Regla de técnica de pipetas aforadas TD/Ex
       engineRef.current.completeMilestone('MS_ALIQUOT_DELIVERED');
     }
   };
@@ -153,6 +177,19 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleRecordGravimetricDefect = (type: TechniqueDefectType, citationId: string) => {
+    // Registrar defecto en el motor
+    engineRef.current['recordDefect']?.(type, citationId);
+  };
+
+  const handleCompleteGravimetry = (_data: {
+    crucibleTare: number;
+    cruciblePlusBaSO4: number;
+    netBaSO4Mass: number;
+  }) => {
+    // Gravimetría finalizada
+  };
+
   const handleResetBench = () => {
     engineRef.current = new ProcedureEngine();
     setDeliveredMl(0);
@@ -163,7 +200,7 @@ export const App: React.FC = () => {
     setIsStirring(false);
     setIsBuretteLoaded(false);
     setIsSampleDissolved(false);
-    setActualSampleMass(0);
+    setActualSampleMassP4(0);
     setRecordedV0(0);
     setRecordedVf(0);
   };
@@ -178,13 +215,13 @@ export const App: React.FC = () => {
   // Determinar paso actual para el Stepper
   const currentStep = !isMaterialsApproved
     ? 1
-    : !isBuretteLoaded
+    : !isBuretteLoaded && currentPracticeNumber !== 5
     ? 2
-    : !isSampleDissolved
+    : !isSampleDissolved && currentPracticeNumber !== 5
     ? 3
-    : !isBubblePurged
+    : !isBubblePurged && currentPracticeNumber !== 5
     ? 4
-    : indicatorDrops === 0 || !isStirring
+    : (indicatorDrops === 0 || !isStirring) && currentPracticeNumber !== 5
     ? 5
     : 6;
 
@@ -206,7 +243,9 @@ export const App: React.FC = () => {
               </span>
             </div>
             <p className="text-[10px] sm:text-[11px] text-slate-400 truncate hidden sm:block">
-              {currentPracticeNumber === 7
+              {currentPracticeNumber === 5
+                ? 'Práctica 5: Determinación Gravimétrica de Sulfatos (BaSO4)'
+                : currentPracticeNumber === 7
                 ? 'Práctica 7: Titulación Potenciométrica de HCl con NaOH estándar'
                 : 'Práctica 4: Estandarización de NaOH 0.1 N con Biftalato de Potasio'}
             </p>
@@ -272,75 +311,117 @@ export const App: React.FC = () => {
           </div>
           <span className="text-slate-600">➔</span>
 
-          <div className={`flex items-center gap-1.5 ${isBuretteLoaded ? 'text-emerald-400 font-semibold' : currentStep === 2 ? 'text-blue-400 font-bold animate-pulse' : 'text-slate-500'}`}>
-            {isBuretteLoaded ? <CheckCircle2 size={13} /> : <Circle size={13} />}
-            <span>2. Cargar NaOH</span>
-          </div>
-          <span className="text-slate-600">➔</span>
+          {currentPracticeNumber === 5 ? (
+            /* Stepper específico de Gravimetría P5 */
+            <>
+              <div className="flex items-center gap-1.5 text-blue-400 font-semibold">
+                <Circle size={13} />
+                <span>2. Precipitación</span>
+              </div>
+              <span className="text-slate-600">➔</span>
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <Circle size={13} />
+                <span>3. Digestión</span>
+              </div>
+              <span className="text-slate-600">➔</span>
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <Circle size={13} />
+                <span>4. Filtración</span>
+              </div>
+              <span className="text-slate-600">➔</span>
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <Circle size={13} />
+                <span>5. Test AgNO3</span>
+              </div>
+              <span className="text-slate-600">➔</span>
+              <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                <Circle size={13} />
+                <span>6. Calcinación</span>
+              </div>
+            </>
+          ) : (
+            /* Stepper de Volumetría P4/P7 */
+            <>
+              <div className={`flex items-center gap-1.5 ${isBuretteLoaded ? 'text-emerald-400 font-semibold' : currentStep === 2 ? 'text-blue-400 font-bold animate-pulse' : 'text-slate-500'}`}>
+                {isBuretteLoaded ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+                <span>2. Cargar NaOH</span>
+              </div>
+              <span className="text-slate-600">➔</span>
 
-          <div className={`flex items-center gap-1.5 ${isSampleDissolved ? 'text-emerald-400 font-semibold' : currentStep === 3 ? 'text-purple-400 font-bold animate-pulse' : 'text-slate-500'}`}>
-            {isSampleDissolved ? <CheckCircle2 size={13} /> : <Circle size={13} />}
-            <span>{currentPracticeNumber === 7 ? '3. Pipetear HCl' : '3. Pesar KHP'}</span>
-          </div>
-          <span className="text-slate-600">➔</span>
+              <div className={`flex items-center gap-1.5 ${isSampleDissolved ? 'text-emerald-400 font-semibold' : currentStep === 3 ? 'text-purple-400 font-bold animate-pulse' : 'text-slate-500'}`}>
+                {isSampleDissolved ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+                <span>{currentPracticeNumber === 7 ? '3. Pipetear HCl' : '3. Pesar KHP'}</span>
+              </div>
+              <span className="text-slate-600">➔</span>
 
-          <div className={`flex items-center gap-1.5 ${isBubblePurged ? 'text-emerald-400 font-semibold' : currentStep === 4 ? 'text-amber-400 font-bold animate-pulse' : 'text-slate-500'}`}>
-            {isBubblePurged ? <CheckCircle2 size={13} /> : <Circle size={13} />}
-            <span>4. Purgar & Enrasar</span>
-          </div>
-          <span className="text-slate-600">➔</span>
+              <div className={`flex items-center gap-1.5 ${isBubblePurged ? 'text-emerald-400 font-semibold' : currentStep === 4 ? 'text-amber-400 font-bold animate-pulse' : 'text-slate-500'}`}>
+                {isBubblePurged ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+                <span>4. Purgar & Enrasar</span>
+              </div>
+              <span className="text-slate-600">➔</span>
 
-          <div className={`flex items-center gap-1.5 ${indicatorDrops > 0 && isStirring ? 'text-emerald-400 font-semibold' : currentStep === 5 ? 'text-pink-400 font-bold animate-pulse' : 'text-slate-500'}`}>
-            {indicatorDrops > 0 && isStirring ? <CheckCircle2 size={13} /> : <Circle size={13} />}
-            <span>5. Indicador & Agitador</span>
-          </div>
-          <span className="text-slate-600">➔</span>
+              <div className={`flex items-center gap-1.5 ${indicatorDrops > 0 && isStirring ? 'text-emerald-400 font-semibold' : currentStep === 5 ? 'text-pink-400 font-bold animate-pulse' : 'text-slate-500'}`}>
+                {indicatorDrops > 0 && isStirring ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+                <span>5. Indicador & Agitador</span>
+              </div>
+              <span className="text-slate-600">➔</span>
 
-          <div className={`flex items-center gap-1.5 ${currentStep === 6 ? 'text-emerald-400 font-bold' : 'text-slate-500'}`}>
-            <Circle size={13} />
-            <span>6. Titular & Curva</span>
-          </div>
+              <div className={`flex items-center gap-1.5 ${currentStep === 6 ? 'text-emerald-400 font-bold' : 'text-slate-500'}`}>
+                <Circle size={13} />
+                <span>6. Titular</span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="text-[10px] text-slate-400 font-mono hidden xl:block">
           *Paso actual: {
             currentStep === 1 ? 'Presentar lista de materiales al ayudante' :
+            currentPracticeNumber === 5 ? 'Ejecutar las 5 estaciones de gravimetría secuencialmente' :
             currentStep === 2 ? 'Cargar solución de NaOH en la bureta' :
             currentStep === 3 ? (currentPracticeNumber === 7 ? 'Pipetear 25.00 mL de HCl con propipeta' : 'Pesar KHP en balanza y disolver') :
             currentStep === 4 ? 'Purgar burbuja y enrasar' :
             currentStep === 5 ? 'Agregar gotas de fenolftaleína y encender agitador' :
-            (currentPracticeNumber === 7 ? 'Titular y registrar curva de pH / primera derivada' : 'Goteo hasta primer viraje rosa tenue')
+            'Titular muestra hasta punto final'
           }
         </div>
       </div>
 
       {/* Contenedor Principal */}
       <main className="flex-1 p-2.5 sm:p-4 flex flex-col lg:flex-row gap-3 sm:gap-4 overflow-hidden min-h-0 relative">
-        {/* Mesada Virtual 2D */}
+        {/* Mesada Virtual 2D (Conmutable entre Volumetría P4/P7 y Gravimetría P5) */}
         <section className="flex-1 h-full min-h-0 flex flex-col">
-          <LabBench
-            practiceNumber={currentPracticeNumber}
-            currentDeliveredMl={deliveredMl}
-            isBuretteLoaded={isBuretteLoaded}
-            isSampleDissolved={isSampleDissolved}
-            isStopcockOpen={isStopcockOpen}
-            flowRate={flowRate}
-            hasBubble={!isBubblePurged}
-            indicatorDrops={indicatorDrops}
-            isBubblePurged={isBubblePurged}
-            isStirring={isStirring}
-            equilibrium={equilibrium}
-            onToggleStopcock={handleToggleStopcock}
-            onSetFlowRate={setFlowRate}
-            onOpenLoupe={() => setIsLoupeOpen(true)}
-            onLoadBurette={handleLoadBurette}
-            onOpenTransferModal={handleOpenTransferModal}
-            onAddIndicator={handleAddIndicator}
-            onPurgeBubble={handlePurgeBubble}
-            onToggleStirring={handleToggleStirring}
-            onResetBench={handleResetBench}
-            onTickTitration={handleTickTitration}
-          />
+          {currentPracticeNumber === 5 ? (
+            <GravimetryBench
+              sampleMassGrams={sampleMassP5}
+              onRecordDefect={handleRecordGravimetricDefect}
+              onCompleteGravimetry={handleCompleteGravimetry}
+            />
+          ) : (
+            <LabBench
+              practiceNumber={currentPracticeNumber}
+              currentDeliveredMl={deliveredMl}
+              isBuretteLoaded={isBuretteLoaded}
+              isSampleDissolved={isSampleDissolved}
+              isStopcockOpen={isStopcockOpen}
+              flowRate={flowRate}
+              hasBubble={!isBubblePurged}
+              indicatorDrops={indicatorDrops}
+              isBubblePurged={isBubblePurged}
+              isStirring={isStirring}
+              equilibrium={equilibrium}
+              onToggleStopcock={handleToggleStopcock}
+              onSetFlowRate={setFlowRate}
+              onOpenLoupe={() => setIsLoupeOpen(true)}
+              onLoadBurette={handleLoadBurette}
+              onOpenTransferModal={handleOpenTransferModal}
+              onAddIndicator={handleAddIndicator}
+              onPurgeBubble={handlePurgeBubble}
+              onToggleStirring={handleToggleStirring}
+              onResetBench={handleResetBench}
+              onTickTitration={handleTickTitration}
+            />
+          )}
         </section>
 
         {/* Libreta de Laboratorio Digital (Desktop) */}
@@ -349,7 +430,7 @@ export const App: React.FC = () => {
             practiceNumber={currentPracticeNumber}
             initialVolume={recordedV0}
             finalVolume={recordedVf}
-            sampleMass={actualSampleMass > 0 ? actualSampleMass : targetMass}
+            sampleMass={activeSampleMass}
             trueConcentration={activeTrueConcentration}
             currentDeliveredMl={deliveredMl}
             currentPH={equilibrium.pH}
@@ -388,7 +469,7 @@ export const App: React.FC = () => {
                   practiceNumber={currentPracticeNumber}
                   initialVolume={recordedV0}
                   finalVolume={recordedVf}
-                  sampleMass={actualSampleMass > 0 ? actualSampleMass : targetMass}
+                  sampleMass={activeSampleMass}
                   trueConcentration={activeTrueConcentration}
                   currentDeliveredMl={deliveredMl}
                   currentPH={equilibrium.pH}
@@ -413,7 +494,7 @@ export const App: React.FC = () => {
 
       <AnalyticalBalanceModal
         isOpen={isBalanceModalOpen}
-        targetSampleMass={targetMass}
+        targetSampleMass={targetMassP4}
         onClose={() => setIsBalanceModalOpen(false)}
         onSampleWeighedAndDissolved={handleSampleWeighedAndDissolved}
       />

@@ -61,7 +61,7 @@ export const ALL_PRACTICES: PracticeSummary[] = [
     unitTitle: 'Gravimetría',
     title: 'Determinación Gravimétrica de Sulfatos (BaSO4)',
     category: 'gravimetry',
-    status: 'specified',
+    status: 'active',
     shortObjective: 'Precipitación cuantitativa en caliente con BaCl2, digestión térmica, filtración con papel Whatman 42 y calcinación a peso constante.',
     keyReagents: ['Muestra de sulfatos', 'Cloruro de bario (BaCl2 5%)', 'HCl diluido', 'AgNO3 0.1 M'],
     keyEquipment: ['Vaso de precipitado 400 mL', 'Embudo analítico de vástago largo', 'Papel filtro Whatman 42', 'Crisol de porcelana', 'Mufla a 800 °C', 'Desecador']

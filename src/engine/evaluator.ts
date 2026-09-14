@@ -20,40 +20,75 @@ export function evaluateStudentNotebook(
   // Etapa 1: Validación de Consistencia Física de Datos Crudos
   let dataIntegrityPassed = true;
 
-  if (practiceNumber === 4) {
+  if (practiceNumber === 5) {
+    // P5: Gravimetría de BaSO4
     if (data.sampleMass <= 0 || data.sampleMass > 2.0) {
       dataIntegrityPassed = false;
-      feedbackNotes.push('La masa de patrón primario KHP debe ser un valor positivo razonable (típicamente 0.20 a 0.25 g).');
+      feedbackNotes.push('La masa de muestra de sulfatos debe ser positiva (~0.5000 g).');
       score -= 20;
     }
-  }
+    if ((data.studentPurityPercent || 0) <= 0 || (data.studentPurityPercent || 0) > 100) {
+      dataIntegrityPassed = false;
+      feedbackNotes.push('El porcentaje de sulfato debe estar entre 0% y 100%.');
+      score -= 20;
+    }
+  } else {
+    // Volumetría (P4 y P7)
+    if (practiceNumber === 4) {
+      if (data.sampleMass <= 0 || data.sampleMass > 2.0) {
+        dataIntegrityPassed = false;
+        feedbackNotes.push('La masa de patrón primario KHP debe ser un valor positivo razonable (típicamente 0.20 a 0.25 g).');
+        score -= 20;
+      }
+    }
 
-  if (data.finalVolume < data.initialVolume) {
-    dataIntegrityPassed = false;
-    feedbackNotes.push('El volumen final de la bureta (Vf) no puede ser menor a la lectura inicial (V0).');
-    score -= 20;
-  }
+    if (data.finalVolume < data.initialVolume) {
+      dataIntegrityPassed = false;
+      feedbackNotes.push('El volumen final de la bureta (Vf) no puede ser menor a la lectura inicial (V0).');
+      score -= 20;
+    }
 
-  const calculatedNetVolume = Number((data.finalVolume - data.initialVolume).toFixed(2));
-  if (Math.abs(data.netVolume - calculatedNetVolume) > 0.05) {
-    dataIntegrityPassed = false;
-    feedbackNotes.push(`El volumen neto anotado (${data.netVolume} mL) difiere de la resta (Vf - V0 = ${calculatedNetVolume} mL).`);
-    score -= 15;
+    const calculatedNetVolume = Number((data.finalVolume - data.initialVolume).toFixed(2));
+    if (Math.abs(data.netVolume - calculatedNetVolume) > 0.05) {
+      dataIntegrityPassed = false;
+      feedbackNotes.push(`El volumen neto anotado (${data.netVolume} mL) difiere de la resta (Vf - V0 = ${calculatedNetVolume} mL).`);
+      score -= 15;
+    }
   }
 
   // Etapa 2: Rigor Aritmético y Cifras Significativas
   let arithmeticAccuracyPassed = false;
   let significantFiguresPassed = false;
 
-  if (dataIntegrityPassed && data.netVolume > 0) {
+  if (practiceNumber === 5) {
+    // P5: % SO4 = (m_BaSO4 * 0.4116 / m_muestra) * 100
+    // data.netVolume aquí almacena la masa neta de BaSO4 (ej: 0.3521 g)
+    const netBaSO4 = data.netVolume;
+    const expectedPercent = (netBaSO4 * 0.4116 * 100) / data.sampleMass;
+    const studentPct = data.studentPurityPercent || 0;
+    const relDiff = Math.abs(studentPct - expectedPercent) / expectedPercent;
+
+    if (relDiff <= 0.01) {
+      arithmeticAccuracyPassed = true;
+    } else {
+      feedbackNotes.push(`Error en la estequiometría gravimétrica: según sus datos (m_BaSO4=${netBaSO4} g, m_muestra=${data.sampleMass} g, FG=0.4116), el porcentaje de SO4 debería ser ${expectedPercent.toFixed(2)}%, pero ingresó ${studentPct.toFixed(2)}%.`);
+      score -= 25;
+    }
+
+    const strPct = studentPct.toString();
+    if (strPct.includes('.') && strPct.split('.')[1].length >= 2) {
+      significantFiguresPassed = true;
+    } else {
+      feedbackNotes.push('Atención a las cifras significativas: exprese el porcentaje gravimétrico con al menos 2 cifras decimales (ej. 28.98%).');
+      score -= 10;
+    }
+  } else if (dataIntegrityPassed && data.netVolume > 0) {
     let expectedStudentN = 0.1000;
 
     if (practiceNumber === 7) {
-      // P7: N_HCl = (V_NaOH * N_NaOH) / V_alicuota (con V_alicuota = 25.00 mL)
       const aliquotVolume = 25.00;
       expectedStudentN = (data.netVolume * titrantNormalityP7) / aliquotVolume;
     } else {
-      // P4: N_NaOH = (m_KHP * 1000) / (PE_KHP * Delta_V)
       expectedStudentN = (data.sampleMass * 1000) / (equivalentWeight * data.netVolume);
     }
 
@@ -70,7 +105,6 @@ export function evaluateStudentNotebook(
       score -= 25;
     }
 
-    // Validación de Cifras Significativas (4 cifras exigidas en volumetría analítica)
     const strVal = data.studentConcentration.toString();
     const decimalPart = strVal.split('.')[1] || '';
     if (decimalPart.length >= 3 && decimalPart.length <= 5) {
@@ -82,19 +116,31 @@ export function evaluateStudentNotebook(
   }
 
   // Etapa 3: Metrología y Comparación contra el Valor Verdadero
+  let relativeErrorPercent = 0;
   let trueVolumeRequired = 0;
-  if (practiceNumber === 7) {
-    trueVolumeRequired = (25.00 * trueConcentration) / titrantNormalityP7;
+
+  if (practiceNumber === 5) {
+    // trueConcentration en P5 es el % verdadero de sulfatos en la muestra (~28.95%)
+    const studentPct = data.studentPurityPercent || 0;
+    relativeErrorPercent = Math.abs((studentPct - trueConcentration) / trueConcentration) * 100;
+    if (relativeErrorPercent > 3.0) {
+      score -= Math.min(25, Math.round(relativeErrorPercent * 2));
+      feedbackNotes.push(`Su porcentaje obtenido (${studentPct.toFixed(2)}%) difiere del valor verdadero de la muestra (${trueConcentration.toFixed(2)}%) en un ${relativeErrorPercent.toFixed(2)}%.`);
+    }
   } else {
-    const molesReal = data.sampleMass / equivalentWeight;
-    trueVolumeRequired = (molesReal / trueConcentration) * 1000;
-  }
+    if (practiceNumber === 7) {
+      trueVolumeRequired = (25.00 * trueConcentration) / titrantNormalityP7;
+    } else {
+      const molesReal = data.sampleMass / equivalentWeight;
+      trueVolumeRequired = (molesReal / trueConcentration) * 1000;
+    }
 
-  const relativeErrorPercent = Math.abs((data.studentConcentration - trueConcentration) / trueConcentration) * 100;
+    relativeErrorPercent = Math.abs((data.studentConcentration - trueConcentration) / trueConcentration) * 100;
 
-  if (relativeErrorPercent > 3.0) {
-    score -= Math.min(25, Math.round(relativeErrorPercent * 2));
-    feedbackNotes.push(`Su concentración calculada (${data.studentConcentration} N) difiere del valor verdadero (${trueConcentration.toFixed(4)} N) en un ${relativeErrorPercent.toFixed(2)}%.`);
+    if (relativeErrorPercent > 3.0) {
+      score -= Math.min(25, Math.round(relativeErrorPercent * 2));
+      feedbackNotes.push(`Su concentración calculada (${data.studentConcentration} N) difiere del valor verdadero (${trueConcentration.toFixed(4)} N) en un ${relativeErrorPercent.toFixed(2)}%.`);
+    }
   }
 
   // Deducción por Defectos de Técnica de Mesada (TDA)
@@ -114,6 +160,15 @@ export function evaluateStudentNotebook(
     } else if (defect.type === 'DEFECT_BLOWN_PIPETTE_DROP') {
       score -= 15;
       feedbackNotes.push('Penalización TDA: Sopló la última gota de la pipeta aforada calibrada para vertido libre TD/Ex.');
+    } else if (defect.type === 'DEFECT_NO_DIGESTION') {
+      score -= 20;
+      feedbackNotes.push('Penalización TDA: Filtró sin completar la digestión térmica. Pérdida de cristales finos coloidales de BaSO4.');
+    } else if (defect.type === 'DEFECT_INCOMPLETE_WASHING') {
+      score -= 20;
+      feedbackNotes.push('Penalización TDA: Lavado incompleto del precipitado (prueba de AgNO3 aún positiva a cloruros).');
+    } else if (defect.type === 'DEFECT_WEIGHING_HOT_CRUCIBLE') {
+      score -= 15;
+      feedbackNotes.push('Penalización TDA: Pesó el crisol caliente sin esperar enfriamiento en desecador (error de convección).');
     }
   }
 
