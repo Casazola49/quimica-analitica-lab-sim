@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { LabBench } from './components/bench/LabBench';
 import { GravimetryBench } from './components/bench/GravimetryBench';
-import { LabNotebook } from './components/notebook/LabNotebook';
+import { SpectrophotometryBench } from './components/bench/SpectrophotometryBench';
+import { LabNotebook, SpectroMeasurementPoint } from './components/notebook/LabNotebook';
 import { MeniscusLoupeModal } from './components/inspection/MeniscusLoupeModal';
 import { AnalyticalBalanceModal } from './components/inspection/AnalyticalBalanceModal';
 import { PipetteTransferModal } from './components/inspection/PipetteTransferModal';
@@ -16,7 +17,7 @@ import { TechniqueDefectType } from './types';
 import { FlaskConical, BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle, Layers, CheckCircle2, Circle } from 'lucide-react';
 
 export const App: React.FC = () => {
-  // Práctica actualmente seleccionada (P4, P5 o P7)
+  // Práctica actualmente seleccionada (P4, P5, P7 o P12)
   const [currentPracticeNumber, setCurrentPracticeNumber] = useState<number>(4);
 
   // Parámetros aleatorizados de la sesión:
@@ -32,6 +33,10 @@ export const App: React.FC = () => {
   // P5: Masa de muestra sulfatos (~0.5000 g) y % verdadero (~28.95%)
   const [sampleMassP5] = useState<number>(() => Number((0.5000 + (Math.random() - 0.5) * 0.03).toFixed(4)));
   const [truePercentSO4] = useState<number>(() => Number((28.95 + (Math.random() - 0.5) * 0.8).toFixed(2)));
+
+  // P12: Concentración de Fe problema (~2.45 ppm)
+  const [unknownTrueFePpm] = useState<number>(() => Number((2.45 + (Math.random() - 0.5) * 0.8).toFixed(2)));
+  const [spectroPoints, setSpectroPoints] = useState<SpectroMeasurementPoint[]>([]);
 
   // Instancia de la Máquina de Estados Procedimental (TDA)
   const engineRef = useRef<ProcedureEngine>(new ProcedureEngine());
@@ -67,7 +72,9 @@ export const App: React.FC = () => {
 
   // Concentración verdadera según práctica
   const activeTrueConcentration =
-    currentPracticeNumber === 5
+    currentPracticeNumber === 12
+      ? unknownTrueFePpm
+      : currentPracticeNumber === 5
       ? truePercentSO4
       : currentPracticeNumber === 7
       ? trueNormalityP7
@@ -178,7 +185,6 @@ export const App: React.FC = () => {
   };
 
   const handleRecordGravimetricDefect = (type: TechniqueDefectType, citationId: string) => {
-    // Registrar defecto en el motor
     engineRef.current['recordDefect']?.(type, citationId);
   };
 
@@ -187,7 +193,26 @@ export const App: React.FC = () => {
     cruciblePlusBaSO4: number;
     netBaSO4Mass: number;
   }) => {
-    // Gravimetría finalizada
+    // Gravimetría completada
+  };
+
+  // Registro de medición en espectrofotometría (P12)
+  const handleRecordSpectroMeasurement = (data: {
+    ppm: number;
+    absorbance: number;
+    transmittance: number;
+    isUnknown?: boolean;
+  }) => {
+    setSpectroPoints((prev) => {
+      // Si ya existe este estándar medido, actualizarlo; sino, agregarlo
+      const existingIdx = prev.findIndex((p) => (data.isUnknown ? p.isUnknown : p.ppm === data.ppm));
+      if (existingIdx >= 0) {
+        const copy = [...prev];
+        copy[existingIdx] = data;
+        return copy;
+      }
+      return [...prev, data];
+    });
   };
 
   const handleResetBench = () => {
@@ -203,6 +228,7 @@ export const App: React.FC = () => {
     setActualSampleMassP4(0);
     setRecordedV0(0);
     setRecordedVf(0);
+    setSpectroPoints([]);
   };
 
   const handleSelectPractice = (practiceNum: number) => {
@@ -215,13 +241,13 @@ export const App: React.FC = () => {
   // Determinar paso actual para el Stepper
   const currentStep = !isMaterialsApproved
     ? 1
-    : !isBuretteLoaded && currentPracticeNumber !== 5
+    : !isBuretteLoaded && currentPracticeNumber !== 5 && currentPracticeNumber !== 12
     ? 2
-    : !isSampleDissolved && currentPracticeNumber !== 5
+    : !isSampleDissolved && currentPracticeNumber !== 5 && currentPracticeNumber !== 12
     ? 3
-    : !isBubblePurged && currentPracticeNumber !== 5
+    : !isBubblePurged && currentPracticeNumber !== 5 && currentPracticeNumber !== 12
     ? 4
-    : (indicatorDrops === 0 || !isStirring) && currentPracticeNumber !== 5
+    : (indicatorDrops === 0 || !isStirring) && currentPracticeNumber !== 5 && currentPracticeNumber !== 12
     ? 5
     : 6;
 
@@ -243,7 +269,9 @@ export const App: React.FC = () => {
               </span>
             </div>
             <p className="text-[10px] sm:text-[11px] text-slate-400 truncate hidden sm:block">
-              {currentPracticeNumber === 5
+              {currentPracticeNumber === 12
+                ? 'Práctica 12: Colorimetría y Espectrofotometría UV-Vis (Ley de Beer)'
+                : currentPracticeNumber === 5
                 ? 'Práctica 5: Determinación Gravimétrica de Sulfatos (BaSO4)'
                 : currentPracticeNumber === 7
                 ? 'Práctica 7: Titulación Potenciométrica de HCl con NaOH estándar'
@@ -311,7 +339,35 @@ export const App: React.FC = () => {
           </div>
           <span className="text-slate-600">➔</span>
 
-          {currentPracticeNumber === 5 ? (
+          {currentPracticeNumber === 12 ? (
+            /* Stepper específico de Espectrofotometría P12 */
+            <>
+              <div className="flex items-center gap-1.5 text-blue-400 font-semibold">
+                <Circle size={13} />
+                <span>2. λ = 508 nm</span>
+              </div>
+              <span className="text-slate-600">➔</span>
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <Circle size={13} />
+                <span>3. Auto-Zero</span>
+              </div>
+              <span className="text-slate-600">➔</span>
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <Circle size={13} />
+                <span>4. Limpiar Cubeta</span>
+              </div>
+              <span className="text-slate-600">➔</span>
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <Circle size={13} />
+                <span>5. Medir Serie</span>
+              </div>
+              <span className="text-slate-600">➔</span>
+              <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                <Circle size={13} />
+                <span>6. Ley de Beer</span>
+              </div>
+            </>
+          ) : currentPracticeNumber === 5 ? (
             /* Stepper específico de Gravimetría P5 */
             <>
               <div className="flex items-center gap-1.5 text-blue-400 font-semibold">
@@ -377,6 +433,7 @@ export const App: React.FC = () => {
         <div className="text-[10px] text-slate-400 font-mono hidden xl:block">
           *Paso actual: {
             currentStep === 1 ? 'Presentar lista de materiales al ayudante' :
+            currentPracticeNumber === 12 ? 'Calibrar blanco, limpiar cubetas y medir serie espectrofotométrica a 508 nm' :
             currentPracticeNumber === 5 ? 'Ejecutar las 5 estaciones de gravimetría secuencialmente' :
             currentStep === 2 ? 'Cargar solución de NaOH en la bureta' :
             currentStep === 3 ? (currentPracticeNumber === 7 ? 'Pipetear 25.00 mL de HCl con propipeta' : 'Pesar KHP en balanza y disolver') :
@@ -389,9 +446,15 @@ export const App: React.FC = () => {
 
       {/* Contenedor Principal */}
       <main className="flex-1 p-2.5 sm:p-4 flex flex-col lg:flex-row gap-3 sm:gap-4 overflow-hidden min-h-0 relative">
-        {/* Mesada Virtual 2D (Conmutable entre Volumetría P4/P7 y Gravimetría P5) */}
+        {/* Mesada Virtual 2D (Conmutable entre Volumetría P4/P7, Gravimetría P5 y Espectrofotometría P12) */}
         <section className="flex-1 h-full min-h-0 flex flex-col">
-          {currentPracticeNumber === 5 ? (
+          {currentPracticeNumber === 12 ? (
+            <SpectrophotometryBench
+              unknownTruePpm={unknownTrueFePpm}
+              onRecordDefect={handleRecordGravimetricDefect}
+              onRecordMeasurement={handleRecordSpectroMeasurement}
+            />
+          ) : currentPracticeNumber === 5 ? (
             <GravimetryBench
               sampleMassGrams={sampleMassP5}
               onRecordDefect={handleRecordGravimetricDefect}
@@ -434,6 +497,7 @@ export const App: React.FC = () => {
             trueConcentration={activeTrueConcentration}
             currentDeliveredMl={deliveredMl}
             currentPH={equilibrium.pH}
+            spectroPoints={spectroPoints}
             defects={engineRef.current.getState().defects}
             onOpenAuditModal={() => setIsAuditModalOpen(true)}
           />
@@ -473,6 +537,7 @@ export const App: React.FC = () => {
                   trueConcentration={activeTrueConcentration}
                   currentDeliveredMl={deliveredMl}
                   currentPH={equilibrium.pH}
+                  spectroPoints={spectroPoints}
                   defects={engineRef.current.getState().defects}
                   onOpenAuditModal={() => setIsAuditModalOpen(true)}
                 />

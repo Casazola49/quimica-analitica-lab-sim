@@ -20,7 +20,14 @@ export function evaluateStudentNotebook(
   // Etapa 1: Validación de Consistencia Física de Datos Crudos
   let dataIntegrityPassed = true;
 
-  if (practiceNumber === 5) {
+  if (practiceNumber === 12) {
+    // P12: Espectrofotometría UV-Vis (Concentración en ppm Fe)
+    if (data.studentConcentration <= 0 || data.studentConcentration > 20) {
+      dataIntegrityPassed = false;
+      feedbackNotes.push('La concentración de la muestra problema de hierro debe ser un valor positivo razonable (típicamente 1 a 5 ppm).');
+      score -= 20;
+    }
+  } else if (practiceNumber === 5) {
     // P5: Gravimetría de BaSO4
     if (data.sampleMass <= 0 || data.sampleMass > 2.0) {
       dataIntegrityPassed = false;
@@ -60,9 +67,25 @@ export function evaluateStudentNotebook(
   let arithmeticAccuracyPassed = false;
   let significantFiguresPassed = false;
 
-  if (practiceNumber === 5) {
+  if (practiceNumber === 12) {
+    // P12: Interpolación por Ley de Beer
+    const relDiff = Math.abs(data.studentConcentration - trueConcentration) / trueConcentration;
+    if (relDiff <= 0.03) {
+      arithmeticAccuracyPassed = true;
+    } else {
+      feedbackNotes.push(`Error en la interpolación de la Ley de Beer: según la recta de calibración, la concentración debería aproximarse a ${trueConcentration.toFixed(2)} ppm, pero ingresó ${data.studentConcentration} ppm.`);
+      score -= 25;
+    }
+
+    const strPpm = data.studentConcentration.toString();
+    if (strPpm.includes('.') && strPpm.split('.')[1].length >= 2) {
+      significantFiguresPassed = true;
+    } else {
+      feedbackNotes.push('Atención a las cifras significativas: exprese la concentración fotométrica con al menos 2 decimales (ej. 2.45 ppm).');
+      score -= 10;
+    }
+  } else if (practiceNumber === 5) {
     // P5: % SO4 = (m_BaSO4 * 0.4116 / m_muestra) * 100
-    // data.netVolume aquí almacena la masa neta de BaSO4 (ej: 0.3521 g)
     const netBaSO4 = data.netVolume;
     const expectedPercent = (netBaSO4 * 0.4116 * 100) / data.sampleMass;
     const studentPct = data.studentPurityPercent || 0;
@@ -119,8 +142,13 @@ export function evaluateStudentNotebook(
   let relativeErrorPercent = 0;
   let trueVolumeRequired = 0;
 
-  if (practiceNumber === 5) {
-    // trueConcentration en P5 es el % verdadero de sulfatos en la muestra (~28.95%)
+  if (practiceNumber === 12) {
+    relativeErrorPercent = Math.abs((data.studentConcentration - trueConcentration) / trueConcentration) * 100;
+    if (relativeErrorPercent > 3.0) {
+      score -= Math.min(25, Math.round(relativeErrorPercent * 2));
+      feedbackNotes.push(`Su concentración interpolada (${data.studentConcentration} ppm) difiere del valor verdadero de la muestra (${trueConcentration.toFixed(2)} ppm) en un ${relativeErrorPercent.toFixed(2)}%.`);
+    }
+  } else if (practiceNumber === 5) {
     const studentPct = data.studentPurityPercent || 0;
     relativeErrorPercent = Math.abs((studentPct - trueConcentration) / trueConcentration) * 100;
     if (relativeErrorPercent > 3.0) {
@@ -169,6 +197,15 @@ export function evaluateStudentNotebook(
     } else if (defect.type === 'DEFECT_WEIGHING_HOT_CRUCIBLE') {
       score -= 15;
       feedbackNotes.push('Penalización TDA: Pesó el crisol caliente sin esperar enfriamiento en desecador (error de convección).');
+    } else if (defect.type === 'DEFECT_FINGERPRINTS_ON_CUVETTE') {
+      score -= 15;
+      feedbackNotes.push('Penalización TDA: Cubeta óptica con huellas dactilares (aumento espurio de absorbancia por dispersión).');
+    } else if (defect.type === 'DEFECT_NO_BLANK_ZERO') {
+      score -= 20;
+      feedbackNotes.push('Penalización TDA: Omitió el ajuste de cero de absorbancia con el blanco de reactivos.');
+    } else if (defect.type === 'DEFECT_WRONG_WAVELENGTH') {
+      score -= 15;
+      feedbackNotes.push('Penalización TDA: Medición fuera de la longitud de onda de máxima absorción (508 nm).');
     }
   }
 

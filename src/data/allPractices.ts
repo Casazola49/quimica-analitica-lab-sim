@@ -138,7 +138,7 @@ export const ALL_PRACTICES: PracticeSummary[] = [
     unitTitle: 'Espectrofotometría Molecular',
     title: 'Colorimetría y Espectrofotometría UV-Vis (Hierro con 1,10-Fenantrolina)',
     category: 'instrumental',
-    status: 'specified',
+    status: 'active',
     shortObjective: 'Curva de calibración de Beer-Lambert a 508 nm para el complejo ferroso-fenantrolina y regresión lineal por mínimos cuadrados.',
     keyReagents: ['Patrón Fe 100 ppm', '1,10-Fenantrolina 0.1%', 'Hidroxilamina reductora', 'Tampón acetato pH 4.5'],
     keyEquipment: ['Espectrofotómetro UV-Vis digital', 'Par de cubetas de vidrio óptico 1 cm', 'Matraces aforados 50 mL', 'Micropipetas']

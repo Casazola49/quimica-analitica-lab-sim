@@ -191,6 +191,55 @@ test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsi
     await expect(page.locator('text=Puntaje Formativo:').first()).toBeVisible();
   });
 
+  test('Práctica 12 (Espectrofotometría UV-Vis Fe): Curva de Beer, calibración de blanco a 508 nm y regresión R²', async ({ page }) => {
+    await page.goto('/');
+
+    // Cerrar modal inicial
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
+
+    // Cambiar a Práctica 12 desde el selector
+    await page.locator('button', { hasText: 'Prácticas (13)' }).click();
+    await page.locator('text=Colorimetría y Espectrofotometría UV-Vis').click();
+    await page.locator('button', { hasText: 'Cargar Práctica 12 en la Mesada Virtual' }).click();
+
+    // Aprobar materiales P12
+    await expect(page.locator('text=Práctica 12 (Espectrofotometría UV-Vis Fe)')).toBeVisible();
+    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
+    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
+
+    // Verificar consola del espectrofotómetro
+    await expect(page.locator('text=Espectrofotómetro UV-Visible Digital')).toBeVisible();
+
+    // Limpiar cubeta y calibrar blanco
+    await page.locator('button', { hasText: 'Limpiar con papel para lentes' }).click();
+    await page.locator('button', { hasText: 'Calibrar Blanco (Auto-Zero' }).click();
+    await expect(page.locator('text=● ZERO CALIBRATED')).toBeVisible();
+
+    // Medir Patrón 1 (1.00 ppm)
+    await page.locator('button', { hasText: '1.0 ppm' }).click();
+    await page.locator('button', { hasText: 'Limpiar con papel para lentes' }).click();
+    await page.locator('button', { hasText: 'Medir Patrón 1' }).click();
+
+    // Medir Muestra Problema
+    await page.locator('button', { hasText: 'Problema' }).click();
+    await page.locator('button', { hasText: 'Limpiar con papel para lentes' }).click();
+    await page.locator('button', { hasText: 'Medir Muestra Problema' }).click();
+
+    // En la libreta, ingresar concentración estimada y evaluar
+    const viewport = page.viewportSize();
+    if (viewport && viewport.width < 1024) {
+      await page.locator('button', { hasText: 'Abrir Libreta de Laboratorio' }).click();
+    }
+
+    const feInput = page.locator('input[placeholder="ej. 2.45"]:visible');
+    await feInput.fill('2.45');
+    await page.locator('button:visible', { hasText: 'Evaluar Informe y Cálculos' }).click();
+    await expect(page.locator('text=Puntaje Formativo:').first()).toBeVisible();
+  });
+
   test('Rotación suave de la llave de la bureta sin saltos de posición', async ({ page }) => {
     await page.goto('/');
 

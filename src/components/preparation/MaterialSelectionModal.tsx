@@ -105,6 +105,35 @@ export const P5_ITEMS: MaterialItem[] = [
   { id: 'd_k2cr2o7', name: 'Dicromato de potasio patrón primario', category: 'reagent', isRequired: false, reason: 'Incorrecto: Patrón oxidante de volumetría redox de hierro (P8).' },
 ];
 
+export const P12_ITEMS: MaterialItem[] = [
+  // Materiales Requeridos P12 (Espectrofotometría UV-Vis)
+  { id: 'm_spectro', name: 'Espectrofotómetro UV-Visible digital con monocromador a 508 nm', category: 'material', isRequired: true, reason: 'Instrumento óptico para medir la absorbancia y transmitancia del haz de luz monocromático transmitido.' },
+  { id: 'm_cuvettes', name: 'Par de cubetas apareadas de vidrio óptico de 1.00 cm de camino de paso', category: 'material', isRequired: true, reason: 'Celdas ópticas con ventanas transparentes paralelas idénticas para contener el blanco y los estándares.' },
+  { id: 'm_flasks', name: 'Serie de 6 matraces aforados de 50 mL Clase A (blanco y 5 patrones)', category: 'material', isRequired: true, reason: 'Para preparar por dilución volumétrica exacta la curva de calibración de 0 a 5 ppm de Fe.' },
+  { id: 'm_pipettes', name: 'Micropipetas automáticas de precisión calibradas (100 - 1000 µL)', category: 'material', isRequired: true, reason: 'Para dosificar con reproducibilidad los volúmenes de patrón de Fe, hidroxilamina, tampón y fenantrolina.' },
+  { id: 'm_lenspaper', name: 'Papel especial de limpieza para lentes y superficies ópticas', category: 'material', isRequired: true, reason: 'Limpia las caras transparentes de la cubeta sin rayarlas ni dejar pelusas que dispersen la luz.' },
+
+  // Distractores P12
+  { id: 'd_burette', name: 'Bureta graduada de 50 mL Clase A', category: 'material', isRequired: false, reason: 'Incorrecto: La bureta es para valoraciones volumétricas gota a gota, no para espectrofotometría.' },
+  { id: 'd_crucible', name: 'Crisol de porcelana con tapa', category: 'material', isRequired: false, reason: 'Incorrecto: El crisol es material refractario exclusivo para calcinación en mufla (P5).' },
+  { id: 'd_phmeter', name: 'pH-metro digital de mesa con electrodo combinado de vidrio', category: 'material', isRequired: false, reason: 'Incorrecto: En P12 el pH se fija químicamente con solución tampón acetato; no se titula potenciométricamente.' },
+  { id: 'd_cylinder', name: 'Probeta graduada de 100 mL', category: 'material', isRequired: false, reason: 'Incorrecto: La probeta carece de la exactitud volumétrica requerida para curvas de calibración espectrofotométricas.' },
+
+  // Reactivos Requeridos P12
+  { id: 'r_festandard', name: 'Solución estándar concentrada de Hierro (100 ppm de Fe)', category: 'reagent', isRequired: true, reason: 'Solución madre analítica a partir de la cual se preparan las diluciones estándar de la curva de Beer.' },
+  { id: 'r_phen', name: 'Solución de clorhidrato de 1,10-fenantrolina al 0.1% p/v en agua', category: 'reagent', isRequired: true, reason: 'Reactivo complejante cromóforo que forma el quelato rojo-anaranjado [Fe(phen)3](2+) con absorción máxima a 508 nm.' },
+  { id: 'r_hydroxylamine', name: 'Solución reductora de clorhidrato de hidroxilamina (NH2OH·HCl) al 10%', category: 'reagent', isRequired: true, reason: 'Agente reductor indispensable para reducir cuantitativamente todo Fe(3+) a Fe(2+), estado que reacciona con la fenantrolina.' },
+  { id: 'r_acetate', name: 'Solución amortiguadora de acetato de sodio (pH 4.5)', category: 'reagent', isRequired: true, reason: 'Fija el medio en el rango óptimo de pH 4.0 - 5.0 donde el quelato ferroso-fenantrolina es termodinámicamente estable.' },
+  { id: 'r_sample', name: 'Muestra problema desconocida con trazas de hierro a cuantificar', category: 'reagent', isRequired: true, reason: 'Disolución acuosa cuya concentración de Fe se interpolará en la recta de calibración.' },
+  { id: 'r_water', name: 'Agua desionizada ultra-pura para enrase', category: 'reagent', isRequired: true, reason: 'Medio disolvente libre de trazas metálicas interferentes para aforar los matraces de 50 mL.' },
+
+  // Distractores P12
+  { id: 'd_naoh', name: 'Solución de Hidróxido de Sodio (NaOH 0.1 N)', category: 'reagent', isRequired: false, reason: 'Incorrecto: El NaOH precipitaría el hierro como hidróxido insoluble Fe(OH)3 arruinando la solución homogénea.' },
+  { id: 'd_bacl2', name: 'Solución de Cloruro de Bario (BaCl2 al 5%)', category: 'reagent', isRequired: false, reason: 'Incorrecto: Reactivo precipitante de sulfatos para gravimetría (P5).' },
+  { id: 'd_edta', name: 'Sal disódica de EDTA 0.01 M', category: 'reagent', isRequired: false, reason: 'Incorrecto: El EDTA competiría por el ion Fe(2+) destruyendo el complejo coloreado con la fenantrolina.' },
+  { id: 'd_phenolphthalein', name: 'Solución de Fenolftaleína indicadora', category: 'reagent', isRequired: false, reason: 'Incorrecto: Indicador de pH volumétrico completamente ajeno a la colorimetría de hierro.' },
+];
+
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -127,7 +156,14 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
   onClose,
   onValidationSuccess,
 }) => {
-  const baseItems = practiceNumber === 5 ? P5_ITEMS : practiceNumber === 7 ? P7_ITEMS : P4_ITEMS;
+  const baseItems =
+    practiceNumber === 12
+      ? P12_ITEMS
+      : practiceNumber === 5
+      ? P5_ITEMS
+      : practiceNumber === 7
+      ? P7_ITEMS
+      : P4_ITEMS;
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [shuffledMaterials, setShuffledMaterials] = useState<MaterialItem[]>([]);
@@ -178,7 +214,7 @@ export const MaterialSelectionModal: React.FC<MaterialSelectionModalProps> = ({
             <PackageCheck className="text-blue-400" size={22} />
             <div>
               <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wide">
-                Solicitud Pre-Laboratorio: {practiceNumber === 5 ? 'Práctica 5 (Gravimetría de BaSO4)' : practiceNumber === 7 ? 'Práctica 7 (Titulación Potenciométrica HCl)' : 'Práctica 4 (Estandarización NaOH)'}
+                Solicitud Pre-Laboratorio: {practiceNumber === 12 ? 'Práctica 12 (Espectrofotometría UV-Vis Fe)' : practiceNumber === 5 ? 'Práctica 5 (Gravimetría de BaSO4)' : practiceNumber === 7 ? 'Práctica 7 (Titulación Potenciométrica HCl)' : 'Práctica 4 (Estandarización NaOH)'}
               </h3>
               <p className="text-[11px] text-slate-400">
                 Seleccione el instrumental y reactivos estrictamente necesarios (lista barajada dinámicamente).

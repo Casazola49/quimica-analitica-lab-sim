@@ -126,5 +126,47 @@ export const PEDAGOGICAL_CITATIONS: Record<string, PedagogicalCitation> = {
     pedagogicalImpact: 'Una sola pesada no garantiza la remoción de humedad ni la combustión total del carbón.',
     remediationAdvice: 'Repita el ciclo de mufla por 15 minutos, enfríe 30 minutos en desecador y vuelva a pesar hasta que |m2 - m1| <= 0.0002 g.',
     ragDeepLinkQuery: 'criterio de peso constante en gravimetria analitica'
+  },
+  CITE_FINGERPRINTS_ON_CUVETTE: {
+    id: 'CITE_FINGERPRINTS_ON_CUVETTE',
+    defectType: 'DEFECT_FINGERPRINTS_ON_CUVETTE',
+    practiceId: 12,
+    book: 'Skoog',
+    edition: '9na Edición (2014)',
+    chapter: 24,
+    chapterTitle: 'Espectrofotometría de absorción molecular ultravioleta y visible',
+    pagePhysical: 612,
+    exactQuote: 'Las huellas dactilares, polvo o grasa sobre las caras ópticas transparentes de la cubeta provocan la dispersión espuria y absorción parasitaria del haz de luz, originando lecturas falsamente elevadas de absorbancia.',
+    pedagogicalImpact: 'Una huella grasa sobre la cara transparente incrementa la absorbancia leída entre +0.04 y +0.10 unidades, destruyendo la linealidad de la Ley de Beer.',
+    remediationAdvice: 'Sujete la cubeta únicamente por las caras esmeriladas opacas y limpie meticulosamente las ventanas ópticas transparentes con papel tissue especial para óptica antes de insertarla.',
+    ragDeepLinkQuery: 'limpieza de cubetas espectrofotometro huellas dactilares dispersion'
+  },
+  CITE_NO_BLANK_ZERO: {
+    id: 'CITE_NO_BLANK_ZERO',
+    defectType: 'DEFECT_NO_BLANK_ZERO',
+    practiceId: 12,
+    book: 'Day & Underwood',
+    edition: '6ta Edición (1989)',
+    chapter: 10,
+    chapterTitle: 'Métodos espectrofotométricos de análisis',
+    pagePhysical: 340,
+    exactQuote: 'El ajuste a cero de absorbancia empleando una cubeta con el blanco de reactivos compensa las pérdidas por reflexión en las interfaces vidrio-aire y la absorbancia propia de los reactivos y el solvente a la longitud de onda de trabajo.',
+    pedagogicalImpact: 'Omitir el ajuste de blanco introduce un error sistemático constante por exceso en toda la serie de calibración (ordenada al origen c desplazada espuriamente).',
+    remediationAdvice: 'Inserte la cubeta con el blanco de reactivos (sin hierro), cierre la tapa del compartimento y presione el botón Auto-Zero antes de medir cualquier estándar.',
+    ragDeepLinkQuery: 'calibracion blanco de reactivos absorbancia cero espectrofotometria'
+  },
+  CITE_OMITTED_REDUCING_AGENT: {
+    id: 'CITE_OMITTED_REDUCING_AGENT',
+    defectType: 'DEFECT_OMITTED_REDUCING_AGENT',
+    practiceId: 12,
+    book: 'Aguilar',
+    edition: '2da Edición (1999)',
+    chapter: 8,
+    chapterTitle: 'Métodos ópticos y espectrofotometría de quelatos',
+    pagePhysical: 210,
+    exactQuote: 'La 1,10-fenantrolina reacciona exclusivamente con hierro en estado de oxidación ferroso Fe(II). Si no se añade clorhidrato de hidroxilamina para reducir cuantitativamente el Fe(III) a Fe(II), el quelato coloreado [Fe(phen)3]2+ no se formará estequiométricamente.',
+    pedagogicalImpact: 'El analito Fe(III) no forma el complejo rojo-anaranjado cromóforo, produciendo absorbancias erróneamente bajas y un error grave por defecto en la concentración.',
+    remediationAdvice: 'Añada siempre 1 mL de disolución reductora de clorhidrato de hidroxilamina al 10% antes de adicionar la fenantrolina y el tampón acetato.',
+    ragDeepLinkQuery: 'reduccion de fe3 a fe2 con hidroxilamina fenantrolina'
   }
 };
