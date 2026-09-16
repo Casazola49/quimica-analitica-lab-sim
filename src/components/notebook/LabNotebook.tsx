@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BookOpen, Calculator, Award, CheckCircle2, XCircle, ExternalLink, LineChart, Table } from 'lucide-react';
+import { BookOpen, Calculator, Award, CheckCircle2, XCircle, ExternalLink, LineChart, Table, FileText } from 'lucide-react';
 import { EvaluationResult, LabNotebookData, TechniqueDefect } from '../../types';
 import { evaluateStudentNotebook } from '../../engine/evaluator';
+import { LabReportModal } from './LabReportModal';
 
 interface TitrationDataPoint {
   volume: number;
@@ -58,6 +59,7 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
   const [studentFePpm, setStudentFePpm] = useState<string>('');
 
   const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
 
   // Registro dinámico de puntos de titulación potenciométrica (P7)
   const [titrationPoints, setTitrationPoints] = useState<TitrationDataPoint[]>([
@@ -626,13 +628,23 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                   </div>
                 )}
 
-                <button
-                  onClick={onOpenAuditModal}
-                  className="w-full mt-2 py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 text-cyan-300 border border-cyan-500/40 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <span>Ver Citas de la Tríada Digital (Skoog / Day & Underwood)</span>
-                  <ExternalLink size={13} />
-                </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  <button
+                    onClick={onOpenAuditModal}
+                    className="w-full py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 text-cyan-300 border border-cyan-500/40 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  >
+                    <span>Citas Tríada Digital</span>
+                    <ExternalLink size={13} />
+                  </button>
+
+                  <button
+                    onClick={() => setIsReportModalOpen(true)}
+                    className="w-full py-2 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white border border-blue-400/50 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow transition-all"
+                  >
+                    <FileText size={14} />
+                    <span>Descargar Informe (PDF)</span>
+                  </button>
+                </div>
               </div>
             )}
           </>
@@ -875,6 +887,33 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
           </div>
         )}
       </div>
+
+      {/* Modal de Informe Formal Imprimible / Descargable */}
+      {evaluation && (
+        <LabReportModal
+          isOpen={isReportModalOpen}
+          practiceNumber={practiceNumber}
+          data={{
+            analyteName:
+              practiceNumber === 12
+                ? 'Hierro total con 1,10-fenantrolina'
+                : practiceNumber === 5
+                ? 'Sulfatos en muestra (como BaSO4)'
+                : practiceNumber === 7
+                ? 'Ácido Clorhídrico (HCl)'
+                : 'Biftalato de Potasio',
+            titrantName: practiceNumber === 12 ? 'Luz 508 nm' : practiceNumber === 5 ? 'BaCl2 5%' : 'Hidróxido de Sodio',
+            sampleMass: parseFloat(mass) || 0,
+            initialVolume: parseFloat(v0) || 0,
+            finalVolume: parseFloat(vf) || 0,
+            netVolume: practiceNumber === 5 ? parseFloat(netBaSO4Mass) || 0 : parseFloat(netV) || 0,
+            studentConcentration: practiceNumber === 12 ? parseFloat(studentFePpm) || 0 : parseFloat(calculatedN) || 0,
+            studentPurityPercent: parseFloat(studentPurityPercent) || 0,
+          }}
+          evaluation={evaluation}
+          onClose={() => setIsReportModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

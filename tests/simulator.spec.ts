@@ -37,6 +37,32 @@ test.describe('Simulador de Laboratorio: Pruebas E2E del Portal de Inicio y Fluj
     await expect(page.locator('#buretteGlass')).toBeVisible();
     await expect(page.locator('#flaskBody')).toBeVisible();
 
+    // Abrir libreta si es pantalla móvil
+    const viewport = page.viewportSize();
+    if (viewport && viewport.width < 1024) {
+      await page.locator('button', { hasText: 'Abrir Libreta de Laboratorio' }).click();
+    }
+
+    // Evaluar reporte en la libreta
+    const netVInput = page.locator('input[placeholder="0.00"]:visible');
+    await netVInput.fill('10.50');
+    const concInput = page.locator('input[placeholder="ej. 0.1012"]:visible');
+    await concInput.fill('0.1015');
+    await page.locator('button:visible', { hasText: 'Evaluar Informe y Cálculos' }).click();
+
+    // Abrir Modal de Informe Formal
+    await page.locator('button:visible', { hasText: 'Descargar Informe (PDF)' }).click();
+    await expect(page.locator('text=Informe Oficial de Laboratorio')).toBeVisible();
+    await expect(page.locator('text=Alquímica-33').first()).toBeVisible();
+    await expect(page.locator('text=Firma del Estudiante Evaluado')).toBeVisible();
+    await page.locator('button', { hasText: 'Imprimir Informe' }).click();
+    await page.locator('button:has(svg.lucide-x)').first().click();
+
+    // Si es pantalla móvil, cerrar el bottom sheet de la libreta para volver a la mesada
+    if (viewport && viewport.width < 1024) {
+      await page.locator('button', { hasText: 'Volver a Mesada' }).click();
+    }
+
     // Volver al Menú Principal
     await page.locator('button', { hasText: 'Menú Principal' }).click();
     await expect(page.locator('text=Laboratorio Virtual de Química Analítica Cuantitativa')).toBeVisible();
