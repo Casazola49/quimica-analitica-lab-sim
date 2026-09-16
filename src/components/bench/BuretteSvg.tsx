@@ -9,6 +9,7 @@ interface BuretteSvgProps {
   hasBubble: boolean;
   onToggleStopcock: () => void;
   onOpenLoupe: () => void;
+  onOpenTipZoom?: () => void;
 }
 
 export const BuretteSvg: React.FC<BuretteSvgProps> = ({
@@ -19,6 +20,7 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
   hasBubble,
   onToggleStopcock,
   onOpenLoupe,
+  onOpenTipZoom,
 }) => {
   // Altura total del tubo de la bureta en coordenadas SVG
   const tubeWidth = 24;
@@ -53,12 +55,16 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
         </button>
       )}
 
-      {/* Alerta sutil si hay burbuja en el pico */}
+      {/* Alerta interactiva si hay burbuja en el pico (clic para abrir zoom e inspección) */}
       {hasBubble && isBuretteLoaded && (
-        <div className="absolute top-1/2 -left-28 z-20 flex items-center gap-1 px-2 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] rounded shadow-md backdrop-blur">
-          <AlertCircle size={13} className="text-amber-400 shrink-0" />
-          <span>Burbuja en el pico</span>
-        </div>
+        <button
+          onClick={onOpenTipZoom}
+          className="absolute top-1/2 -left-32 z-20 flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-500/25 hover:bg-amber-500/40 border border-amber-500 text-amber-200 text-[11px] font-bold rounded-lg shadow-lg backdrop-blur transition-all active:scale-95 animate-pulse cursor-pointer"
+          title="Acercarse a la punta de la bureta para inspeccionar y purgar burbuja"
+        >
+          <AlertCircle size={14} className="text-amber-400 shrink-0" />
+          <span>Purgar Pico (Zoom)</span>
+        </button>
       )}
 
       <svg
@@ -245,14 +251,17 @@ export const BuretteSvg: React.FC<BuretteSvgProps> = ({
                   className="animate-pulse"
                 />
               ) : (
-                // Gota discreta cayendo
-                <circle
-                  cx="90"
-                  cy={stopcockY + 16 + tipHeight + 20}
-                  r="3.5"
-                  fill="#38bdf8"
-                  className="animate-bounce"
-                />
+                // Gota discreta cayendo continuamente hacia el matraz (unidireccional)
+                <g transform={`translate(90, ${stopcockY + 16 + tipHeight})`}>
+                  <ellipse
+                    cx="0"
+                    cy="0"
+                    rx="3"
+                    ry="4.5"
+                    fill="#38bdf8"
+                    className="animate-falling-drop"
+                  />
+                </g>
               )}
             </g>
           )}

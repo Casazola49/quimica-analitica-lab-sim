@@ -6,6 +6,7 @@ import { LabNotebook, SpectroMeasurementPoint } from './components/notebook/LabN
 import { MeniscusLoupeModal } from './components/inspection/MeniscusLoupeModal';
 import { AnalyticalBalanceModal } from './components/inspection/AnalyticalBalanceModal';
 import { PipetteTransferModal } from './components/inspection/PipetteTransferModal';
+import { TipPurgeModal } from './components/inspection/TipPurgeModal';
 import { AuditModal } from './components/feedback/AuditModal';
 import { MaterialSelectionModal } from './components/preparation/MaterialSelectionModal';
 import { LabGuideModal } from './components/guide/LabGuideModal';
@@ -68,6 +69,7 @@ export const App: React.FC = () => {
   const [isMaterialsModalOpen, setIsMaterialsModalOpen] = useState<boolean>(false);
   const [isBalanceModalOpen, setIsBalanceModalOpen] = useState<boolean>(false);
   const [isPipetteModalOpen, setIsPipetteModalOpen] = useState<boolean>(false);
+  const [isTipPurgeModalOpen, setIsTipPurgeModalOpen] = useState<boolean>(false);
   const [isLoupeOpen, setIsLoupeOpen] = useState<boolean>(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState<boolean>(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState<boolean>(false);
@@ -524,10 +526,15 @@ export const App: React.FC = () => {
               onToggleStopcock={handleToggleStopcock}
               onSetFlowRate={setFlowRate}
               onOpenLoupe={() => setIsLoupeOpen(true)}
+              onOpenTipZoom={() => setIsTipPurgeModalOpen(true)}
               onLoadBurette={handleLoadBurette}
               onOpenTransferModal={handleOpenTransferModal}
               onAddIndicator={handleAddIndicator}
-              onPurgeBubble={handlePurgeBubble}
+              onPurgeBubble={() => {
+                if (!isBubblePurged) {
+                  setIsTipPurgeModalOpen(true);
+                }
+              }}
               onToggleStirring={handleToggleStirring}
               onResetBench={handleResetBench}
               onTickTitration={handleTickTitration}
@@ -626,6 +633,15 @@ export const App: React.FC = () => {
         onClose={() => setIsLoupeOpen(false)}
         onTransferReading={handleTransferReading}
         onParallaxChanged={handleParallaxChanged}
+      />
+
+      <TipPurgeModal
+        isOpen={isTipPurgeModalOpen}
+        hasBubble={!isBubblePurged}
+        onClose={() => setIsTipPurgeModalOpen(false)}
+        onPurgeComplete={() => {
+          handlePurgeBubble();
+        }}
       />
 
       <LabGuideModal

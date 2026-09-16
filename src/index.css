@@ -22,28 +22,57 @@
   box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1), 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* Animación física realista de barra magnética de agitación (pez de teflón girando horizontalmente en 3D) */
+/* Animación física de barra magnética de agitación (proyección axial 3D simétrica sin desvío lateral) */
 @keyframes magnetic-stir-bar {
   0% {
-    transform: scaleX(1) translateX(0px);
+    transform: scaleX(1);
   }
   25% {
-    transform: scaleX(0.4) translateX(2px);
+    transform: scaleX(0.15);
   }
   50% {
-    transform: scaleX(0.9) translateX(-1px);
+    transform: scaleX(-1);
   }
   75% {
-    transform: scaleX(0.35) translateX(-2px);
+    transform: scaleX(-0.15);
   }
   100% {
-    transform: scaleX(1) translateX(0px);
+    transform: scaleX(1);
   }
 }
 
 .animate-stir-bar {
-  animation: magnetic-stir-bar 0.35s infinite linear;
-  transform-origin: center;
+  animation: magnetic-stir-bar 0.28s infinite linear;
+  transform-origin: 0 0;
+}
+
+/* Animación física de caída de gota continua unidireccional (nunca rebota hacia arriba) */
+@keyframes drop-fall-down {
+  0% {
+    transform: translateY(0px) scale(0.9, 1.1);
+    opacity: 0.95;
+  }
+  30% {
+    transform: translateY(18px) scale(0.8, 1.3);
+    opacity: 0.95;
+  }
+  75% {
+    transform: translateY(46px) scale(0.85, 1.2);
+    opacity: 0.9;
+  }
+  98% {
+    transform: translateY(62px) scale(1.4, 0.4);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(64px) scale(1.6, 0.2);
+    opacity: 0;
+  }
+}
+
+.animate-falling-drop {
+  animation: drop-fall-down 0.45s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  transform-origin: center top;
 }
 
 /* Ondulación del vórtice líquido */

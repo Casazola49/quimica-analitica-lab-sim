@@ -19,6 +19,7 @@ interface LabBenchProps {
   onToggleStopcock: () => void;
   onSetFlowRate: (rate: 'dropwise' | 'fast' | 'closed') => void;
   onOpenLoupe: () => void;
+  onOpenTipZoom?: () => void;
   onLoadBurette: () => void;
   onOpenTransferModal: () => void;
   onAddIndicator: () => void;
@@ -43,6 +44,7 @@ export const LabBench: React.FC<LabBenchProps> = ({
   onToggleStopcock,
   onSetFlowRate,
   onOpenLoupe,
+  onOpenTipZoom,
   onLoadBurette,
   onOpenTransferModal,
   onAddIndicator,
@@ -139,6 +141,7 @@ export const LabBench: React.FC<LabBenchProps> = ({
           hasBubble={hasBubble}
           onToggleStopcock={onToggleStopcock}
           onOpenLoupe={onOpenLoupe}
+          onOpenTipZoom={onOpenTipZoom}
         />
 
         <ErlenmeyerSvg
