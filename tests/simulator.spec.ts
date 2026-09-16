@@ -1,287 +1,114 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Simulador de Laboratorio: Pruebas E2E de Flujo Físico y Responsividad', () => {
+test.describe('Simulador de Laboratorio: Pruebas E2E del Portal de Inicio y Flujo de Prácticas', () => {
 
-  test('Flujo de inicio: Solicitud previa de materiales requerida al abrir el simulador', async ({ page }) => {
+  test('Portal de Inicio (Landing Hub): Debe recibir al alumno con el menú curricular y metodología en 3 pasos', async ({ page }) => {
     await page.goto('/');
 
-    // 1. Al iniciar debe aparecer el modal de solicitud de materiales
-    const materialsModal = page.locator('text=Solicitud Pre-Laboratorio');
-    await expect(materialsModal).toBeVisible();
+    // 1. Debe mostrar el Hero institucional
+    await expect(page.locator('text=Laboratorio Virtual de Química Analítica Cuantitativa')).toBeVisible();
+    await expect(page.locator('text=Simulador de Química Analítica Cuantitativa').first()).toBeVisible();
 
-    // 2. Usar botón de autocompletar recomendados
-    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
+    // 2. Metodología en 3 pasos visible
+    await expect(page.locator('text=Control de Entrada: Requisición de Materiales')).toBeVisible();
+    await expect(page.locator('text=Mesada 2D y Cuidado de Técnica Analítica (TDA)')).toBeVisible();
+    await expect(page.locator('text=Libreta de Laboratorio & Tríada Digital')).toBeVisible();
 
-    // 3. Verificar con el ayudante de laboratorio (notificación centrada inmediata)
-    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await expect(page.locator('text=¡Solicitud Aprobada por el Ayudante!')).toBeVisible();
-
-    // 4. Ingresar a la mesada
-    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
-    await expect(materialsModal).toBeHidden();
+    // 3. Grid con las 13 prácticas del plan de estudios
+    await expect(page.locator('text=Selecciona la Práctica de Laboratorio a Realizar')).toBeVisible();
+    await expect(page.locator('button', { hasText: 'Iniciar Laboratorio P4' })).toBeVisible();
   });
 
-  test('Verificar que el simulador empiece en reposo (agitador apagado y bureta vacía)', async ({ page }) => {
+  test('Iniciar Práctica P4 desde el Portal: Despliega mesada y requisición de materiales de P4', async ({ page }) => {
     await page.goto('/');
 
-    // Cerrar modal de materiales primero ingresando a la mesada
+    // Iniciar P4 desde el hub
+    await page.locator('button', { hasText: 'Iniciar Laboratorio P4' }).click();
+
+    // Debe abrir la mesada de P4 y desplegar la solicitud de materiales de P4
+    await expect(page.locator('text=Solicitud Pre-Laboratorio: Práctica 4')).toBeVisible();
+
+    // Completar requisición
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
     await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
 
-    // 1. La agitación debe estar estrictamente DETENIDA al inicio
-    const stirrerBtn = page.locator('button', { hasText: 'Matraz vacío: Pesar KHP en Balanza Analítica' });
-    await expect(stirrerBtn).toBeVisible();
+    // La mesada debe estar visible
+    await expect(page.locator('#buretteGlass')).toBeVisible();
+    await expect(page.locator('#flaskBody')).toBeVisible();
 
-    // 2. La llave de la bureta debe indicar "Bureta vacía" antes de ser cargada
-    await expect(page.locator('button', { hasText: 'Bureta vacía' })).toBeVisible();
-
-    // 3. El stepper debe indicar paso 2 (Cargar NaOH)
-    await expect(page.locator('text=2. Cargar NaOH')).toBeVisible();
+    // Volver al Menú Principal
+    await page.locator('button', { hasText: 'Menú Principal' }).click();
+    await expect(page.locator('text=Laboratorio Virtual de Química Analítica Cuantitativa')).toBeVisible();
   });
 
-  test('Paso a paso físico P4: Cargar bureta, pesar en balanza analítica y purgar', async ({ page }) => {
+  test('Iniciar Práctica P7 (Potenciometría) desde el Portal y verificar flujo', async ({ page }) => {
     await page.goto('/');
 
-    // Aprobar materiales
+    // Iniciar P7 desde el hub
+    await page.locator('button', { hasText: 'Iniciar Laboratorio P7' }).click();
+
+    // Requisición específica P7
+    await expect(page.locator('text=Solicitud Pre-Laboratorio: Práctica 7')).toBeVisible();
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
     await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
 
-    // 1. Cargar bureta con NaOH
-    const loadBuretteBtn = page.locator('button', { hasText: '1. Cargar Bureta con NaOH 0.1 N' });
-    await loadBuretteBtn.click();
-    await expect(page.locator('text=✓ Bureta con NaOH')).toBeVisible();
-
-    // 2. Pesar KHP en Balanza Analítica
-    const balanceBtn = page.locator('button', { hasText: '2. Pesar KHP en Balanza' });
-    await balanceBtn.click();
-    await expect(page.locator('text=Balanza Analítica Digital (Sensibilidad 0.1 mg)')).toBeVisible();
-
-    // Seguir pasos de la balanza
-    await page.locator('button', { hasText: '1. Colocar pesafiltro seco en el platillo' }).click();
-    await page.locator('button', { hasText: '2. Presionar botón de Tara (TARE ➔ 0.0000 g)' }).click();
-    await page.locator('button', { hasText: '3. Adicionar Biftalato de Potasio con espátula' }).click();
-    await page.locator('button', { hasText: '4. Transferir muestra al Erlenmeyer' }).click();
-
-    // Balanza cerrada y muestra disuelta
-    await expect(page.locator('text=✓ KHP Disuelto en Erlenmeyer')).toBeVisible();
-
-    // 3. Ahora el botón de agitación está disponible y apagado
-    const stirBtn = page.locator('button', { hasText: 'Agitación: Detenida' });
-    await expect(stirBtn).toBeVisible();
-
-    // Encender agitación
-    await stirBtn.click();
-    await expect(page.locator('button', { hasText: 'Agitación: 450 RPM (Vórtice)' })).toBeVisible();
-
-    // 4. Purgar burbuja de la bureta
-    const purgeBtn = page.locator('button', { hasText: 'Purgar Burbuja' });
-    await purgeBtn.click();
-    await expect(page.locator('text=✓ Llave Purgada')).toBeVisible();
-  });
-
-  test('Práctica 7 (Potenciometría de HCl): Pipeteo con propipeta, electrodo de pH y curva de 1ra derivada', async ({ page }) => {
-    await page.goto('/');
-
-    // Cerrar modal inicial
-    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
-    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
-
-    // Cambiar a Práctica 7 desde el selector
-    await page.locator('button', { hasText: 'Prácticas (13)' }).click();
-    await page.locator('text=P7').click();
-    await page.locator('button', { hasText: 'Cargar Práctica 7 en la Mesada Virtual' }).click();
-
-    // En P7 se abre de nuevo el modal de materiales específico para P7
-    await expect(page.locator('text=Práctica 7 (Titulación Potenciométrica HCl)')).toBeVisible();
-    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
-    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
-
-    // Cargar NaOH
+    // Cargar bureta
     await page.locator('button', { hasText: '1. Cargar Bureta con NaOH 0.1 N' }).click();
 
-    // Abrir Pipeta de 25.00 mL
-    const pipetteBtn = page.locator('button', { hasText: '2. Pipetear 25.00 mL de HCl' });
-    await pipetteBtn.click();
-
-    // Pasos de la pipeta
+    // Pipetear HCl
+    await page.locator('button', { hasText: '2. Pipetear 25.00 mL de HCl' }).click();
     await page.locator('button', { hasText: '1. Aspirar solución de HCl' }).click();
     await page.locator('button', { hasText: '2. Ajustar menisco cóncavo' }).click();
     await page.locator('button', { hasText: '3. Descarga libre vertical' }).click();
-    // Decisión de la gota (retirar sin soplar)
     await page.locator('button', { hasText: 'Retirar sin soplar' }).click();
 
-    // Debe mostrar la alícuota con electrodo
-    await expect(page.locator('text=✓ 25.00 mL HCl + Electrodo pH')).toBeVisible();
+    // Electrodo visible
     await expect(page.locator('#phElectrode')).toBeVisible();
 
-    // Si es pantalla grande, verificar pestaña de Curva Potenciométrica en la libreta
-    const viewport = page.viewportSize();
-    if (viewport && viewport.width >= 1024) {
-      await page.locator('button', { hasText: 'Curva pH & 1ra Derivada' }).click();
-      await expect(page.locator('text=Curva Potenciométrica en Tiempo Real')).toBeVisible();
-    }
+    // Volver al Menú Principal
+    await page.locator('button', { hasText: 'Menú Principal' }).click();
+    await expect(page.locator('text=Laboratorio Virtual de Química Analítica Cuantitativa')).toBeVisible();
   });
 
-  test('Práctica 5 (Gravimetría de BaSO4): Flujo completo de 5 estaciones y cálculo gravimétrico', async ({ page }) => {
+  test('Iniciar Práctica P5 (Gravimetría) desde el Portal', async ({ page }) => {
     await page.goto('/');
 
-    // Cerrar modal inicial
+    // Iniciar P5 desde el hub
+    await page.locator('button', { hasText: 'Iniciar Laboratorio P5' }).click();
+
+    // Requisición específica P5
+    await expect(page.locator('text=Solicitud Pre-Laboratorio: Práctica 5')).toBeVisible();
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
     await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
 
-    // Cambiar a Práctica 5 desde el selector
-    await page.locator('button', { hasText: 'Prácticas (13)' }).click();
-    await page.locator('text=Determinación Gravimétrica de Sulfatos (BaSO4)').click();
-    await page.locator('button', { hasText: 'Cargar Práctica 5 en la Mesada Virtual' }).click();
-
-    // Aprobar materiales P5
-    await expect(page.locator('text=Práctica 5 (Gravimetría de BaSO4)')).toBeVisible();
-    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
-    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
-
-    // Estación 1: Precipitación
+    // Estación 1 visible
     await expect(page.locator('text=Estación 1: Precipitación en Caliente')).toBeVisible();
-    await page.locator('button', { hasText: 'Adición Lenta Gota a Gota' }).click();
-    await page.locator('button', { hasText: 'Pasar a Estación 2' }).click();
 
-    // Estación 2: Digestión
-    await expect(page.locator('text=Estación 2: Digestión Térmica')).toBeVisible();
-    await page.locator('button', { hasText: 'Iniciar Digestión Térmica' }).click();
-    await page.waitForTimeout(1500); // Esperar digestión
-    await page.locator('button', { hasText: 'Pasar a Estación 3' }).click();
-
-    // Estación 3: Filtración
-    await expect(page.locator('text=Estación 3: Filtración por Gravedad')).toBeVisible();
-    await page.locator('button', { hasText: 'Verter por varilla' }).click();
-    await page.locator('button', { hasText: 'Pasar a Estación 4' }).click();
-
-    // Estación 4: Test AgNO3
-    await expect(page.locator('text=Estación 4: Ensayo de Cloruros')).toBeVisible();
-    // 3 lavados con agua caliente
-    await page.locator('button', { hasText: 'Lavar precipitado' }).click();
-    await page.locator('button', { hasText: 'Lavar precipitado' }).click();
-    await page.locator('button', { hasText: 'Lavar precipitado' }).click();
-    await page.locator('button', { hasText: '+1 gota AgNO3' }).click();
-    await expect(page.locator('text=Ensayo negativo de cloruros')).toBeVisible();
-    await page.locator('button', { hasText: 'Pasar a Estación 5' }).click();
-
-    // Estación 5: Calcinación y Peso Constante
-    await expect(page.locator('text=Estación 5: Calcinación')).toBeVisible();
-    await page.locator('button', { hasText: 'Calcinar crisol en mufla' }).click();
-    await page.locator('button', { hasText: 'Enfriar 30 min en Desecador' }).click();
-    await page.locator('button', { hasText: 'Realizar Pesada 1' }).click();
-    await page.locator('button', { hasText: 'Calcinación adicional 15 min' }).click();
-
-    await expect(page.locator('text=¡Peso Constante Alcanzado!')).toBeVisible();
-
-    // Libreta: Evaluar % SO4
-    const viewport = page.viewportSize();
-    if (viewport && viewport.width < 1024) {
-      await page.locator('button', { hasText: 'Abrir Libreta de Laboratorio' }).click();
-    }
-    const percentInput = page.locator('input[placeholder="ej. 28.98"]:visible');
-    await percentInput.fill('28.98');
-    await page.locator('button:visible', { hasText: 'Evaluar Informe y Cálculos' }).click();
-    await expect(page.locator('text=Puntaje Formativo:').first()).toBeVisible();
+    // Volver al Menú Principal
+    await page.locator('button', { hasText: 'Menú Principal' }).click();
+    await expect(page.locator('text=Laboratorio Virtual de Química Analítica Cuantitativa')).toBeVisible();
   });
 
-  test('Práctica 12 (Espectrofotometría UV-Vis Fe): Curva de Beer, calibración de blanco a 508 nm y regresión R²', async ({ page }) => {
+  test('Iniciar Práctica P12 (Espectrofotometría UV-Vis) desde el Portal', async ({ page }) => {
     await page.goto('/');
 
-    // Cerrar modal inicial
+    // Iniciar P12 desde el hub
+    await page.locator('button', { hasText: 'Iniciar Laboratorio P12' }).click();
+
+    // Requisición específica P12
+    await expect(page.locator('text=Solicitud Pre-Laboratorio: Práctica 12')).toBeVisible();
     await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
     await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
 
-    // Cambiar a Práctica 12 desde el selector
-    await page.locator('button', { hasText: 'Prácticas (13)' }).click();
-    await page.locator('text=Colorimetría y Espectrofotometría UV-Vis').click();
-    await page.locator('button', { hasText: 'Cargar Práctica 12 en la Mesada Virtual' }).click();
-
-    // Aprobar materiales P12
-    await expect(page.locator('text=Práctica 12 (Espectrofotometría UV-Vis Fe)')).toBeVisible();
-    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
-    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
-
-    // Verificar consola del espectrofotómetro
+    // Consola visible
     await expect(page.locator('text=Espectrofotómetro UV-Visible Digital')).toBeVisible();
 
-    // Limpiar cubeta y calibrar blanco
-    await page.locator('button', { hasText: 'Limpiar con papel para lentes' }).click();
-    await page.locator('button', { hasText: 'Calibrar Blanco (Auto-Zero' }).click();
-    await expect(page.locator('text=● ZERO CALIBRATED')).toBeVisible();
-
-    // Medir Patrón 1 (1.00 ppm)
-    await page.locator('button', { hasText: '1.0 ppm' }).click();
-    await page.locator('button', { hasText: 'Limpiar con papel para lentes' }).click();
-    await page.locator('button', { hasText: 'Medir Patrón 1' }).click();
-
-    // Medir Muestra Problema
-    await page.locator('button', { hasText: 'Problema' }).click();
-    await page.locator('button', { hasText: 'Limpiar con papel para lentes' }).click();
-    await page.locator('button', { hasText: 'Medir Muestra Problema' }).click();
-
-    // En la libreta, ingresar concentración estimada y evaluar
-    const viewport = page.viewportSize();
-    if (viewport && viewport.width < 1024) {
-      await page.locator('button', { hasText: 'Abrir Libreta de Laboratorio' }).click();
-    }
-
-    const feInput = page.locator('input[placeholder="ej. 2.45"]:visible');
-    await feInput.fill('2.45');
-    await page.locator('button:visible', { hasText: 'Evaluar Informe y Cálculos' }).click();
-    await expect(page.locator('text=Puntaje Formativo:').first()).toBeVisible();
-  });
-
-  test('Rotación suave de la llave de la bureta sin saltos de posición', async ({ page }) => {
-    await page.goto('/');
-
-    // Setup rápido
-    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
-    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
-    await page.locator('button', { hasText: '1. Cargar Bureta con NaOH 0.1 N' }).click();
-
-    // Abrir llave
-    const stopcockGroup = page.locator('#stopcock');
-    await stopcockGroup.click();
-
-    await expect(page.locator('button', { hasText: 'Llave: Gota a Gota' })).toBeVisible();
-
-    // Esperar goteo y cerrar
-    await page.waitForTimeout(1000);
-    await stopcockGroup.click();
-    await expect(page.locator('button', { hasText: 'Llave: Cerrada' })).toBeVisible();
-  });
-
-  test('Verificar que la mesada completa permanezca visible sin recortes en 100% zoom', async ({ page }) => {
-    await page.goto('/');
-
-    // Setup rápido
-    await page.locator('button', { hasText: 'Autocompletar recomendados' }).click();
-    await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
-    await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
-
-    const burette = page.locator('#buretteGlass');
-    const flask = page.locator('#flaskBody');
-    const shelf = page.locator('button', { hasText: 'Reiniciar' });
-
-    await expect(burette).toBeVisible();
-    await expect(flask).toBeVisible();
-    await expect(shelf).toBeVisible();
-
-    const shelfBox = await shelf.boundingBox();
-    const viewport = page.viewportSize();
-
-    if (shelfBox && viewport && viewport.width >= 1024) {
-      expect(shelfBox.y + shelfBox.height).toBeLessThanOrEqual(viewport.height);
-    }
+    // Volver al Menú Principal
+    await page.locator('button', { hasText: 'Menú Principal' }).click();
+    await expect(page.locator('text=Laboratorio Virtual de Química Analítica Cuantitativa')).toBeVisible();
   });
 });

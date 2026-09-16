@@ -14,9 +14,13 @@ import { ProcedureEngine } from './engine/procedureFsm';
 import { evaluateBenchEquilibrium } from './engine/equilibrium';
 import { PRACTICE_4_CONFIG } from './data/practiceConfig';
 import { TechniqueDefectType } from './types';
-import { FlaskConical, BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle, Layers, CheckCircle2, Circle } from 'lucide-react';
+import { FlaskConical, BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle, Layers, CheckCircle2, Circle, Home } from 'lucide-react';
+import { LandingHub } from './components/home/LandingHub';
 
 export const App: React.FC = () => {
+  // Vista activa: 'home' (Portal de Inicio) o 'bench' (Mesada de Laboratorio)
+  const [currentView, setCurrentView] = useState<'home' | 'bench'>('home');
+
   // Práctica actualmente seleccionada (P4, P5, P7 o P12)
   const [currentPracticeNumber, setCurrentPracticeNumber] = useState<number>(4);
 
@@ -61,7 +65,7 @@ export const App: React.FC = () => {
   const [recordedVf, setRecordedVf] = useState<number>(0);
 
   // Modales interactivos
-  const [isMaterialsModalOpen, setIsMaterialsModalOpen] = useState<boolean>(true);
+  const [isMaterialsModalOpen, setIsMaterialsModalOpen] = useState<boolean>(false);
   const [isBalanceModalOpen, setIsBalanceModalOpen] = useState<boolean>(false);
   const [isPipetteModalOpen, setIsPipetteModalOpen] = useState<boolean>(false);
   const [isLoupeOpen, setIsLoupeOpen] = useState<boolean>(false);
@@ -238,6 +242,14 @@ export const App: React.FC = () => {
     handleResetBench();
   };
 
+  const handleStartPracticeFromHub = (practiceNum: number) => {
+    setCurrentPracticeNumber(practiceNum);
+    setCurrentView('bench');
+    setIsMaterialsApproved(false);
+    setIsMaterialsModalOpen(true);
+    handleResetBench();
+  };
+
   // Determinar paso actual para el Stepper
   const currentStep = !isMaterialsApproved
     ? 1
@@ -250,6 +262,31 @@ export const App: React.FC = () => {
     : (indicatorDrops === 0 || !isStirring) && currentPracticeNumber !== 5 && currentPracticeNumber !== 12
     ? 5
     : 6;
+
+  if (currentView === 'home') {
+    return (
+      <>
+        <LandingHub
+          onSelectPractice={handleStartPracticeFromHub}
+          onOpenGuide={(pNum) => {
+            if (pNum) setCurrentPracticeNumber(pNum);
+            setIsGuideModalOpen(true);
+          }}
+          onOpenAuditRAG={() => setIsAuditModalOpen(true)}
+        />
+        <LabGuideModal
+          isOpen={isGuideModalOpen}
+          practiceNumber={currentPracticeNumber}
+          onClose={() => setIsGuideModalOpen(false)}
+        />
+        <AuditModal
+          isOpen={isAuditModalOpen}
+          defects={engineRef.current.getState().defects}
+          onClose={() => setIsAuditModalOpen(false)}
+        />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased">
@@ -281,6 +318,17 @@ export const App: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Botón Volver al Menú Principal */}
+          <button
+            onClick={() => setCurrentView('home')}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
+            title="Volver al Portal de Prácticas"
+          >
+            <Home size={15} className="text-blue-400" />
+            <span className="hidden sm:inline">Menú Principal</span>
+            <span className="sm:hidden">Menú</span>
+          </button>
+
           {/* Selector de Prácticas */}
           <button
             onClick={() => setIsPracticeSelectorOpen(true)}
