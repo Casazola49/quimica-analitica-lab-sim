@@ -7,19 +7,39 @@
   color-scheme: dark;
 }
 
-/* Custom glassmorphism & lab textures */
-.lab-bench-bg {
-  background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 100%);
+/* ==========================================================================
+   SISTEMA DE DISEÑO ALQUÍMICA-33 (SUMI-E / SUIBOKUGA)
+   Colores: Negro Tinta (Sumi), Blanco Papel (Washi) y Rojo Cinabrio (Shu-iro)
+   ========================================================================== */
+
+/* Fondo de mesada estilo papel de arroz húmedo con gradiente de tinta Sumi */
+.lab-bench-bg, .sumi-bench-bg {
+  background: radial-gradient(circle at 50% 25%, #171717 0%, #0a0a0a 100%);
   background-image: 
-    radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 100%);
-  background-size: 24px 24px, 100% 100%;
+    radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 50% 25%, #171717 0%, #080808 100%);
+  background-size: 28px 28px, 100% 100%;
+}
+
+/* Tarjeta con borde sutil de tinta china lavada */
+.sumi-card {
+  background-color: rgba(18, 18, 18, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Borde caligráfico asimétrico de tinta */
+.sumi-brush-border {
+  border-left: 3px solid #dc2626;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .wood-surface {
-  background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
-  border-top: 3px solid #64748b;
-  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1), 0 8px 16px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(180deg, #262626 0%, #121212 100%);
+  border-top: 2px solid #525252;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.08), 0 8px 16px rgba(0, 0, 0, 0.6);
 }
 
 /* Animación física de barra magnética de agitación (proyección axial 3D simétrica sin desvío lateral) */
@@ -89,6 +109,27 @@
 
 .animate-vortex {
   animation: liquid-vortex-wave 0.8s infinite ease-in-out;
+}
+
+/* Fogonazo cromático transitorio al caer gota de indicador */
+@keyframes indicator-bloom {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.animate-indicator-bloom {
+  animation: indicator-bloom 0.9s ease-out forwards;
+  transform-origin: center;
 }
 
 /* Reglas de impresión para el Informe Formal de Laboratorio */

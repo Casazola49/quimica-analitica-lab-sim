@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Simulador de Laboratorio: Pruebas E2E del Portal de Inicio y Flujo de Prácticas', () => {
 
-  test('Portal de Inicio (Landing Hub): Debe recibir al alumno con el menú curricular y metodología en 3 pasos', async ({ page }) => {
+  test('Portal de Inicio (Landing Hub): Debe recibir al alumno con estética Alquímica-33 y metodología en 3 pasos', async ({ page }) => {
     await page.goto('/');
 
-    // 1. Debe mostrar el Hero institucional
+    // 1. Debe mostrar el Hero institucional con sello Alquímica-33
     await expect(page.locator('text=Laboratorio Virtual de Química Analítica Cuantitativa')).toBeVisible();
-    await expect(page.locator('text=Simulador de Química Analítica Cuantitativa').first()).toBeVisible();
+    await expect(page.locator('text=Alquímica-33').first()).toBeVisible();
 
     // 2. Metodología en 3 pasos visible
     await expect(page.locator('text=Control de Entrada: Requisición de Materiales')).toBeVisible();
@@ -19,7 +19,7 @@ test.describe('Simulador de Laboratorio: Pruebas E2E del Portal de Inicio y Fluj
     await expect(page.locator('button', { hasText: 'Iniciar Laboratorio P4' })).toBeVisible();
   });
 
-  test('Iniciar Práctica P4 desde el Portal: Despliega mesada y requisición de materiales de P4', async ({ page }) => {
+  test('Iniciar Práctica P4 desde el Portal y probar Balanza Interactiva "Per Se", Gotero y Purga Zoom', async ({ page }) => {
     await page.goto('/');
 
     // Iniciar P4 desde el hub
@@ -33,9 +33,53 @@ test.describe('Simulador de Laboratorio: Pruebas E2E del Portal de Inicio y Fluj
     await page.locator('button', { hasText: 'Verificar Lista con Ayudante' }).click();
     await page.locator('button', { hasText: 'Ingresar a la Mesada Virtual' }).click();
 
-    // La mesada debe estar visible
-    await expect(page.locator('#buretteGlass')).toBeVisible();
-    await expect(page.locator('#flaskBody')).toBeVisible();
+    // 1. Probar Modal de Cálculos Previos
+    await page.locator('button', { hasText: 'Cálculos Previos' }).click();
+    await expect(page.locator('text=Cálculos Previos de Preparación')).toBeVisible();
+    await page.locator('button', { hasText: 'Autocompletar estequiometría teórica' }).click();
+    await page.locator('button', { hasText: 'Comprobar' }).click();
+    await expect(page.locator('text=¡Cálculos Verificados Conformes!')).toBeVisible();
+    await page.locator('button', { hasText: 'Ir a la Mesada' }).click();
+
+    // 2. Cargar bureta
+    await page.locator('button', { hasText: '1. Cargar Bureta con NaOH 0.1 N' }).click();
+
+    // 3. Probar Balanza Analítica Digital "Per Se"
+    await page.locator('button', { hasText: '2. Pesar KHP en Balanza' }).click();
+    await expect(page.locator('text=Balanza Analítica Digital Mettler Toledo')).toBeVisible();
+
+    // Abrir y cerrar vitrina
+    await page.locator('button', { hasText: 'Abrir Puertas Corredizas' }).click();
+    await expect(page.locator('text=PUERTA ABIERTA')).toBeVisible();
+    await page.locator('button', { hasText: 'Cerrar Puertas Corredizas' }).click();
+    await expect(page.locator('text=PUERTAS CERRADAS (ESTABLE)')).toBeVisible();
+
+    // Colocar pesafiltro y tarar
+    await page.locator('button', { hasText: 'Colocar Pesafiltro en Platillo' }).click();
+    await page.locator('button', { hasText: 'TARE / ZERO' }).click();
+
+    // Dosificar con espátula (macro y micro) o autopesar
+    await page.locator('button', { hasText: 'Porción Macro' }).click();
+    await page.locator('button', { hasText: 'Autopesar óptimo' }).click();
+
+    // Transferir al erlenmeyer
+    await page.locator('button', { hasText: 'Transferir' }).click();
+    await expect(page.locator('text=✓ KHP Disuelto en Erlenmeyer')).toBeVisible();
+
+    // 4. Probar Purga de Burbuja con Zoom (TipPurgeModal)
+    await page.locator('button', { hasText: 'Purgar Pico (Zoom)' }).or(page.locator('button', { hasText: 'Purgar Burbuja' })).first().click();
+    await expect(page.locator('text=Inspección y Purga del Pico de la Bureta')).toBeVisible();
+    await page.locator('button', { hasText: 'Girar llave con golpe enérgico' }).click();
+    await expect(page.locator('text=¡Pico de bureta purgado exitosamente!')).toBeVisible();
+    await page.locator('button', { hasText: 'Volver a la Mesada' }).click();
+
+    // 5. Probar Gotero de Fenolftaleína Interactivo (IndicatorDropperModal)
+    await page.locator('button', { hasText: 'Gotero Fenolftaleína' }).click();
+    await expect(page.locator('text=Adición Táctil de Fenolftaleína con Gotero')).toBeVisible();
+    await page.locator('button', { hasText: 'Apretar Perilla del Gotero' }).click();
+    await page.locator('button', { hasText: 'Apretar Perilla del Gotero' }).click();
+    await expect(page.locator('text=✓ Dosis analítica correcta alcanzada')).toBeVisible();
+    await page.locator('button', { hasText: 'Volver a la Mesada' }).click();
 
     // Abrir libreta si es pantalla móvil
     const viewport = page.viewportSize();
@@ -58,7 +102,6 @@ test.describe('Simulador de Laboratorio: Pruebas E2E del Portal de Inicio y Fluj
     await page.locator('button', { hasText: 'Imprimir Informe' }).click();
     await page.locator('button:has(svg.lucide-x)').first().click();
 
-    // Si es pantalla móvil, cerrar el bottom sheet de la libreta para volver a la mesada
     if (viewport && viewport.width < 1024) {
       await page.locator('button', { hasText: 'Volver a Mesada' }).click();
     }

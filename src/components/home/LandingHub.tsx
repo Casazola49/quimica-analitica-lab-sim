@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { FlaskConical, BookOpen, ShieldCheck, HelpCircle, Layers, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
+import { BookOpen, ShieldCheck, HelpCircle, Layers, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { ALL_PRACTICES } from '../../data/allPractices';
+import { HankoSeal } from '../common/HankoSeal';
 
 interface LandingHubProps {
   onSelectPractice: (practiceNumber: number) => void;
@@ -26,20 +27,20 @@ export const LandingHub: React.FC<LandingHubProps> = ({
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-blue-600 selection:text-white">
       {/* Barra de Navegación del Portal */}
-      <header className="h-16 px-4 sm:px-8 bg-slate-900/90 border-b border-slate-800 backdrop-blur sticky top-0 z-30 flex items-center justify-between">
+      <header className="h-16 px-4 sm:px-8 bg-sumi-900/90 border-b border-sumi-800 backdrop-blur sticky top-0 z-30 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-blue-600/20 border border-blue-500/40 rounded-xl text-blue-400 shadow-inner">
-            <FlaskConical size={22} />
-          </div>
+          <HankoSeal size="md" variant="stamp" className="shrink-0" />
           <div>
-            <h1 className="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
-              <span>Simulador de Química Analítica Cuantitativa</span>
-              <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-300 border border-blue-700/50 rounded-full font-mono hidden md:inline">
-                UMSS 5to Semestre
+            <div className="flex items-center gap-2">
+              <h1 className="text-sm sm:text-base font-bold text-washi-100">
+                Simulador de Química Analítica Cuantitativa
+              </h1>
+              <span className="text-[10px] px-2 py-0.5 bg-cinabrio-950 border border-cinabrio-700/60 text-cinabrio-400 rounded-full font-mono font-bold">
+                Alquímica-33
               </span>
-            </h1>
-            <p className="text-[11px] text-slate-400 hidden sm:block">
-              Facultad de Ciencias y Tecnología — Departamento de Química
+            </div>
+            <p className="text-[11px] text-sumi-400 hidden sm:block">
+              Universidad Mayor de San Simón • Facultad de Ciencias y Tecnología
             </p>
           </div>
         </div>
@@ -69,12 +70,13 @@ export const LandingHub: React.FC<LandingHubProps> = ({
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-10">
         {/* HERO INSTITUCIONAL */}
         <section className="text-center space-y-4 pt-4 sm:pt-6 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-950/70 border border-blue-600/40 rounded-full text-blue-300 text-xs font-semibold shadow">
-            <Sparkles size={14} className="text-cyan-400" />
-            <span>Entorno Interactivo de Mesada • Costo $0 • PWA Offline</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-sumi-900 border border-cinabrio-600/40 rounded-full text-washi-200 text-xs font-semibold shadow-lg">
+            <HankoSeal size="sm" variant="badge" />
+            <span className="text-sumi-400">|</span>
+            <span>Estilo Sumi-e • Costo $0 • PWA Offline</span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-100 tracking-tight leading-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-washi-50 tracking-tight leading-tight">
             Laboratorio Virtual de Química Analítica Cuantitativa
           </h2>
 

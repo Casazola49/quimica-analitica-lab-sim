@@ -15,8 +15,11 @@ import { ProcedureEngine } from './engine/procedureFsm';
 import { evaluateBenchEquilibrium } from './engine/equilibrium';
 import { PRACTICE_4_CONFIG } from './data/practiceConfig';
 import { TechniqueDefectType } from './types';
-import { FlaskConical, BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle, Layers, CheckCircle2, Circle, Home } from 'lucide-react';
+import { BookOpen, ShieldCheck, ChevronUp, PackageCheck, HelpCircle, Layers, CheckCircle2, Circle, Home, Calculator } from 'lucide-react';
 import { LandingHub } from './components/home/LandingHub';
+import { HankoSeal } from './components/common/HankoSeal';
+import { IndicatorDropperModal } from './components/inspection/IndicatorDropperModal';
+import { PreLabCalculationModal } from './components/preparation/PreLabCalculationModal';
 
 export const App: React.FC = () => {
   // Vista activa: 'home' (Portal de Inicio) o 'bench' (Mesada de Laboratorio)
@@ -70,6 +73,8 @@ export const App: React.FC = () => {
   const [isBalanceModalOpen, setIsBalanceModalOpen] = useState<boolean>(false);
   const [isPipetteModalOpen, setIsPipetteModalOpen] = useState<boolean>(false);
   const [isTipPurgeModalOpen, setIsTipPurgeModalOpen] = useState<boolean>(false);
+  const [isDropperModalOpen, setIsDropperModalOpen] = useState<boolean>(false);
+  const [isCalculationModalOpen, setIsCalculationModalOpen] = useState<boolean>(false);
   const [isLoupeOpen, setIsLoupeOpen] = useState<boolean>(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState<boolean>(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState<boolean>(false);
@@ -295,15 +300,16 @@ export const App: React.FC = () => {
       {/* Barra de Navegación Superior */}
       <header className="h-14 px-3 sm:px-6 bg-slate-900 border-b border-slate-800 flex items-center justify-between z-30 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="p-2 bg-blue-600/20 border border-blue-500/40 rounded-xl text-blue-400 shrink-0">
-            <FlaskConical size={18} />
-          </div>
+          <HankoSeal size="sm" variant="stamp" className="shrink-0" />
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-xs sm:text-base font-bold text-slate-100 truncate">
                 Simulador de Laboratorio: Química Analítica
               </h1>
-              <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full font-mono shrink-0 hidden md:inline">
+              <span className="text-[10px] px-2 py-0.5 bg-cinabrio-950/80 text-cinabrio-400 border border-cinabrio-700/60 rounded-full font-mono shrink-0 font-bold">
+                Alquímica-33
+              </span>
+              <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full font-mono shrink-0 hidden lg:inline">
                 UMSS 5to Semestre
               </span>
             </div>
@@ -340,6 +346,17 @@ export const App: React.FC = () => {
             <Layers size={15} className="text-blue-400" />
             <span className="hidden sm:inline">Prácticas (13)</span>
             <span className="sm:hidden font-bold text-cyan-300">P{currentPracticeNumber}</span>
+          </button>
+
+          {/* Botón Cálculos Previos */}
+          <button
+            onClick={() => setIsCalculationModalOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-sumi-800 hover:bg-sumi-700 border border-sumi-600 text-washi-200 rounded-xl text-xs font-semibold shadow transition-all active:scale-95 cursor-pointer"
+            title="Ver o estimar cálculos estequiométricos de entrada"
+          >
+            <Calculator size={15} className="text-cinabrio-500" />
+            <span className="hidden sm:inline">Cálculos Previos</span>
+            <span className="sm:hidden">Cálculos</span>
           </button>
 
           {/* Guía Oficial */}
@@ -527,9 +544,9 @@ export const App: React.FC = () => {
               onSetFlowRate={setFlowRate}
               onOpenLoupe={() => setIsLoupeOpen(true)}
               onOpenTipZoom={() => setIsTipPurgeModalOpen(true)}
+              onOpenDropperModal={() => setIsDropperModalOpen(true)}
               onLoadBurette={handleLoadBurette}
               onOpenTransferModal={handleOpenTransferModal}
-              onAddIndicator={handleAddIndicator}
               onPurgeBubble={() => {
                 if (!isBubblePurged) {
                   setIsTipPurgeModalOpen(true);
@@ -642,6 +659,20 @@ export const App: React.FC = () => {
         onPurgeComplete={() => {
           handlePurgeBubble();
         }}
+      />
+
+      <IndicatorDropperModal
+        isOpen={isDropperModalOpen}
+        currentDrops={indicatorDrops}
+        isStirring={isStirring}
+        onClose={() => setIsDropperModalOpen(false)}
+        onAddDrop={handleAddIndicator}
+      />
+
+      <PreLabCalculationModal
+        isOpen={isCalculationModalOpen}
+        practiceNumber={currentPracticeNumber}
+        onClose={() => setIsCalculationModalOpen(false)}
       />
 
       <LabGuideModal

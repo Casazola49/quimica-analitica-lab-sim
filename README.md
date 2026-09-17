@@ -10,14 +10,17 @@ Entorno interactivo 2D modular, ágil y pedagógico para estudiantes de Ingenier
 
 ## 🔬 Visión y Características de Arquitectura
 
-- **Costo $0 de Infraestructura**: Alojable 100% de forma estática en GitHub Pages, Vercel o Netlify.
-- **Micro-Bundle Ultra Liviano (<85 KB gzipped)**: Carga instantánea en redes móviles universitarias sin frameworks 3D pesados ni dependencias de servidor.
-- **Instrumental Vectorial Nítido (SVG Nativo)**: Buretas con escala métrica cada 0.1 mL con zoom óptico sin pixelación en pantallas de cualquier resolución.
+- **Identidad de Marca Alquímica-33 (Estilo Sumi-e / Suibokuga)**: Estética de inspiración japonesa clásica con paleta estricta de Negro Tinta (Sumi), Blanco Washi y Rojo Cinabrio con sellos tradicionales Hanko.
+- **Portal de Inicio y Hub de Selección (LandingHub)**: Pantalla de bienvenida institucional de la UMSS que explica la metodología en 3 pasos y ofrece acceso directo a las prácticas.
+- **Balanza Analítica Digital "Per Se" (Mettler Toledo)**: Vitrina corrediza (draft shield) con fluctuación por corrientes de aire, botones físicos funcionales (TARE / ZERO a 0.0000 g) y dosificación táctil con espátula analítica.
+- **Cuentagotas Interactivo con Halo Cromático**: Descarga de gotas de fenolftaleína con fogonazo fucsia transitorio dispersado por el vórtice de agitación magnética.
+- **Inspección y Purga de Bureta con Zoom 4x**: Visor ampliado del pico capilar para desalojar burbujas con golpe de 180° hacia el vaso de desecho.
+- **Cálculos Previos de Preparación**: Módulo estequiométrico para estimar masas de soluto y volúmenes de viraje antes de ingresar a la mesada.
+- **Costo $0 de Infraestructura**: Alojable 100% de forma estática en GitHub Pages con soporte PWA 100% Offline.
+- **Instrumental Vectorial Nítido (SVG Nativo)**: Buretas con escala métrica cada 0.1 mL con zoom óptico sin pixelación.
 - **Lupa Óptica de Menisco (4x) con Simulación de Paralaje**: Demuestra interactivamente el desvío óptico al desviar la línea de visión del plano horizontal.
-- **Motor Físico-Químico $O(1)$ a 60 FPS**: Cálculo de curvas de titulación y viraje continuo de indicadores (fenolftaleína, naranja de metilo, NET) mediante funciones sigmoidales en espacio RGBA en el cliente.
-- **Auditoría de Defectos de Técnica (TDA)**: Si el alumno titula con burbuja en la llave de la bureta o mira con paralaje, el error se propaga físicamente a los números de la bureta.
-- **Libreta de Laboratorio Digital con Pipeline en 3 Etapas**: Evaluación de integridad de datos, cálculo aritmético, control estricto de 4 cifras significativas y cálculo de error relativo porcentual ($E_r\%$).
-- **Integración con la Tríada Digital (RAG)**: Citas textuales exactas verificadas de Skoog (9na ed.), Day & Underwood (6ta ed.) y Aguilar (2da ed.) ante cualquier desviación experimental.
+- **Motor Físico-Químico $O(1)$ a 60 FPS**: Cálculo de curvas de titulación y virajes continuos de indicadores sin solvers pesados.
+- **Libreta Digital e Informes Formales Imprimibles (PDF)**: Documento oficial académico con membrete de la UMSS, datos, estequiometría, citas de la Tríada Digital y firmas del estudiante (Alquímica-33) y docente.
 
 ---
 

@@ -20,9 +20,9 @@ interface LabBenchProps {
   onSetFlowRate: (rate: 'dropwise' | 'fast' | 'closed') => void;
   onOpenLoupe: () => void;
   onOpenTipZoom?: () => void;
+  onOpenDropperModal?: () => void;
   onLoadBurette: () => void;
   onOpenTransferModal: () => void;
-  onAddIndicator: () => void;
   onPurgeBubble: () => void;
   onToggleStirring: () => void;
   onResetBench: () => void;
@@ -45,9 +45,9 @@ export const LabBench: React.FC<LabBenchProps> = ({
   onSetFlowRate,
   onOpenLoupe,
   onOpenTipZoom,
+  onOpenDropperModal = () => {},
   onLoadBurette,
   onOpenTransferModal,
-  onAddIndicator,
   onPurgeBubble,
   onToggleStirring,
   onResetBench,
@@ -169,7 +169,7 @@ export const LabBench: React.FC<LabBenchProps> = ({
           isBubblePurged={isBubblePurged}
           onLoadBurette={onLoadBurette}
           onOpenTransferModal={onOpenTransferModal}
-          onAddIndicator={onAddIndicator}
+          onOpenDropperModal={onOpenDropperModal}
           onPurgeBubble={onPurgeBubble}
           onResetBench={onResetBench}
         />
