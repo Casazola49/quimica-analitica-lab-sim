@@ -19,7 +19,7 @@ export const AuditModal: React.FC<AuditModalProps> = ({
 
   const handleOpenRagDeepLink = (query: string) => {
     const encoded = encodeURIComponent(query);
-    const ragUrl = `https://github.com/Casazola49/quimica-analitica-rag#query=${encoded}`;
+    const ragUrl = `https://analytical01.streamlit.app/#query=${encoded}`;
     window.open(ragUrl, '_blank');
   };
 

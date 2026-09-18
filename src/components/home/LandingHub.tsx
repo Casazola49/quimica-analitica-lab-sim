@@ -54,6 +54,18 @@ export const LandingHub: React.FC<LandingHubProps> = ({
         </div>
 
         <div className="flex items-center gap-2 font-sans">
+          <a
+            href="https://analytical01.streamlit.app/"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#141414] hover:bg-[#222222] border border-[#333333] hover:border-[#dc2626] text-[#d4d4d4] hover:text-white rounded-xl text-xs font-semibold shadow transition-all active:scale-95 cursor-pointer no-underline"
+            title="Abrir Portal de Teoría, RAG y Exámenes"
+          >
+            <BookOpen size={15} className="text-[#dc2626]" />
+            <span className="hidden sm:inline">Portal RAG & Libros ↗</span>
+            <span className="sm:hidden">RAG ↗</span>
+          </a>
+
           <button
             onClick={() => onOpenGuide(4)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-[#141414] hover:bg-[#222222] border border-[#333333] hover:border-white text-[#d4d4d4] hover:text-white rounded-xl text-xs font-semibold shadow transition-all active:scale-95 cursor-pointer"
@@ -69,7 +81,7 @@ export const LandingHub: React.FC<LandingHubProps> = ({
           >
             <ShieldCheck size={15} />
             <span className="hidden sm:inline">Tríada Digital RAG</span>
-            <span className="sm:hidden">RAG</span>
+            <span className="sm:hidden">Citas</span>
           </button>
         </div>
       </header>
