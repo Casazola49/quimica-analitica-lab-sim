@@ -88,27 +88,27 @@ export const LabBench: React.FC<LabBenchProps> = ({
   }, [isStopcockOpen, flowRate, isBuretteLoaded, onTickTitration]);
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-between p-3 sm:p-4 lab-bench-bg rounded-2xl border border-slate-700/80 shadow-2xl relative overflow-y-auto overflow-x-hidden min-h-0">
+    <div className="w-full h-full flex flex-col items-center justify-between p-3 sm:p-4 lab-bench-bg rounded-2xl border border-[#262626] shadow-2xl relative overflow-y-auto overflow-x-hidden min-h-0 font-sans">
       {/* Selector de Velocidad de la Llave */}
       <div className="w-full flex items-center justify-between z-10 px-2 shrink-0">
-        <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-800/90 border border-slate-700 px-2.5 py-1 rounded-xl shadow">
-          <span className="text-[11px] sm:text-xs text-slate-300 font-medium">Modo:</span>
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#121212] border border-[#2e2e2e] px-2.5 py-1 rounded-xl shadow-lg">
+          <span className="text-[11px] sm:text-xs text-[#888888] font-bold uppercase tracking-wider">Modo:</span>
           <button
             onClick={() => onSetFlowRate('dropwise')}
-            className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-semibold border transition-all ${
+            className={`px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition-all cursor-pointer ${
               flowRate === 'dropwise'
-                ? 'bg-blue-600 border-blue-400 text-white'
-                : 'bg-slate-700 border-slate-600 text-slate-300 hover:text-white'
+                ? 'bg-[#dc2626] border-[#ef4444] text-white shadow-[0_2px_10px_rgba(220,38,38,0.4)]'
+                : 'bg-[#1a1a1a] border-[#333333] text-[#888888] hover:text-white'
             }`}
           >
             Gota a Gota
           </button>
           <button
             onClick={() => onSetFlowRate('fast')}
-            className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-semibold border transition-all ${
+            className={`px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition-all cursor-pointer ${
               flowRate === 'fast'
-                ? 'bg-amber-600 border-amber-400 text-white'
-                : 'bg-slate-700 border-slate-600 text-slate-300 hover:text-white'
+                ? 'bg-[#dc2626] border-[#ef4444] text-white shadow-[0_2px_10px_rgba(220,38,38,0.4)]'
+                : 'bg-[#1a1a1a] border-[#333333] text-[#888888] hover:text-white'
             }`}
           >
             Chorro Rápido
@@ -118,10 +118,10 @@ export const LabBench: React.FC<LabBenchProps> = ({
         {/* Notificación de Viraje en tiempo real */}
         {equilibrium.endpointQuality !== 'none' && isSampleDissolved && (
           <div
-            className={`px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-bold border shadow animate-in fade-in shrink-0 ${
+            className={`px-3 py-1 rounded-xl text-[11px] sm:text-xs font-extrabold border shadow-lg animate-in fade-in shrink-0 font-serif ${
               equilibrium.endpointQuality === 'perfect'
-                ? 'bg-pink-950/80 text-pink-300 border-pink-500'
-                : 'bg-fuchsia-950/80 text-fuchsia-300 border-fuchsia-600 animate-pulse'
+                ? 'bg-[#1f0808] text-[#ef4444] border-[#dc2626]'
+                : 'bg-[#2a0505] text-[#ff4444] border-2 border-[#ef4444] animate-pulse'
             }`}
           >
             {equilibrium.endpointQuality === 'perfect'

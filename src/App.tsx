@@ -296,24 +296,21 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased">
-      {/* Barra de Navegación Superior */}
-      <header className="h-14 px-3 sm:px-6 bg-slate-900 border-b border-slate-800 flex items-center justify-between z-30 shrink-0">
+    <div className="min-h-screen flex flex-col bg-[#050505] text-[#f5f5f5] antialiased selection:bg-[#dc2626] selection:text-white font-sans">
+      {/* Barra de Navegación Superior con Estilo Sumi-e Alquímica-33 */}
+      <header className="h-14 px-3 sm:px-6 bg-[#0a0a0a] border-b-2 border-[#dc2626] flex items-center justify-between z-30 shrink-0 shadow-2xl">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <HankoSeal size="sm" variant="stamp" className="shrink-0" />
           <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xs sm:text-base font-bold text-slate-100 truncate">
-                Simulador de Laboratorio: Química Analítica
-              </h1>
-              <span className="text-[10px] px-2 py-0.5 bg-cinabrio-950/80 text-cinabrio-400 border border-cinabrio-700/60 rounded-full font-mono shrink-0 font-bold">
+            <div className="flex items-center gap-2 flex-wrap font-serif">
+              <h1 className="text-xs sm:text-base font-bold text-white truncate uppercase tracking-wider">
                 Alquímica-33
-              </span>
-              <span className="text-[10px] px-2 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full font-mono shrink-0 hidden lg:inline">
-                UMSS 5to Semestre
+              </h1>
+              <span className="text-[10px] px-2 py-0.5 bg-[#1f0808] text-[#ef4444] border border-[#dc2626]/70 rounded-full font-mono shrink-0 font-bold">
+                UMSS • 5to Semestre
               </span>
             </div>
-            <p className="text-[10px] sm:text-[11px] text-slate-400 truncate hidden sm:block">
+            <p className="text-[10px] sm:text-[11px] text-[#888888] truncate hidden sm:block font-sans">
               {currentPracticeNumber === 12
                 ? 'Práctica 12: Colorimetría y Espectrofotometría UV-Vis (Ley de Beer)'
                 : currentPracticeNumber === 5
@@ -325,14 +322,14 @@ export const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 font-sans">
           {/* Botón Volver al Menú Principal */}
           <button
             onClick={() => setCurrentView('home')}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-[#141414] hover:bg-[#222222] border border-[#333333] hover:border-white text-[#d4d4d4] hover:text-white rounded-xl text-xs font-semibold shadow transition-all active:scale-95 cursor-pointer"
             title="Volver al Portal de Prácticas"
           >
-            <Home size={15} className="text-blue-400" />
+            <Home size={15} className="text-[#dc2626]" />
             <span className="hidden sm:inline">Menú Principal</span>
             <span className="sm:hidden">Menú</span>
           </button>
@@ -340,21 +337,21 @@ export const App: React.FC = () => {
           {/* Selector de Prácticas */}
           <button
             onClick={() => setIsPracticeSelectorOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-[#141414] hover:bg-[#222222] border border-[#333333] hover:border-white text-[#d4d4d4] hover:text-white rounded-xl text-xs font-semibold shadow transition-all active:scale-95 cursor-pointer"
             title="Ver catálogo de las 13 prácticas del plan de estudios"
           >
-            <Layers size={15} className="text-blue-400" />
+            <Layers size={15} className="text-[#dc2626]" />
             <span className="hidden sm:inline">Prácticas (13)</span>
-            <span className="sm:hidden font-bold text-cyan-300">P{currentPracticeNumber}</span>
+            <span className="sm:hidden font-bold text-white">P{currentPracticeNumber}</span>
           </button>
 
           {/* Botón Cálculos Previos */}
           <button
             onClick={() => setIsCalculationModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-sumi-800 hover:bg-sumi-700 border border-sumi-600 text-washi-200 rounded-xl text-xs font-semibold shadow transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-[#141414] hover:bg-[#222222] border border-[#333333] hover:border-[#dc2626] text-white rounded-xl text-xs font-semibold shadow transition-all active:scale-95 cursor-pointer"
             title="Ver o estimar cálculos estequiométricos de entrada"
           >
-            <Calculator size={15} className="text-cinabrio-500" />
+            <Calculator size={15} className="text-[#ef4444]" />
             <span className="hidden sm:inline">Cálculos Previos</span>
             <span className="sm:hidden">Cálculos</span>
           </button>
@@ -362,21 +359,21 @@ export const App: React.FC = () => {
           {/* Guía Oficial */}
           <button
             onClick={() => setIsGuideModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-blue-950/60 hover:bg-blue-900/80 border border-blue-700/60 text-blue-300 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-[#141414] hover:bg-[#222222] border border-[#333333] hover:border-white text-[#d4d4d4] hover:text-white rounded-xl text-xs font-semibold shadow transition-all active:scale-95 cursor-pointer"
             title="Ver Guía de Laboratorio Real y de la Mesada"
           >
-            <HelpCircle size={15} />
-            <span className="hidden sm:inline">Guía de Práctica</span>
+            <HelpCircle size={15} className="text-[#dc2626]" />
+            <span className="hidden sm:inline">Guía</span>
             <span className="sm:hidden">Guía</span>
           </button>
 
           {/* Solicitud Materiales */}
           <button
             onClick={() => setIsMaterialsModalOpen(true)}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border shadow transition-all active:scale-95 ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold border shadow-lg transition-all active:scale-95 cursor-pointer ${
               isMaterialsApproved
-                ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300'
-                : 'bg-purple-950/70 hover:bg-purple-900 border-purple-600 text-purple-200 animate-pulse'
+                ? 'bg-[#1a0505] border-[#dc2626] text-[#ef4444]'
+                : 'bg-[#dc2626] hover:bg-[#b91c1c] text-white animate-pulse border-[#ef4444]'
             }`}
             title="Seleccionar Materiales y Reactivos requeridos"
           >
@@ -388,108 +385,105 @@ export const App: React.FC = () => {
           {/* Auditoría RAG */}
           <button
             onClick={() => setIsAuditModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 rounded-xl text-xs font-semibold shadow transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-[#141414] hover:bg-[#200808] border border-[#333333] hover:border-[#dc2626] text-[#ef4444] rounded-xl text-xs font-bold shadow transition-all active:scale-95 cursor-pointer"
           >
             <ShieldCheck size={15} />
-            <span className="hidden sm:inline">Auditoría RAG</span>
+            <span className="hidden sm:inline">RAG</span>
             <span className="sm:hidden">RAG</span>
           </button>
         </div>
       </header>
 
-      {/* Stepper de Laboratorio */}
-      <div className="bg-slate-900/90 border-b border-slate-800 px-3 sm:px-6 py-2 overflow-x-auto flex items-center justify-between gap-3 text-[11px] shrink-0">
+      {/* Stepper de Laboratorio Sumi-e */}
+      <div className="bg-[#0c0c0c] border-b border-[#222222] px-3 sm:px-6 py-2 overflow-x-auto flex items-center justify-between gap-3 text-[11px] shrink-0 font-mono">
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          <div className={`flex items-center gap-1.5 ${isMaterialsApproved ? 'text-emerald-400 font-semibold' : 'text-purple-400 font-bold animate-pulse'}`}>
-            {isMaterialsApproved ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+          <div className={`flex items-center gap-1.5 ${isMaterialsApproved ? 'text-white font-bold' : 'text-[#ef4444] font-black animate-pulse'}`}>
+            {isMaterialsApproved ? <CheckCircle2 size={13} className="text-[#dc2626]" /> : <Circle size={13} />}
             <span>1. Materiales</span>
           </div>
-          <span className="text-slate-600">➔</span>
+          <span className="text-[#333333]">➔</span>
 
           {currentPracticeNumber === 12 ? (
-            /* Stepper específico de Espectrofotometría P12 */
             <>
-              <div className="flex items-center gap-1.5 text-blue-400 font-semibold">
+              <div className="flex items-center gap-1.5 text-white font-semibold">
                 <Circle size={13} />
                 <span>2. λ = 508 nm</span>
               </div>
-              <span className="text-slate-600">➔</span>
-              <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="text-[#333333]">➔</span>
+              <div className="flex items-center gap-1.5 text-[#666666]">
                 <Circle size={13} />
                 <span>3. Auto-Zero</span>
               </div>
-              <span className="text-slate-600">➔</span>
-              <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="text-[#333333]">➔</span>
+              <div className="flex items-center gap-1.5 text-[#666666]">
                 <Circle size={13} />
                 <span>4. Limpiar Cubeta</span>
               </div>
-              <span className="text-slate-600">➔</span>
-              <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="text-[#333333]">➔</span>
+              <div className="flex items-center gap-1.5 text-[#666666]">
                 <Circle size={13} />
                 <span>5. Medir Serie</span>
               </div>
-              <span className="text-slate-600">➔</span>
-              <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+              <span className="text-[#333333]">➔</span>
+              <div className="flex items-center gap-1.5 text-[#ef4444] font-bold">
                 <Circle size={13} />
                 <span>6. Ley de Beer</span>
               </div>
             </>
           ) : currentPracticeNumber === 5 ? (
-            /* Stepper específico de Gravimetría P5 */
             <>
-              <div className="flex items-center gap-1.5 text-blue-400 font-semibold">
+              <div className="flex items-center gap-1.5 text-white font-semibold">
                 <Circle size={13} />
                 <span>2. Precipitación</span>
               </div>
-              <span className="text-slate-600">➔</span>
-              <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="text-[#333333]">➔</span>
+              <div className="flex items-center gap-1.5 text-[#666666]">
                 <Circle size={13} />
                 <span>3. Digestión</span>
               </div>
-              <span className="text-slate-600">➔</span>
-              <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="text-[#333333]">➔</span>
+              <div className="flex items-center gap-1.5 text-[#666666]">
                 <Circle size={13} />
                 <span>4. Filtración</span>
               </div>
-              <span className="text-slate-600">➔</span>
-              <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="text-[#333333]">➔</span>
+              <div className="flex items-center gap-1.5 text-[#666666]">
                 <Circle size={13} />
                 <span>5. Test AgNO3</span>
               </div>
-              <span className="text-slate-600">➔</span>
-              <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+              <span className="text-[#333333]">➔</span>
+              <div className="flex items-center gap-1.5 text-[#ef4444] font-bold">
                 <Circle size={13} />
                 <span>6. Calcinación</span>
               </div>
             </>
           ) : (
-            /* Stepper de Volumetría P4/P7 */
             <>
-              <div className={`flex items-center gap-1.5 ${isBuretteLoaded ? 'text-emerald-400 font-semibold' : currentStep === 2 ? 'text-blue-400 font-bold animate-pulse' : 'text-slate-500'}`}>
-                {isBuretteLoaded ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+              <div className={`flex items-center gap-1.5 ${isBuretteLoaded ? 'text-white font-bold' : currentStep === 2 ? 'text-[#ef4444] font-black animate-pulse' : 'text-[#666666]'}`}>
+                {isBuretteLoaded ? <CheckCircle2 size={13} className="text-[#dc2626]" /> : <Circle size={13} />}
                 <span>2. Cargar NaOH</span>
               </div>
-              <span className="text-slate-600">➔</span>
+              <span className="text-[#333333]">➔</span>
 
-              <div className={`flex items-center gap-1.5 ${isSampleDissolved ? 'text-emerald-400 font-semibold' : currentStep === 3 ? 'text-purple-400 font-bold animate-pulse' : 'text-slate-500'}`}>
-                {isSampleDissolved ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+              <div className={`flex items-center gap-1.5 ${isSampleDissolved ? 'text-white font-bold' : currentStep === 3 ? 'text-[#ef4444] font-black animate-pulse' : 'text-[#666666]'}`}>
+                {isSampleDissolved ? <CheckCircle2 size={13} className="text-[#dc2626]" /> : <Circle size={13} />}
                 <span>{currentPracticeNumber === 7 ? '3. Pipetear HCl' : '3. Pesar KHP'}</span>
               </div>
-              <span className="text-slate-600">➔</span>
+              <span className="text-[#333333]">➔</span>
 
-              <div className={`flex items-center gap-1.5 ${isBubblePurged ? 'text-emerald-400 font-semibold' : currentStep === 4 ? 'text-amber-400 font-bold animate-pulse' : 'text-slate-500'}`}>
-                {isBubblePurged ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+              <div className={`flex items-center gap-1.5 ${isBubblePurged ? 'text-white font-bold' : currentStep === 4 ? 'text-[#ef4444] font-black animate-pulse' : 'text-[#666666]'}`}>
+                {isBubblePurged ? <CheckCircle2 size={13} className="text-[#dc2626]" /> : <Circle size={13} />}
                 <span>4. Purgar & Enrasar</span>
               </div>
-              <span className="text-slate-600">➔</span>
+              <span className="text-[#333333]">➔</span>
 
-              <div className={`flex items-center gap-1.5 ${indicatorDrops > 0 && isStirring ? 'text-emerald-400 font-semibold' : currentStep === 5 ? 'text-pink-400 font-bold animate-pulse' : 'text-slate-500'}`}>
-                {indicatorDrops > 0 && isStirring ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+              <div className={`flex items-center gap-1.5 ${indicatorDrops > 0 && isStirring ? 'text-white font-bold' : currentStep === 5 ? 'text-[#ef4444] font-black animate-pulse' : 'text-[#666666]'}`}>
+                {indicatorDrops > 0 && isStirring ? <CheckCircle2 size={13} className="text-[#dc2626]" /> : <Circle size={13} />}
                 <span>5. Indicador & Agitador</span>
               </div>
-              <span className="text-slate-600">➔</span>
+              <span className="text-[#333333]">➔</span>
 
-              <div className={`flex items-center gap-1.5 ${currentStep === 6 ? 'text-emerald-400 font-bold' : 'text-slate-500'}`}>
+              <div className={`flex items-center gap-1.5 ${currentStep === 6 ? 'text-[#ef4444] font-bold' : 'text-[#666666]'}`}>
                 <Circle size={13} />
                 <span>6. Titular</span>
               </div>
@@ -497,7 +491,7 @@ export const App: React.FC = () => {
           )}
         </div>
 
-        <div className="text-[10px] text-slate-400 font-mono hidden xl:block">
+        <div className="text-[10px] text-[#777777] font-mono hidden xl:block">
           *Paso actual: {
             currentStep === 1 ? 'Presentar lista de materiales al ayudante' :
             currentPracticeNumber === 12 ? 'Calibrar blanco, limpiar cubetas y medir serie espectrofotométrica a 508 nm' :
@@ -514,7 +508,7 @@ export const App: React.FC = () => {
       {/* Contenedor Principal */}
       <main className="flex-1 p-2.5 sm:p-4 flex flex-col lg:flex-row gap-3 sm:gap-4 overflow-hidden min-h-0 relative">
         {/* Mesada Virtual 2D (Conmutable entre Volumetría P4/P7, Gravimetría P5 y Espectrofotometría P12) */}
-        <section className="flex-1 h-full min-h-0 flex flex-col">
+        <section className="flex-1 h-full min-h-0 flex flex-col pb-16 lg:pb-0">
           {currentPracticeNumber === 12 ? (
             <SpectrophotometryBench
               unknownTruePpm={unknownTrueFePpm}
@@ -575,11 +569,11 @@ export const App: React.FC = () => {
           />
         </section>
 
-        {/* Botón Flotante en Móviles para abrir la Libreta */}
+        {/* Botón Flotante en Móviles para abrir la Libreta (Estilo Cinabrio) */}
         <div className="lg:hidden fixed bottom-4 right-4 z-40">
           <button
             onClick={() => setIsMobileNotebookOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-full shadow-2xl border border-blue-400 active:scale-95 transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-extrabold text-xs rounded-full shadow-2xl border border-[#ef4444] active:scale-95 transition-all cursor-pointer uppercase tracking-wider"
           >
             <BookOpen size={16} />
             <span>Abrir Libreta de Laboratorio</span>
@@ -589,13 +583,13 @@ export const App: React.FC = () => {
 
         {/* Cajón Deslizable Inferior (Bottom Sheet) para Smartphones */}
         {isMobileNotebookOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-sm animate-in fade-in">
-            <div className="h-[80vh] w-full bg-slate-900 rounded-t-3xl border-t border-slate-700 shadow-2xl overflow-hidden flex flex-col">
-              <div className="p-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
-                <span className="text-xs font-bold text-slate-200">Libreta de Laboratorio</span>
+          <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/85 backdrop-blur-md animate-in fade-in">
+            <div className="h-[80vh] w-full bg-[#0a0a0a] rounded-t-3xl border-t-2 border-[#dc2626] shadow-2xl overflow-hidden flex flex-col">
+              <div className="p-3 bg-[#121212] flex items-center justify-between border-b border-[#222222]">
+                <span className="text-xs font-bold text-white font-serif uppercase tracking-wider">Libreta de Laboratorio</span>
                 <button
                   onClick={() => setIsMobileNotebookOpen(false)}
-                  className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold text-slate-300"
+                  className="px-3 py-1 bg-[#1a1a1a] hover:bg-[#262626] rounded-lg text-xs font-semibold text-white border border-[#333333] cursor-pointer"
                 >
                   Volver a Mesada ✕
                 </button>

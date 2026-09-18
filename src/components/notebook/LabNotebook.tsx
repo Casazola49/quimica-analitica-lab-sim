@@ -20,7 +20,7 @@ interface LabNotebookProps {
   practiceNumber?: number;
   initialVolume: number;
   finalVolume: number;
-  sampleMass: number; // P4: masa KHP. P5: muestra sulfatos. P7: alícuota 25 mL. P12: no se usa
+  sampleMass: number;
   trueConcentration: number;
   currentDeliveredMl?: number;
   currentPH?: number;
@@ -61,7 +61,6 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
   const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
 
-  // Registro dinámico de puntos de titulación potenciométrica (P7)
   const [titrationPoints, setTitrationPoints] = useState<TitrationDataPoint[]>([
     { volume: 0, pH: practiceNumber === 7 ? 1.05 : 3.5 },
   ]);
@@ -110,7 +109,6 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
     setNetBaSO4Mass(diff.toFixed(4));
   };
 
-  // Cálculo de Regresión Lineal de la Ley de Beer (P12)
   const beerRegression = useMemo(() => {
     const calPoints = spectroPoints.filter((p) => !p.isUnknown);
     if (calPoints.length < 2) return null;
@@ -179,7 +177,6 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
     setEvaluation(res);
   };
 
-  // Primera Derivada Numérica para P7
   const derivativeData = useMemo(() => {
     if (titrationPoints.length < 2) return [];
     const deriv: { volume: number; dpH_dV: number }[] = [];
@@ -205,18 +202,18 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
   }, [derivativeData]);
 
   return (
-    <div className="w-full h-full flex flex-col bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden min-h-0">
-      {/* Encabezado */}
-      <div className="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between shrink-0">
+    <div className="w-full h-full flex flex-col bg-[#0a0a0a] border border-[#2b2b2b] rounded-2xl shadow-2xl overflow-hidden min-h-0 font-sans">
+      {/* Encabezado Sumi-e con Sello Hanko */}
+      <div className="px-4 py-3 bg-[#121212] border-b border-[#222222] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <BookOpen className="text-blue-400" size={18} />
-          <h2 className="text-xs sm:text-sm font-bold text-slate-100 uppercase tracking-wide">
-            Libreta de Laboratorio Digital
+          <BookOpen className="text-[#dc2626]" size={18} />
+          <h2 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider font-serif">
+            Libreta de Laboratorio
           </h2>
         </div>
-        <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-900/50 text-blue-300 border border-blue-700/50 rounded-full font-semibold">
+        <span className="text-[10px] font-mono px-2.5 py-0.5 bg-[#1f0808] text-[#ef4444] border border-[#dc2626]/70 rounded-full font-bold">
           {practiceNumber === 12
-            ? 'P12: Ley de Beer UV-Vis'
+            ? 'P12: Espectrofotometría'
             : practiceNumber === 5
             ? 'P5: Gravimetría BaSO4'
             : practiceNumber === 7
@@ -227,13 +224,13 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
 
       {/* Pestañas para P7 y P12 */}
       {(practiceNumber === 7 || practiceNumber === 12) && (
-        <div className="flex border-b border-slate-800 bg-slate-950/70 px-3 pt-1.5 gap-2 text-xs shrink-0">
+        <div className="flex border-b border-[#222222] bg-[#0d0d0d] px-3 pt-1.5 gap-2 text-xs shrink-0 font-mono">
           <button
             onClick={() => setActiveTab('data')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t-lg font-bold border-t border-x text-[11px] transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t-lg font-bold border-t border-x text-[11px] transition-all cursor-pointer ${
               activeTab === 'data'
-                ? 'bg-slate-900 border-slate-700 text-blue-300 border-b-transparent'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'bg-[#171717] border-[#333333] border-t-2 border-t-[#dc2626] text-white'
+                : 'border-transparent text-[#777777] hover:text-white'
             }`}
           >
             <Table size={13} />
@@ -241,10 +238,10 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('graph')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t-lg font-bold border-t border-x text-[11px] transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t-lg font-bold border-t border-x text-[11px] transition-all cursor-pointer ${
               activeTab === 'graph'
-                ? 'bg-slate-900 border-slate-700 text-cyan-300 border-b-transparent'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'bg-[#171717] border-[#333333] border-t-2 border-t-[#dc2626] text-white'
+                : 'border-transparent text-[#777777] hover:text-white'
             }`}
           >
             <LineChart size={13} />
@@ -257,16 +254,16 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs text-slate-200 min-h-0">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs text-white min-h-0">
         {activeTab === 'data' ? (
           <>
             {/* Tarjeta de Fórmula Canónica */}
-            <div className="p-3 bg-slate-800/60 border border-slate-700 rounded-xl space-y-1">
-              <div className="flex items-center gap-1.5 text-blue-300 font-semibold">
+            <div className="p-3.5 bg-[#121212] border-l-4 border-l-[#dc2626] border-y border-r border-[#262626] rounded-xl space-y-1 shadow">
+              <div className="flex items-center gap-1.5 text-[#ef4444] font-bold uppercase tracking-wider text-[11px]">
                 <Calculator size={14} />
-                <span>Fórmula Estequiométrica:</span>
+                <span>Fórmula Estequiométrica Canónica:</span>
               </div>
-              <p className="font-mono text-[11px] text-slate-300 bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+              <p className="font-mono text-[11px] text-white bg-[#080808] p-2.5 rounded-lg border border-[#222222]">
                 {practiceNumber === 12
                   ? 'A = m · C(ppm) + c  ➔  C_muestra(ppm) = (A_muestra - c) / m'
                   : practiceNumber === 5
@@ -277,13 +274,12 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
               </p>
             </div>
 
-            {/* FORMULARIO P12 (ESPECTROFOTOMETRÍA) */}
+            {/* FORMULARIO SEGÚN PRÁCTICA */}
             {practiceNumber === 12 ? (
               <div className="space-y-3">
-                {/* Tabla de Lecturas de la Serie */}
-                <div className="border border-slate-800 rounded-xl overflow-hidden">
+                <div className="border border-[#262626] rounded-xl overflow-hidden shadow">
                   <table className="w-full text-left font-mono text-[10px]">
-                    <thead className="bg-slate-800 text-slate-300">
+                    <thead className="bg-[#171717] text-[#cccccc] uppercase tracking-wider">
                       <tr>
                         <th className="p-2">Solución</th>
                         <th className="p-2">C (ppm Fe)</th>
@@ -291,18 +287,18 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                         <th className="p-2">%T</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800 bg-slate-950/60">
+                    <tbody className="divide-y divide-[#222222] bg-[#0d0d0d]">
                       {spectroPoints.map((pt, i) => (
-                        <tr key={i} className={pt.isUnknown ? 'bg-amber-950/30 text-amber-300 font-bold' : ''}>
+                        <tr key={i} className={pt.isUnknown ? 'bg-[#2a0505] text-[#ff4444] font-bold' : ''}>
                           <td className="p-2">{pt.isUnknown ? 'Problema' : pt.ppm === 0 ? 'Blanco' : `Std ${i}`}</td>
                           <td className="p-2">{pt.isUnknown ? '?' : `${pt.ppm.toFixed(2)}`}</td>
-                          <td className="p-2 text-cyan-400 font-bold">{pt.absorbance.toFixed(3)}</td>
-                          <td className="p-2 text-slate-400">{pt.transmittance ?? '--'}%</td>
+                          <td className="p-2 text-white font-bold">{pt.absorbance.toFixed(3)}</td>
+                          <td className="p-2 text-[#888888]">{pt.transmittance ?? '--'}%</td>
                         </tr>
                       ))}
                       {spectroPoints.length === 0 && (
                         <tr>
-                          <td colSpan={4} className="p-3 text-center text-slate-500 italic">
+                          <td colSpan={4} className="p-3 text-center text-[#666666] italic">
                             Aún no se han medido estándares en el espectrofotómetro.
                           </td>
                         </tr>
@@ -311,23 +307,21 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                   </table>
                 </div>
 
-                {/* Parámetros de la Recta de Calibración */}
                 {beerRegression && (
-                  <div className="p-3 bg-slate-800/80 border border-slate-700 rounded-xl space-y-1 font-mono text-[11px]">
-                    <div className="flex justify-between text-cyan-300">
+                  <div className="p-3 bg-[#141414] border border-[#2e2e2e] rounded-xl space-y-1 font-mono text-[11px]">
+                    <div className="flex justify-between text-white">
                       <span>Ecuación de Beer:</span>
-                      <span className="font-bold">A = {beerRegression.slope} · C + {beerRegression.intercept}</span>
+                      <span className="font-bold text-[#ef4444]">A = {beerRegression.slope} · C + {beerRegression.intercept}</span>
                     </div>
-                    <div className="flex justify-between text-emerald-400">
+                    <div className="flex justify-between text-[#cccccc]">
                       <span>Coeficiente R²:</span>
-                      <span className="font-bold">{beerRegression.r2} {beerRegression.r2 >= 0.995 ? '✓ (Lineal)' : '⚠️'}</span>
+                      <span className="font-bold text-white">{beerRegression.r2} {beerRegression.r2 >= 0.995 ? '✓ (Lineal)' : '⚠️'}</span>
                     </div>
                   </div>
                 )}
 
-                {/* Campo de concentración calculada */}
-                <div className="p-3 bg-blue-950/30 border border-blue-800/50 rounded-xl space-y-1.5">
-                  <label className="text-xs font-semibold text-blue-200">
+                <div className="p-3.5 bg-[#170505] border border-[#dc2626]/60 rounded-xl space-y-1.5 shadow-lg">
+                  <label className="text-xs font-bold text-white uppercase tracking-wider">
                     Su Concentración de Fe en Muestra Problema (ppm):
                   </label>
                   <div className="flex items-center gap-2">
@@ -337,79 +331,75 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       value={studentFePpm}
                       onChange={(e) => setStudentFePpm(e.target.value)}
                       placeholder="ej. 2.45"
-                      className="w-full px-3 py-2 bg-slate-900 border border-blue-500/60 rounded-lg font-mono text-sm text-emerald-400 font-bold focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#dc2626] rounded-lg font-mono text-sm text-white font-bold focus:outline-none focus:ring-1 focus:ring-[#ef4444]"
                     />
-                    <span className="text-sm font-mono text-blue-300 font-bold">ppm Fe</span>
+                    <span className="text-sm font-mono text-[#ef4444] font-bold">ppm Fe</span>
                   </div>
-                  <p className="text-[10px] text-slate-400">
-                    *Despeje C_x empleando su ecuación de regresión de mínimos cuadrados.
-                  </p>
                 </div>
               </div>
             ) : practiceNumber === 5 ? (
-              /* FORMULARIO P5 (GRAVIMETRÍA) */
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[11px] text-slate-400 font-medium">Masa Muestra Problema:</label>
+                    <label className="text-[11px] text-[#aaaaaa] font-medium">Masa Muestra Problema:</label>
                     <div className="flex items-center gap-1">
                       <input
                         type="number"
                         step="0.0001"
                         value={mass}
                         onChange={(e) => setMass(e.target.value)}
-                        className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg font-mono text-cyan-300 focus:outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#333333] rounded-lg font-mono text-white focus:border-[#dc2626] focus:outline-none"
                       />
-                      <span className="text-slate-400 font-mono">g</span>
+                      <span className="text-[#888888] font-mono">g</span>
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[11px] text-slate-400 font-medium">Factor Gravimétrico (FG):</label>
+                    <label className="text-[11px] text-[#aaaaaa] font-medium">Factor Gravimétrico (FG):</label>
                     <input
                       type="text"
                       disabled
                       value="0.4116 (SO4/BaSO4)"
-                      className="w-full px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg font-mono text-slate-400"
+                      className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#222222] rounded-lg font-mono text-[#777777]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[11px] text-slate-400 font-medium">Masa Crisol Vacío (Tara):</label>
+                    <label className="text-[11px] text-[#aaaaaa] font-medium">Masa Crisol Vacío (Tara):</label>
                     <div className="flex items-center gap-1">
                       <input
                         type="number"
                         step="0.0001"
                         value={crucibleTare}
                         onChange={(e) => setCrucibleTare(e.target.value)}
-                        className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg font-mono text-cyan-300 focus:outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#333333] rounded-lg font-mono text-white focus:border-[#dc2626] focus:outline-none"
                       />
-                      <span className="text-slate-400 font-mono">g</span>
+                      <span className="text-[#888888] font-mono">g</span>
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[11px] text-slate-400 font-medium">Crisol + BaSO4 (Peso Cte):</label>
+                    <label className="text-[11px] text-[#aaaaaa] font-medium">Crisol + BaSO4 (Peso Cte):</label>
                     <div className="flex items-center gap-1">
                       <input
                         type="number"
                         step="0.0001"
                         value={cruciblePlusBaSO4}
                         onChange={(e) => setCruciblePlusBaSO4(e.target.value)}
-                        className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg font-mono text-cyan-300 focus:outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#333333] rounded-lg font-mono text-white focus:border-[#dc2626] focus:outline-none"
                       />
-                      <span className="text-slate-400 font-mono">g</span>
+                      <span className="text-[#888888] font-mono">g</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <label className="text-[11px] text-slate-400 font-medium">Masa Neta BaSO4 Calcinado (Δm):</label>
+                    <label className="text-[11px] text-[#aaaaaa] font-medium">Masa Neta BaSO4 Calcinado (Δm):</label>
                     <button
                       type="button"
                       onClick={handleCalculateGravimetricDiff}
-                      className="text-[10px] text-blue-400 hover:text-blue-300 underline"
+                      className="text-[10px] text-[#ef4444] hover:underline font-bold"
                     >
                       Calcular resta
                     </button>
@@ -421,14 +411,14 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       value={netBaSO4Mass}
                       onChange={(e) => setNetBaSO4Mass(e.target.value)}
                       placeholder="0.0000"
-                      className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg font-mono text-amber-300 font-bold focus:outline-none focus:border-blue-500"
+                      className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#333333] rounded-lg font-mono text-white font-bold focus:border-[#dc2626] focus:outline-none"
                     />
-                    <span className="text-slate-400 font-mono">g</span>
+                    <span className="text-[#888888] font-mono">g</span>
                   </div>
                 </div>
 
-                <div className="p-3 bg-blue-950/30 border border-blue-800/50 rounded-xl space-y-1.5">
-                  <label className="text-xs font-semibold text-blue-200">
+                <div className="p-3.5 bg-[#170505] border border-[#dc2626]/60 rounded-xl space-y-1.5 shadow-lg">
+                  <label className="text-xs font-bold text-white uppercase tracking-wider">
                     Su Porcentaje (% p/p) de SO4(2-) Calculado:
                   </label>
                   <div className="flex items-center gap-2">
@@ -438,83 +428,79 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       value={studentPurityPercent}
                       onChange={(e) => setStudentPurityPercent(e.target.value)}
                       placeholder="ej. 28.98"
-                      className="w-full px-3 py-2 bg-slate-900 border border-blue-500/60 rounded-lg font-mono text-sm text-emerald-400 font-bold focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#dc2626] rounded-lg font-mono text-sm text-white font-bold focus:outline-none focus:ring-1 focus:ring-[#ef4444]"
                     />
-                    <span className="text-sm font-mono text-blue-300 font-bold">%</span>
+                    <span className="text-sm font-mono text-[#ef4444] font-bold">%</span>
                   </div>
-                  <p className="text-[10px] text-slate-400">
-                    *Exprese el resultado con al menos 2 cifras decimales rigurosas.
-                  </p>
                 </div>
               </div>
             ) : (
-              /* FORMULARIO P4 Y P7 (VOLUMETRÍA) */
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {practiceNumber === 7 ? (
                   <div className="space-y-1">
-                    <label className="text-[11px] text-slate-400 font-medium">Volumen Alícuota HCl (Pipeta):</label>
+                    <label className="text-[11px] text-[#aaaaaa] font-medium">Volumen Alícuota HCl (Pipeta):</label>
                     <div className="flex items-center gap-1">
                       <input
                         type="number"
                         step="0.01"
                         value={aliquotVolume}
                         onChange={(e) => setAliquotVolume(e.target.value)}
-                        className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg font-mono text-cyan-300 focus:outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#333333] rounded-lg font-mono text-white focus:border-[#dc2626] focus:outline-none"
                       />
-                      <span className="text-slate-400 font-mono">mL</span>
+                      <span className="text-[#888888] font-mono">mL</span>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-1">
-                    <label className="text-[11px] text-slate-400 font-medium">Masa KHP (Balanza Analítica):</label>
+                    <label className="text-[11px] text-[#aaaaaa] font-medium">Masa KHP (Balanza Analítica):</label>
                     <div className="flex items-center gap-1">
                       <input
                         type="number"
                         step="0.0001"
                         value={mass}
                         onChange={(e) => setMass(e.target.value)}
-                        className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg font-mono text-cyan-300 focus:outline-none focus:border-blue-500"
+                        className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#333333] rounded-lg font-mono text-white focus:border-[#dc2626] focus:outline-none"
                       />
-                      <span className="text-slate-400 font-mono">g</span>
+                      <span className="text-[#888888] font-mono">g</span>
                     </div>
                   </div>
                 )}
 
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-400 font-medium">Lectura Inicial (V0 bureta):</label>
+                  <label className="text-[11px] text-[#aaaaaa] font-medium">Lectura Inicial (V0 bureta):</label>
                   <div className="flex items-center gap-1">
                     <input
                       type="number"
                       step="0.01"
                       value={v0}
                       onChange={(e) => setV0(e.target.value)}
-                      className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg font-mono text-cyan-300 focus:outline-none focus:border-blue-500"
+                      className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#333333] rounded-lg font-mono text-white focus:border-[#dc2626] focus:outline-none"
                     />
-                    <span className="text-slate-400 font-mono">mL</span>
+                    <span className="text-[#888888] font-mono">mL</span>
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-400 font-medium">Lectura Final (Vf viraje):</label>
+                  <label className="text-[11px] text-[#aaaaaa] font-medium">Lectura Final (Vf viraje):</label>
                   <div className="flex items-center gap-1">
                     <input
                       type="number"
                       step="0.01"
                       value={vf}
                       onChange={(e) => setVf(e.target.value)}
-                      className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg font-mono text-cyan-300 focus:outline-none focus:border-blue-500"
+                      className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#333333] rounded-lg font-mono text-white focus:border-[#dc2626] focus:outline-none"
                     />
-                    <span className="text-slate-400 font-mono">mL</span>
+                    <span className="text-[#888888] font-mono">mL</span>
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <label className="text-[11px] text-slate-400 font-medium">Volumen Neto (ΔV = Vf - V0):</label>
+                    <label className="text-[11px] text-[#aaaaaa] font-medium">Volumen Neto (ΔV = Vf - V0):</label>
                     <button
                       type="button"
                       onClick={handleCalculateDiff}
-                      className="text-[10px] text-blue-400 hover:text-blue-300 underline"
+                      className="text-[10px] text-[#ef4444] hover:underline font-bold"
                     >
                       Calcular resta
                     </button>
@@ -526,14 +512,14 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       value={netV}
                       onChange={(e) => setNetV(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg font-mono text-amber-300 focus:outline-none focus:border-blue-500 font-bold"
+                      className="w-full px-3 py-1.5 bg-[#0a0a0a] border border-[#333333] rounded-lg font-mono text-white font-bold focus:border-[#dc2626] focus:outline-none"
                     />
-                    <span className="text-slate-400 font-mono">mL</span>
+                    <span className="text-[#888888] font-mono">mL</span>
                   </div>
                 </div>
 
-                <div className="col-span-1 sm:col-span-2 p-3 bg-blue-950/30 border border-blue-800/50 rounded-xl space-y-1.5">
-                  <label className="text-xs font-semibold text-blue-200">
+                <div className="col-span-1 sm:col-span-2 p-3.5 bg-[#170505] border border-[#dc2626]/60 rounded-xl space-y-1.5 shadow-lg">
+                  <label className="text-xs font-bold text-white uppercase tracking-wider">
                     Su Concentración de {practiceNumber === 7 ? 'HCl' : 'NaOH'} Calculada:
                   </label>
                   <div className="flex items-center gap-2">
@@ -543,21 +529,21 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       value={calculatedN}
                       onChange={(e) => setCalculatedN(e.target.value)}
                       placeholder="ej. 0.1012"
-                      className="w-full px-3 py-2 bg-slate-900 border border-blue-500/60 rounded-lg font-mono text-sm text-emerald-400 font-bold focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#dc2626] rounded-lg font-mono text-sm text-white font-bold focus:outline-none focus:ring-1 focus:ring-[#ef4444]"
                     />
-                    <span className="text-sm font-mono text-blue-300 font-bold">N (eq/L)</span>
+                    <span className="text-sm font-mono text-[#ef4444] font-bold">N (eq/L)</span>
                   </div>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[10px] text-[#888888]">
                     *Exprese el resultado con 4 cifras significativas rigurosas.
                   </p>
                 </div>
               </div>
             )}
 
-            {/* Botón de evaluación */}
+            {/* Botón de evaluación Sumi-e */}
             <button
               onClick={handleEvaluate}
-              className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-[0.99] text-white font-bold rounded-xl shadow-lg border border-blue-400/30 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 bg-[#dc2626] hover:bg-[#b91c1c] active:scale-[0.99] text-white font-extrabold rounded-xl shadow-lg shadow-red-950/40 border border-[#ef4444] transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
             >
               <Award size={16} />
               <span>Evaluar Informe y Cálculos</span>
@@ -565,62 +551,66 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
 
             {/* Resultados de la Evaluación */}
             {evaluation && (
-              <div className="mt-3 p-4 bg-slate-800 border border-slate-700 rounded-xl space-y-3 animate-in fade-in">
-                <div className="flex items-center justify-between border-b border-slate-700 pb-2">
-                  <span className="text-xs font-bold text-slate-200">Puntaje Formativo:</span>
+              <div className="mt-3 p-4 bg-[#121212] border-2 border-[#dc2626] rounded-xl space-y-3 animate-in fade-in shadow-2xl">
+                <div className="flex items-center justify-between border-b border-[#2b2b2b] pb-2">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">
+                    Puntaje Formativo Obtenido:
+                  </span>
                   <span
-                    className={`text-base font-extrabold font-mono px-3 py-0.5 rounded-full border ${
+                    className={`text-base font-black font-mono px-3 py-0.5 rounded-full border-2 ${
                       evaluation.score >= 85
-                        ? 'bg-emerald-950 text-emerald-400 border-emerald-600'
+                        ? 'bg-[#1f0808] text-[#ef4444] border-[#dc2626]'
                         : evaluation.score >= 60
-                        ? 'bg-amber-950 text-amber-400 border-amber-600'
-                        : 'bg-rose-950 text-rose-400 border-rose-600'
+                        ? 'bg-[#171717] text-white border-[#555555]'
+                        : 'bg-[#2a0505] text-[#ff4444] border-[#dc2626]'
                     }`}
                   >
                     {evaluation.score} / 100 pts
                   </span>
                 </div>
 
-                <div className="space-y-1.5 text-[11px]">
+                <div className="space-y-1.5 text-[11px] font-mono">
                   <div className="flex items-center justify-between">
                     <span>1. Integridad de Datos Físicos:</span>
                     {evaluation.dataIntegrityPassed ? (
-                      <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={12} /> Correcto</span>
+                      <span className="text-white font-bold flex items-center gap-1"><CheckCircle2 size={12} className="text-[#dc2626]" /> Correcto</span>
                     ) : (
-                      <span className="text-rose-400 flex items-center gap-1"><XCircle size={12} /> Falla detectada</span>
+                      <span className="text-[#ef4444] font-bold flex items-center gap-1"><XCircle size={12} /> Falla</span>
                     )}
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span>2. Precisión Aritmética (Fórmula):</span>
                     {evaluation.arithmeticAccuracyPassed ? (
-                      <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={12} /> Correcto</span>
+                      <span className="text-white font-bold flex items-center gap-1"><CheckCircle2 size={12} className="text-[#dc2626]" /> Correcto</span>
                     ) : (
-                      <span className="text-rose-400 flex items-center gap-1"><XCircle size={12} /> Error aritmético</span>
+                      <span className="text-[#ef4444] font-bold flex items-center gap-1"><XCircle size={12} /> Error</span>
                     )}
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span>3. Cifras Significativas:</span>
                     {evaluation.significantFiguresPassed ? (
-                      <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={12} /> Válido</span>
+                      <span className="text-white font-bold flex items-center gap-1"><CheckCircle2 size={12} className="text-[#dc2626]" /> Válido</span>
                     ) : (
-                      <span className="text-amber-400 flex items-center gap-1"><XCircle size={12} /> Formato incorrecto</span>
+                      <span className="text-[#ef4444] font-bold flex items-center gap-1"><XCircle size={12} /> Incorrecto</span>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between font-mono pt-1 border-t border-slate-700/60">
-                    <span className="text-slate-400">Error Relativo (% Er):</span>
-                    <span className={evaluation.relativeErrorPercent <= 2 ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                  <div className="flex items-center justify-between pt-1 border-t border-[#262626]">
+                    <span className="text-[#888888]">Error Relativo (% Er):</span>
+                    <span className={evaluation.relativeErrorPercent <= 2 ? 'text-white font-bold' : 'text-[#ef4444] font-bold'}>
                       {evaluation.relativeErrorPercent}%
                     </span>
                   </div>
                 </div>
 
                 {evaluation.feedbackNotes.length > 0 && (
-                  <div className="space-y-1 pt-2 border-t border-slate-700">
-                    <span className="text-[11px] font-bold text-amber-300">Observaciones Analíticas:</span>
-                    <ul className="list-disc list-inside space-y-1 text-[11px] text-slate-300">
+                  <div className="space-y-1 pt-2 border-t border-[#262626]">
+                    <span className="text-[11px] font-bold text-[#ef4444] uppercase tracking-wider">
+                      Observaciones Analíticas:
+                    </span>
+                    <ul className="list-disc list-inside space-y-1 text-[11px] text-[#cccccc]">
                       {evaluation.feedbackNotes.map((note, i) => (
                         <li key={i}>{note}</li>
                       ))}
@@ -628,10 +618,10 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-[#262626]">
                   <button
                     onClick={onOpenAuditModal}
-                    className="w-full py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 text-cyan-300 border border-cyan-500/40 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                    className="w-full py-2 bg-[#171717] hover:bg-[#222222] active:scale-95 text-[#e5e5e5] border border-[#333333] hover:border-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                   >
                     <span>Citas Tríada Digital</span>
                     <ExternalLink size={13} />
@@ -639,9 +629,9 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
 
                   <button
                     onClick={() => setIsReportModalOpen(true)}
-                    className="w-full py-2 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white border border-blue-400/50 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow transition-all"
+                    className="w-full py-2 bg-white hover:bg-[#e5e5e5] active:scale-95 text-black font-extrabold rounded-xl text-xs shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer uppercase tracking-wider"
                   >
-                    <FileText size={14} />
+                    <FileText size={14} className="text-[#dc2626]" />
                     <span>Descargar Informe (PDF)</span>
                   </button>
                 </div>
@@ -649,62 +639,49 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
             )}
           </>
         ) : practiceNumber === 12 ? (
-          /* PESTAÑA GRÁFICO P12: CURVA DE BEER-LAMBERT */
+          /* GRÁFICO P12: CURVA DE BEER-LAMBERT EN BLANCO, NEGRO Y ROJO */
           <div className="space-y-4 animate-in fade-in">
-            <div className="p-3 bg-slate-800/60 border border-slate-700 rounded-xl space-y-1.5">
-              <span className="font-bold text-cyan-300 flex items-center gap-1.5 text-xs">
-                <LineChart size={15} />
+            <div className="p-3.5 bg-[#121212] border border-[#2b2b2b] rounded-xl space-y-1">
+              <span className="font-bold text-white flex items-center gap-1.5 text-xs font-serif uppercase tracking-wider">
+                <LineChart size={15} className="text-[#dc2626]" />
                 <span>Curva de Calibración de Beer-Lambert (A vs C a 508 nm)</span>
               </span>
-              <p className="text-[11px] text-slate-400">
-                La recta de regresión lineal demuestra la proporcionalidad directa entre Absorbancia y Concentración según la ley A = ε · b · C.
+              <p className="text-[11px] text-[#888888] font-sans">
+                Ajuste lineal A = ε · b · C en tinta negra con puntos medidos en rojo cinabrio.
               </p>
             </div>
 
-            {/* Gráfico SVG de Calibración */}
-            <div className="w-full h-56 bg-slate-950 p-2 rounded-xl border border-slate-800 relative flex items-center justify-center shadow-inner">
-              <svg width="100%" height="100%" viewBox="0 0 340 180" className="overflow-visible">
-                <defs>
-                  <linearGradient id="gridGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1e293b" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#0f172a" stopOpacity="0.8" />
-                  </linearGradient>
-                </defs>
+            <div className="w-full h-56 bg-[#050505] p-2 rounded-xl border border-[#222222] relative flex items-center justify-center shadow-inner">
+              <svg width="100%" height="100%" viewBox="0 0 340 180" className="overflow-visible font-mono">
+                <rect x="35" y="15" width="285" height="140" fill="#0a0a0a" stroke="#262626" strokeWidth="1" />
 
-                {/* Ejes (Origen en x=35, y=155. Max X: 320, Max Y: 15) */}
-                <rect x="35" y="15" width="285" height="140" fill="url(#gridGrad)" stroke="#334155" strokeWidth="1" />
+                <line x1="35" y1="155" x2="320" y2="155" stroke="#444444" strokeWidth="1" />
+                <text x="10" y="158" fill="#888888" fontSize="8">0.00</text>
 
-                {/* Líneas de cuadrícula horizontal para Absorbancia A = 0, 0.5, 1.0 */}
-                <line x1="35" y1="155" x2="320" y2="155" stroke="#475569" strokeWidth="1" />
-                <text x="10" y="158" fill="#94a3b8" fontSize="8" fontFamily="monospace">0.00</text>
+                <line x1="35" y1="85" x2="320" y2="85" stroke="#222222" strokeWidth="0.8" strokeDasharray="3 3" />
+                <text x="10" y="88" fill="#888888" fontSize="8">0.50</text>
 
-                <line x1="35" y1="85" x2="320" y2="85" stroke="#475569" strokeWidth="0.8" strokeDasharray="3 3" />
-                <text x="10" y="88" fill="#94a3b8" fontSize="8" fontFamily="monospace">0.50</text>
+                <line x1="35" y1="15" x2="320" y2="15" stroke="#444444" strokeWidth="1" />
+                <text x="10" y="18" fill="#888888" fontSize="8">1.00</text>
 
-                <line x1="35" y1="15" x2="320" y2="15" stroke="#475569" strokeWidth="1" />
-                <text x="10" y="18" fill="#94a3b8" fontSize="8" fontFamily="monospace">1.00</text>
+                <text x="35" y="168" fill="#888888" fontSize="8">0 ppm</text>
+                <text x="92" y="168" fill="#888888" fontSize="8">1 ppm</text>
+                <text x="149" y="168" fill="#888888" fontSize="8">2 ppm</text>
+                <text x="206" y="168" fill="#888888" fontSize="8">3 ppm</text>
+                <text x="263" y="168" fill="#888888" fontSize="8">4 ppm</text>
+                <text x="310" y="168" fill="#888888" fontSize="8">5 ppm</text>
 
-                {/* Etiquetas eje X (0 a 5 ppm Fe) */}
-                <text x="35" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">0 ppm</text>
-                <text x="92" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">1 ppm</text>
-                <text x="149" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">2 ppm</text>
-                <text x="206" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">3 ppm</text>
-                <text x="263" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">4 ppm</text>
-                <text x="310" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">5 ppm</text>
-
-                {/* Recta de Regresión Ajustada */}
                 {beerRegression && (
                   <line
                     x1="35"
                     y1={155 - (beerRegression.intercept / 1.0) * 140}
                     x2="320"
                     y2={155 - ((beerRegression.slope * 5 + beerRegression.intercept) / 1.0) * 140}
-                    stroke="#38bdf8"
-                    strokeWidth="2"
+                    stroke="#ffffff"
+                    strokeWidth="2.2"
                   />
                 )}
 
-                {/* Puntos de Calibración Medidos */}
                 {spectroPoints
                   .filter((p) => !p.isUnknown)
                   .map((p, idx) => {
@@ -712,12 +689,11 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                     const y = 155 - (Math.min(1.0, p.absorbance) / 1.0) * 140;
                     return (
                       <g key={idx}>
-                        <circle cx={x} cy={y} r="3.5" fill="#f97316" stroke="#ffffff" strokeWidth="1" />
+                        <circle cx={x} cy={y} r="4" fill="#dc2626" stroke="#ffffff" strokeWidth="1.2" />
                       </g>
                     );
                   })}
 
-                {/* Proyección de la Muestra Problema si fue medida */}
                 {beerRegression?.unknownAbs !== null && beerRegression?.unknownAbs !== undefined && (
                   <g>
                     <line
@@ -725,7 +701,7 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       y1={155 - (Math.min(1.0, beerRegression.unknownAbs) / 1.0) * 140}
                       x2={35 + ((beerRegression.interpolatedPpm ?? 2.5) / 5.0) * 285}
                       y2={155 - (Math.min(1.0, beerRegression.unknownAbs) / 1.0) * 140}
-                      stroke="#f59e0b"
+                      stroke="#dc2626"
                       strokeWidth="1.5"
                       strokeDasharray="4 2"
                     />
@@ -734,24 +710,23 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       y1={155 - (Math.min(1.0, beerRegression.unknownAbs) / 1.0) * 140}
                       x2={35 + ((beerRegression.interpolatedPpm ?? 2.5) / 5.0) * 285}
                       y2="155"
-                      stroke="#f59e0b"
+                      stroke="#dc2626"
                       strokeWidth="1.5"
                       strokeDasharray="4 2"
                     />
                     <circle
                       cx={35 + ((beerRegression.interpolatedPpm ?? 2.5) / 5.0) * 285}
                       cy={155 - (Math.min(1.0, beerRegression.unknownAbs) / 1.0) * 140}
-                      r="4.5"
-                      fill="#f59e0b"
-                      stroke="#ffffff"
-                      strokeWidth="1.5"
+                      r="5"
+                      fill="#ffffff"
+                      stroke="#dc2626"
+                      strokeWidth="2"
                     />
                     <text
                       x={35 + ((beerRegression.interpolatedPpm ?? 2.5) / 5.0) * 285 + 6}
                       y={155 - (Math.min(1.0, beerRegression.unknownAbs) / 1.0) * 140 - 6}
-                      fill="#f59e0b"
+                      fill="#dc2626"
                       fontSize="8"
-                      fontFamily="monospace"
                       fontWeight="bold"
                     >
                       Muestra: {beerRegression.interpolatedPpm} ppm
@@ -761,54 +736,47 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
               </svg>
             </div>
 
-            <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-1 text-[11px] font-mono">
-              <div className="flex justify-between text-cyan-300">
+            <div className="p-3 bg-[#121212] border border-[#2b2b2b] rounded-xl space-y-1 text-[11px] font-mono">
+              <div className="flex justify-between text-white">
                 <span>Ecuación:</span>
-                <span>A = {beerRegression?.slope ?? '0.1987'} · C + {beerRegression?.intercept ?? '0.000'}</span>
+                <span className="font-bold text-[#ef4444]">A = {beerRegression?.slope ?? '0.1987'} · C + {beerRegression?.intercept ?? '0.000'}</span>
               </div>
-              <div className="flex justify-between text-emerald-400">
+              <div className="flex justify-between text-[#888888]">
                 <span>Correlación R²:</span>
-                <span>{beerRegression?.r2 ?? '0.9998'}</span>
+                <span className="font-bold text-white">{beerRegression?.r2 ?? '0.9998'}</span>
               </div>
             </div>
           </div>
         ) : (
-          /* PESTAÑA GRÁFICO P7: TITULACIÓN POTENCIOMÉTRICA */
+          /* GRÁFICO P7: TITULACIÓN POTENCIOMÉTRICA */
           <div className="space-y-4 animate-in fade-in">
-            <div className="p-3 bg-slate-800/60 border border-slate-700 rounded-xl space-y-1.5">
-              <span className="font-bold text-cyan-300 flex items-center gap-1.5 text-xs">
-                <LineChart size={15} />
+            <div className="p-3.5 bg-[#121212] border border-[#2b2b2b] rounded-xl space-y-1">
+              <span className="font-bold text-white flex items-center gap-1.5 text-xs font-serif uppercase tracking-wider">
+                <LineChart size={15} className="text-[#dc2626]" />
                 <span>Curva Potenciométrica en Tiempo Real (pH vs V_NaOH)</span>
               </span>
-              <p className="text-[11px] text-slate-400">
-                La curva azul representa la respuesta del electrodo de vidrio. La curva esmeralda traza la primera derivada numérica (ΔpH/ΔV), cuyo pico marca el punto de equivalencia exacto (Veq).
+              <p className="text-[11px] text-[#888888] font-sans">
+                Curva en blanco nítido y primera derivada numérica (ΔpH/ΔV) en rojo cinabrio.
               </p>
             </div>
 
-            <div className="w-full h-56 bg-slate-950 p-2 rounded-xl border border-slate-800 relative flex items-center justify-center shadow-inner">
-              <svg width="100%" height="100%" viewBox="0 0 340 180" className="overflow-visible">
-                <defs>
-                  <linearGradient id="gridGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1e293b" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#0f172a" stopOpacity="0.8" />
-                  </linearGradient>
-                </defs>
+            <div className="w-full h-56 bg-[#050505] p-2 rounded-xl border border-[#222222] relative flex items-center justify-center shadow-inner">
+              <svg width="100%" height="100%" viewBox="0 0 340 180" className="overflow-visible font-mono">
+                <rect x="35" y="15" width="285" height="140" fill="#0a0a0a" stroke="#262626" strokeWidth="1" />
 
-                <rect x="35" y="15" width="285" height="140" fill="url(#gridGrad)" stroke="#334155" strokeWidth="1" />
+                <line x1="35" y1="155" x2="320" y2="155" stroke="#444444" strokeWidth="1" />
+                <text x="12" y="158" fill="#888888" fontSize="8">pH 0</text>
 
-                <line x1="35" y1="155" x2="320" y2="155" stroke="#475569" strokeWidth="1" />
-                <text x="12" y="158" fill="#94a3b8" fontSize="8" fontFamily="monospace">pH 0</text>
+                <line x1="35" y1="85" x2="320" y2="85" stroke="#222222" strokeWidth="0.8" strokeDasharray="3 3" />
+                <text x="12" y="88" fill="#ffffff" fontSize="8">pH 7</text>
 
-                <line x1="35" y1="85" x2="320" y2="85" stroke="#475569" strokeWidth="0.8" strokeDasharray="3 3" />
-                <text x="12" y="88" fill="#10b981" fontSize="8" fontFamily="monospace">pH 7</text>
+                <line x1="35" y1="15" x2="320" y2="15" stroke="#444444" strokeWidth="1" />
+                <text x="8" y="18" fill="#888888" fontSize="8">pH 14</text>
 
-                <line x1="35" y1="15" x2="320" y2="15" stroke="#475569" strokeWidth="1" />
-                <text x="8" y="18" fill="#94a3b8" fontSize="8" fontFamily="monospace">pH 14</text>
-
-                <text x="35" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">0 mL</text>
-                <text x="125" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">10 mL</text>
-                <text x="215" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">20 mL</text>
-                <text x="305" y="168" fill="#94a3b8" fontSize="8" fontFamily="monospace">30 mL</text>
+                <text x="35" y="168" fill="#888888" fontSize="8">0 mL</text>
+                <text x="125" y="168" fill="#888888" fontSize="8">10 mL</text>
+                <text x="215" y="168" fill="#888888" fontSize="8">20 mL</text>
+                <text x="305" y="168" fill="#888888" fontSize="8">30 mL</text>
 
                 {titrationPoints.length > 1 && (
                   <path
@@ -820,7 +788,7 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       })
                       .join(' ')}
                     fill="none"
-                    stroke="#38bdf8"
+                    stroke="#ffffff"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                   />
@@ -829,7 +797,7 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                 {titrationPoints.map((p, idx) => {
                   const x = 35 + (Math.min(30, p.volume) / 30) * 285;
                   const y = 155 - (Math.min(14, Math.max(0, p.pH)) / 14) * 140;
-                  return <circle key={idx} cx={x} cy={y} r="2" fill="#e0f2fe" stroke="#0284c7" strokeWidth="1" />;
+                  return <circle key={idx} cx={x} cy={y} r="2" fill="#ffffff" stroke="#dc2626" strokeWidth="1" />;
                 })}
 
                 {derivativeData.length > 1 && (
@@ -842,9 +810,9 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       })
                       .join(' ')}
                     fill="none"
-                    stroke="#10b981"
-                    strokeWidth="1.8"
-                    strokeDasharray="2 1"
+                    stroke="#dc2626"
+                    strokeWidth="2"
+                    strokeDasharray="3 1.5"
                   />
                 )}
 
@@ -855,14 +823,14 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
                       y1="15"
                       x2={35 + (maxDerivativePoint.volume / 30) * 285}
                       y2="155"
-                      stroke="#f59e0b"
-                      strokeWidth="1.5"
+                      stroke="#dc2626"
+                      strokeWidth="1.8"
                       strokeDasharray="4 2"
                     />
                     <text
                       x={35 + (maxDerivativePoint.volume / 30) * 285 - 18}
                       y="28"
-                      fill="#f59e0b"
+                      fill="#dc2626"
                       fontSize="8"
                       fontFamily="monospace"
                       fontWeight="bold"
@@ -874,21 +842,21 @@ export const LabNotebook: React.FC<LabNotebookProps> = ({
               </svg>
             </div>
 
-            <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-1 text-[11px] font-mono">
-              <div className="flex justify-between text-cyan-300">
+            <div className="p-3 bg-[#121212] border border-[#2b2b2b] rounded-xl space-y-1 text-[11px] font-mono">
+              <div className="flex justify-between text-white">
                 <span>Lectura actual:</span>
-                <span>V = {currentDeliveredMl.toFixed(2)} mL | pH = {currentPH.toFixed(2)}</span>
+                <span className="font-bold">V = {currentDeliveredMl.toFixed(2)} mL | pH = {currentPH.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-emerald-400">
-                <span>Pico 1ra derivada (Veq estimado):</span>
-                <span>{maxDerivativePoint ? `${maxDerivativePoint.volume} mL (ΔpH/ΔV = ${maxDerivativePoint.dpH_dV})` : 'Pendiente...'}</span>
+              <div className="flex justify-between text-[#ef4444]">
+                <span>Pico 1ra derivada (Veq):</span>
+                <span className="font-bold">{maxDerivativePoint ? `${maxDerivativePoint.volume} mL (ΔpH/ΔV = ${maxDerivativePoint.dpH_dV})` : 'Pendiente...'}</span>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Modal de Informe Formal Imprimible / Descargable */}
+      {/* Modal de Informe Formal */}
       {evaluation && (
         <LabReportModal
           isOpen={isReportModalOpen}

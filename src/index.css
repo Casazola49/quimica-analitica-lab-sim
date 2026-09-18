@@ -3,46 +3,104 @@
 @tailwind utilities;
 
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Noto Serif JP', system-ui, -apple-system, sans-serif;
   color-scheme: dark;
 }
 
 /* ==========================================================================
-   SISTEMA DE DISEÑO ALQUÍMICA-33 (SUMI-E / SUIBOKUGA)
-   Colores: Negro Tinta (Sumi), Blanco Papel (Washi) y Rojo Cinabrio (Shu-iro)
+   SISTEMA DE DISEÑO INTEGRAL: ALQUÍMICA-33 (SUMI-E / SUIBOKUGA)
+   Paleta Estricta Exclusiva:
+   1. Negro Tinta (Sumi / 墨): #050505, #0a0a0a, #141414, #1f1f1f
+   2. Blanco Papel de Arroz (Washi / 和紙): #ffffff, #fafafa, #e5e5e5
+   3. Rojo Cinabrio / Bermellón (Shu-iro / 朱色): #dc2626, #ef4444, #991b1b
    ========================================================================== */
 
-/* Fondo de mesada estilo papel de arroz húmedo con gradiente de tinta Sumi */
+/* Fondo de mesada con textura de papel de arroz oscuro y tinta Sumi diluida */
 .lab-bench-bg, .sumi-bench-bg {
-  background: radial-gradient(circle at 50% 25%, #171717 0%, #0a0a0a 100%);
+  background-color: #080808;
   background-image: 
-    radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    radial-gradient(circle at 50% 25%, #171717 0%, #080808 100%);
+    radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 50% 20%, #171717 0%, #080808 100%);
   background-size: 28px 28px, 100% 100%;
 }
 
-/* Tarjeta con borde sutil de tinta china lavada */
+/* Tarjeta estilo panel de caligrafía con laca negra y borde fino */
 .sumi-card {
-  background-color: rgba(18, 18, 18, 0.88);
+  background: linear-gradient(180deg, #141414 0%, #0d0d0d 100%);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Borde caligráfico asimétrico de tinta */
+/* Borde caligráfico asimétrico con acento de pincel en rojo cinabrio */
 .sumi-brush-border {
-  border-left: 3px solid #dc2626;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 3px solid #dc2626 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Superficie de madera lacada en negro tradicional (Urushi) */
 .wood-surface {
-  background: linear-gradient(180deg, #262626 0%, #121212 100%);
-  border-top: 2px solid #525252;
-  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.08), 0 8px 16px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(180deg, #1f1f1f 0%, #0d0d0d 100%);
+  border-top: 2px solid #dc2626;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.06), 0 12px 24px rgba(0, 0, 0, 0.85);
 }
 
-/* Animación física de barra magnética de agitación (proyección axial 3D simétrica sin desvío lateral) */
+/* Botón de acción principal rojo cinabrio */
+.btn-cinabrio {
+  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  font-weight: 700;
+  border: 1px solid #ef4444;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-cinabrio:hover {
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-cinabrio:active {
+  transform: scale(0.97);
+}
+
+/* Botón secundario en tinta negra con borde de papel washi */
+.btn-sumi {
+  background: #141414;
+  color: #fafafa;
+  font-weight: 600;
+  border: 1px solid #333333;
+  transition: all 0.2s ease;
+}
+
+.btn-sumi:hover {
+  background: #1f1f1f;
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+/* Scrollbar estilizada en tinta negra y rojo cinabrio */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #dc2626;
+}
+
+/* Animación física de barra magnética de agitación */
 @keyframes magnetic-stir-bar {
   0% {
     transform: scaleX(1);
@@ -66,7 +124,7 @@
   transform-origin: 0 0;
 }
 
-/* Animación física de caída de gota continua unidireccional (nunca rebota hacia arriba) */
+/* Animación física de caída de gota continua unidireccional */
 @keyframes drop-fall-down {
   0% {
     transform: translateY(0px) scale(0.9, 1.1);
@@ -115,11 +173,11 @@
 @keyframes indicator-bloom {
   0% {
     transform: scale(0.2);
-    opacity: 0.9;
+    opacity: 0.95;
   }
   50% {
     transform: scale(1.1);
-    opacity: 0.7;
+    opacity: 0.75;
   }
   100% {
     transform: scale(1.8);

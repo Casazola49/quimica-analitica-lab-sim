@@ -60,14 +60,14 @@ export const ReagentShelf: React.FC<ReagentShelfProps> = ({
         {!isSampleDissolved ? (
           <button
             onClick={onOpenTransferModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold rounded-xl text-xs shadow-lg transition-all animate-pulse cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1a1a1a] hover:bg-[#262626] active:scale-95 text-white font-bold rounded-xl text-xs shadow-lg shadow-red-950/40 border border-[#dc2626] transition-all animate-pulse cursor-pointer"
             title={practiceNumber === 7 ? "Pipetear 25.00 mL de HCl con propipeta" : "Pesar patrón primario KHP en la balanza analítica Mettler"}
           >
-            <Scale size={14} />
+            <Scale size={14} className="text-[#ef4444]" />
             <span>{practiceNumber === 7 ? '2. Pipetear 25.00 mL de HCl' : '2. Pesar KHP en Balanza'}</span>
           </button>
         ) : (
-          <span className="flex items-center gap-1 px-2.5 py-1 bg-purple-950/60 border border-purple-700/50 text-purple-300 rounded-xl text-[11px] font-semibold">
+          <span className="flex items-center gap-1 px-2.5 py-1 bg-[#1f0808] border border-[#dc2626]/70 text-white rounded-xl text-[11px] font-bold">
             {practiceNumber === 7 ? '✓ 25.00 mL HCl + Electrodo' : '✓ KHP Disuelto en Erlenmeyer'}
           </span>
         )}
@@ -76,16 +76,16 @@ export const ReagentShelf: React.FC<ReagentShelfProps> = ({
         <button
           onClick={onPurgeBubble}
           disabled={isBubblePurged || !isBuretteLoaded}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all active:scale-95 ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all active:scale-95 ${
             !isBuretteLoaded
-              ? 'bg-sumi-800 border-sumi-700 text-sumi-500 cursor-not-allowed'
+              ? 'bg-[#121212] border-[#222222] text-[#555555] cursor-not-allowed'
               : isBubblePurged
-              ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300 cursor-default'
-              : 'bg-amber-600/30 hover:bg-amber-600/50 border-amber-500 text-amber-200 animate-pulse cursor-pointer'
+              ? 'bg-[#1f0808] border-[#dc2626]/70 text-white cursor-default'
+              : 'bg-[#dc2626] hover:bg-[#b91c1c] border-[#ef4444] text-white animate-pulse cursor-pointer shadow-lg shadow-red-950/50'
           }`}
           title="Inspeccionar extremo capilar y purgar burbujas hacia vaso de desecho"
         >
-          <Wind size={14} className={isBubblePurged ? 'text-emerald-400' : 'text-amber-400'} />
+          <Wind size={14} className={isBubblePurged ? 'text-[#dc2626]' : 'text-white'} />
           <span>{isBubblePurged ? '✓ Llave Purgada' : 'Purgar Burbuja (Zoom)'}</span>
         </button>
 
@@ -93,16 +93,16 @@ export const ReagentShelf: React.FC<ReagentShelfProps> = ({
         <button
           onClick={onOpenDropperModal}
           disabled={!isSampleDissolved || indicatorDrops >= 5}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all active:scale-95 cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all active:scale-95 cursor-pointer ${
             !isSampleDissolved
-              ? 'bg-sumi-800 border-sumi-700 text-sumi-500 cursor-not-allowed'
+              ? 'bg-[#121212] border-[#222222] text-[#555555] cursor-not-allowed'
               : indicatorDrops > 0
-              ? 'bg-pink-950/60 border-pink-500/50 text-pink-200'
-              : 'bg-pink-600/30 hover:bg-pink-600/50 border-pink-400 text-pink-100 animate-pulse'
+              ? 'bg-[#1f0808] border-[#dc2626] text-white'
+              : 'bg-[#1c1c1c] hover:bg-[#292929] border border-[#dc2626] text-white animate-pulse'
           }`}
           title="Abrir gotero ámbar para añadir gotas con halo cromático"
         >
-          <Droplet size={14} className={indicatorDrops > 0 ? 'text-pink-400 fill-pink-400/50' : 'text-pink-300'} />
+          <Droplet size={14} className={indicatorDrops > 0 ? 'text-[#dc2626] fill-[#dc2626]/50' : 'text-[#ef4444]'} />
           <span>
             Gotero Fenolftaleína ({indicatorDrops} {indicatorDrops === 1 ? 'gota' : 'gotas'})
           </span>

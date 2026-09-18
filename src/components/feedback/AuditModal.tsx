@@ -1,7 +1,8 @@
 import React from 'react';
-import { X, BookOpen, ExternalLink, ShieldAlert, CheckCircle } from 'lucide-react';
+import { X, ExternalLink, ShieldAlert, CheckCircle } from 'lucide-react';
 import { TechniqueDefect } from '../../types';
 import { PEDAGOGICAL_CITATIONS } from '../../data/pedagogicalCitations';
+import { HankoSeal } from '../common/HankoSeal';
 
 interface AuditModalProps {
   isOpen: boolean;
@@ -23,19 +24,19 @@ export const AuditModal: React.FC<AuditModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl max-h-[90vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-        {/* Encabezado */}
-        <div className="p-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="text-cyan-400" size={20} />
-            <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wider">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-in fade-in duration-200 select-none font-sans">
+      <div className="relative w-full max-w-2xl max-h-[90vh] bg-[#0a0a0a] border border-[#262626] rounded-2xl shadow-2xl flex flex-col overflow-hidden text-white">
+        {/* Encabezado Sumi-e */}
+        <div className="p-4 bg-[#121212] border-b border-[#222222] flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <HankoSeal size="sm" variant="stamp" />
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider font-serif">
               Auditoría Pedagógica y Citas de la Tríada Digital
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700 transition-colors"
+            className="p-1.5 text-[#666666] hover:text-white rounded-lg hover:bg-[#1a1a1a] transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -44,19 +45,19 @@ export const AuditModal: React.FC<AuditModalProps> = ({
         {/* Cuerpo con Scroll */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
           {defects.length === 0 ? (
-            <div className="p-8 text-center space-y-3 bg-slate-800/40 border border-slate-700 rounded-xl">
-              <CheckCircle size={40} className="mx-auto text-emerald-400" />
-              <h4 className="text-sm font-bold text-emerald-300">¡Técnica de Laboratorio Impecable!</h4>
-              <p className="text-slate-400 max-w-md mx-auto">
+            <div className="p-8 text-center space-y-3 bg-[#121212] border border-[#262626] rounded-xl shadow">
+              <CheckCircle size={40} className="mx-auto text-[#dc2626]" />
+              <h4 className="text-sm font-bold text-white font-serif uppercase tracking-wider">¡Técnica de Laboratorio Impecable!</h4>
+              <p className="text-[#888888] max-w-md mx-auto leading-relaxed">
                 No se registraron defectos sistemáticos en la mesada: la bureta fue purgada correctamente, la lectura de menisco no presentó error de paralaje y la titulación se detuvo en el viraje óptimo.
               </p>
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2 text-amber-300 bg-amber-500/10 p-3 rounded-xl border border-amber-500/30">
-                <ShieldAlert size={18} className="shrink-0" />
-                <span>
-                  Se identificaron <strong>{defects.length}</strong> desviaciones de técnica en la mesada. A continuación se presentan las citas exactas de los libros oficiales que explican el impacto metrológico:
+              <div className="flex items-center gap-2.5 text-white bg-[#1f0808] p-3.5 rounded-xl border border-[#dc2626]/70 shadow">
+                <ShieldAlert size={18} className="text-[#ef4444] shrink-0" />
+                <span className="leading-relaxed">
+                  Se identificaron <strong className="text-[#ef4444]">{defects.length}</strong> desviaciones de técnica en la mesada. A continuación se presentan las citas exactas de los libros oficiales que explican el impacto metrológico:
                 </span>
               </div>
 
@@ -67,45 +68,41 @@ export const AuditModal: React.FC<AuditModalProps> = ({
                 return (
                   <div
                     key={index}
-                    className="p-4 bg-slate-800/70 border border-slate-700 rounded-xl space-y-3 shadow-md"
+                    className="p-4 bg-[#121212] border border-[#2b2b2b] rounded-xl space-y-3 shadow-lg"
                   >
-                    {/* Título y Libro */}
-                    <div className="flex items-center justify-between border-b border-slate-700/80 pb-2">
-                      <span className="font-bold text-sm text-cyan-300">
+                    <div className="flex items-center justify-between border-b border-[#222222] pb-2">
+                      <span className="font-bold text-sm text-white font-serif">
                         {index + 1}. {citation.chapterTitle}
                       </span>
-                      <span className="px-2.5 py-0.5 bg-blue-950 text-blue-300 border border-blue-700 text-[10px] font-mono rounded-full font-semibold">
+                      <span className="px-2.5 py-0.5 bg-[#1f0808] text-[#ef4444] border border-[#dc2626]/70 text-[10px] font-mono rounded-full font-bold">
                         {citation.book} — {citation.edition}
                       </span>
                     </div>
 
-                    {/* Cita Textual Verificada */}
-                    <div className="p-3 bg-slate-950/80 border-l-4 border-cyan-500 rounded-r-lg space-y-1">
-                      <p className="italic text-slate-200 font-serif leading-relaxed">
+                    <div className="p-3 bg-[#050505] border-l-4 border-l-[#dc2626] rounded-r-lg space-y-1">
+                      <p className="italic text-[#f5f5f5] font-serif leading-relaxed text-[11px]">
                         "{citation.exactQuote}"
                       </p>
-                      <span className="block text-[10px] text-cyan-400/80 font-mono text-right">
+                      <span className="block text-[10px] text-[#ef4444] font-mono text-right font-bold">
                         — {citation.book}, Cap. {citation.chapter}, Pág. {citation.pagePhysical}
                       </span>
                     </div>
 
-                    {/* Impacto Pedagógico */}
-                    <div className="space-y-1 text-slate-300">
-                      <strong className="text-amber-300">Impacto en el Resultado:</strong>
-                      <p>{citation.pedagogicalImpact}</p>
+                    <div className="space-y-1 text-[#cccccc]">
+                      <strong className="text-[#ef4444] font-serif uppercase tracking-wider text-[10px] block">Impacto en el Resultado:</strong>
+                      <p className="text-[11px] leading-relaxed">{citation.pedagogicalImpact}</p>
                     </div>
 
-                    {/* Acción Correctiva y Deep Link */}
-                    <div className="pt-2 border-t border-slate-700/60 flex items-center justify-between gap-3">
-                      <div className="text-[11px] text-emerald-300">
-                        <strong>Remediación:</strong> {citation.remediationAdvice}
+                    <div className="pt-2.5 border-t border-[#222222] flex items-center justify-between gap-3 font-sans">
+                      <div className="text-[11px] text-white">
+                        <strong className="text-[#dc2626]">Remediación:</strong> {citation.remediationAdvice}
                       </div>
 
                       <button
                         onClick={() => handleOpenRagDeepLink(citation.ragDeepLinkQuery)}
-                        className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-medium text-[11px] rounded-lg shadow transition-colors"
+                        className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#dc2626] hover:bg-[#b91c1c] active:scale-95 text-white font-bold text-[11px] rounded-xl shadow-lg transition-colors cursor-pointer uppercase tracking-wider"
                       >
-                        <span>Profundizar con Asistente RAG</span>
+                        <span>Consultar RAG</span>
                         <ExternalLink size={12} />
                       </button>
                     </div>

@@ -72,14 +72,17 @@ test.describe('Simulador de Laboratorio: Pruebas E2E del Portal de Inicio y Fluj
     await page.locator('button', { hasText: 'Girar llave con golpe enérgico' }).click();
     await expect(page.locator('text=¡Pico de bureta purgado exitosamente!')).toBeVisible();
     await page.locator('button', { hasText: 'Volver a la Mesada' }).click();
+    await expect(page.locator('text=Inspección y Purga del Pico de la Bureta')).toBeHidden();
 
     // 5. Probar Gotero de Fenolftaleína Interactivo (IndicatorDropperModal)
+    await page.locator('button', { hasText: 'Gotero Fenolftaleína' }).scrollIntoViewIfNeeded();
     await page.locator('button', { hasText: 'Gotero Fenolftaleína' }).click();
     await expect(page.locator('text=Adición Táctil de Fenolftaleína con Gotero')).toBeVisible();
     await page.locator('button', { hasText: 'Apretar Perilla del Gotero' }).click();
     await page.locator('button', { hasText: 'Apretar Perilla del Gotero' }).click();
     await expect(page.locator('text=✓ Dosis analítica correcta alcanzada')).toBeVisible();
     await page.locator('button', { hasText: 'Volver a la Mesada' }).click();
+    await expect(page.locator('text=Adición Táctil de Fenolftaleína con Gotero')).toBeHidden();
 
     // Abrir libreta si es pantalla móvil
     const viewport = page.viewportSize();
@@ -97,7 +100,7 @@ test.describe('Simulador de Laboratorio: Pruebas E2E del Portal de Inicio y Fluj
     // Abrir Modal de Informe Formal
     await page.locator('button:visible', { hasText: 'Descargar Informe (PDF)' }).click();
     await expect(page.locator('text=Informe Oficial de Laboratorio')).toBeVisible();
-    await expect(page.locator('text=Alquímica-33').first()).toBeVisible();
+    await expect(page.locator('#printable-lab-report').locator('text=Alquímica-33').first()).toBeVisible();
     await expect(page.locator('text=Firma del Estudiante Evaluado')).toBeVisible();
     await page.locator('button', { hasText: 'Imprimir Informe' }).click();
     await page.locator('button:has(svg.lucide-x)').first().click();
